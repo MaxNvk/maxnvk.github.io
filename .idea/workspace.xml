@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="updated;" />
+    <list default="true" id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="small fix;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,6 +43,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "WebServerToolWindowFactoryState": "false",
     "com.codeium.enabled": "true",
     "git-widget-placeholder": "main",
@@ -63,7 +64,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-WS-243.24978.60" />
       </set>
     </attachedChunks>
   </component>
@@ -88,6 +89,7 @@
       <workItem from="1728376588553" duration="274000" />
       <workItem from="1728376947223" duration="38000" />
       <workItem from="1728378142040" duration="2492000" />
+      <workItem from="1739856650676" duration="37000" />
     </task>
     <task id="LOCAL-00002" summary="update;">
       <created>1668602831537</created>
@@ -152,7 +154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1728379443592</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="small fix;">
+      <option name="closed" value="true" />
+      <created>1739856681470</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1739856681470</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,6 +183,7 @@
     <MESSAGE value="update;" />
     <MESSAGE value="removed videos;" />
     <MESSAGE value="updated;" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated;" />
+    <MESSAGE value="small fix;" />
+    <option name="LAST_COMMIT_MESSAGE" value="small fix;" />
   </component>
 </project>

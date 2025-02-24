@@ -65,7 +65,7 @@ const remove = (arr, el) => {
 };
 const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
 const hasOwn = (val, key) => hasOwnProperty$1.call(val, key);
-const isArray = Array.isArray;
+const isArray$1 = Array.isArray;
 const isMap = (val) => toTypeString(val) === "[object Map]";
 const isSet = (val) => toTypeString(val) === "[object Set]";
 const isFunction = (val) => typeof val === "function";
@@ -135,7 +135,7 @@ const getGlobalThis = () => {
   return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
 };
 function normalizeStyle(value) {
-  if (isArray(value)) {
+  if (isArray$1(value)) {
     const res = {};
     for (let i = 0; i < value.length; i++) {
       const item = value[i];
@@ -168,7 +168,7 @@ function normalizeClass(value) {
   let res = "";
   if (isString(value)) {
     res = value;
-  } else if (isArray(value)) {
+  } else if (isArray$1(value)) {
     for (let i = 0; i < value.length; i++) {
       const normalized = normalizeClass(value[i]);
       if (normalized) {
@@ -193,7 +193,7 @@ const isRef$1 = (val) => {
   return !!(val && val["__v_isRef"] === true);
 };
 const toDisplayString = (val) => {
-  return isString(val) ? val : val == null ? "" : isArray(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? isRef$1(val) ? toDisplayString(val.value) : JSON.stringify(val, replacer, 2) : String(val);
+  return isString(val) ? val : val == null ? "" : isArray$1(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? isRef$1(val) ? toDisplayString(val.value) : JSON.stringify(val, replacer, 2) : String(val);
 };
 const replacer = (_key, val) => {
   if (isRef$1(val)) {
@@ -214,7 +214,7 @@ const replacer = (_key, val) => {
     };
   } else if (isSymbol(val)) {
     return stringifySymbol(val);
-  } else if (isObject(val) && !isArray(val) && !isPlainObject(val)) {
+  } else if (isObject(val) && !isArray$1(val) && !isPlainObject(val)) {
     return String(val);
   }
   return val;
@@ -748,7 +748,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
   if (type === "clear") {
     depsMap.forEach(run);
   } else {
-    const targetIsArray = isArray(target);
+    const targetIsArray = isArray$1(target);
     const isArrayIndex = targetIsArray && isIntegerKey(key);
     if (targetIsArray && key === "length") {
       const newLength = Number(newValue);
@@ -810,7 +810,7 @@ const arrayInstrumentations = {
   },
   concat(...args) {
     return reactiveReadArray(this).concat(
-      ...args.map((x) => isArray(x) ? reactiveReadArray(x) : x)
+      ...args.map((x) => isArray$1(x) ? reactiveReadArray(x) : x)
     );
   },
   entries() {
@@ -1000,7 +1000,7 @@ class BaseReactiveHandler {
       }
       return;
     }
-    const targetIsArray = isArray(target);
+    const targetIsArray = isArray$1(target);
     if (!isReadonly2) {
       let fn;
       if (targetIsArray && (fn = arrayInstrumentations[key])) {
@@ -1048,7 +1048,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
         oldValue = toRaw(oldValue);
         value = toRaw(value);
       }
-      if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
+      if (!isArray$1(target) && isRef(oldValue) && !isRef(value)) {
         if (isOldValueReadonly) {
           return false;
         } else {
@@ -1057,7 +1057,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
         }
       }
     }
-    const hadKey = isArray(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn(target, key);
+    const hadKey = isArray$1(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn(target, key);
     const result = Reflect.set(
       target,
       key,
@@ -1093,7 +1093,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
     track(
       target,
       "iterate",
-      isArray(target) ? "length" : ITERATE_KEY
+      isArray$1(target) ? "length" : ITERATE_KEY
     );
     return Reflect.ownKeys(target);
   }
@@ -1426,6 +1426,9 @@ function isRef(r) {
 function ref(value) {
   return createRef(value, false);
 }
+function shallowRef(value) {
+  return createRef(value, true);
+}
 function createRef(rawValue, shallow) {
   if (isRef(rawValue)) {
     return rawValue;
@@ -1561,7 +1564,7 @@ function watch$1(source, cb, options = EMPTY_OBJ) {
   } else if (isReactive(source)) {
     getter = () => reactiveGetter(source);
     forceTrigger = true;
-  } else if (isArray(source)) {
+  } else if (isArray$1(source)) {
     isMultiSource = true;
     forceTrigger = source.some((s) => isReactive(s) || isShallow(s));
     getter = () => source.map((s) => {
@@ -1695,7 +1698,7 @@ function traverse(value, depth = Infinity, seen) {
   depth--;
   if (isRef(value)) {
     traverse(value.value, depth, seen);
-  } else if (isArray(value)) {
+  } else if (isArray$1(value)) {
     for (let i = 0; i < value.length; i++) {
       traverse(value[i], depth, seen);
     }
@@ -1844,7 +1847,7 @@ function callWithAsyncErrorHandling(fn, instance, type, args) {
     }
     return res;
   }
-  if (isArray(fn)) {
+  if (isArray$1(fn)) {
     const values = [];
     for (let i = 0; i < fn.length; i++) {
       values.push(callWithAsyncErrorHandling(fn[i], instance, type, args));
@@ -1901,7 +1904,7 @@ function nextTick(fn) {
   const p = currentFlushPromise || resolvedPromise;
   return fn ? p.then(this ? fn.bind(this) : fn) : p;
 }
-function findInsertionIndex(id) {
+function findInsertionIndex$1(id) {
   let start = flushIndex + 1;
   let end = queue.length;
   while (start < end) {
@@ -1924,7 +1927,7 @@ function queueJob(job) {
     !(job.flags & 2) && jobId >= getId(lastJob)) {
       queue.push(job);
     } else {
-      queue.splice(findInsertionIndex(jobId), 0, job);
+      queue.splice(findInsertionIndex$1(jobId), 0, job);
     }
     job.flags |= 1;
     queueFlush();
@@ -1936,7 +1939,7 @@ function queueFlush() {
   }
 }
 function queuePostFlushCb(cb) {
-  if (!isArray(cb)) {
+  if (!isArray$1(cb)) {
     if (activePostFlushCbs && cb.id === -1) {
       activePostFlushCbs.splice(postFlushIndex + 1, 0, cb);
     } else if (!(cb.flags & 1)) {
@@ -2107,11 +2110,11 @@ function markAsyncBoundary(instance) {
   instance.ids = [instance.ids[0] + instance.ids[2]++ + "-", 0, 0];
 }
 function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
-  if (isArray(rawRef)) {
+  if (isArray$1(rawRef)) {
     rawRef.forEach(
       (r, i) => setRef(
         r,
-        oldRawRef && (isArray(oldRawRef) ? oldRawRef[i] : oldRawRef),
+        oldRawRef && (isArray$1(oldRawRef) ? oldRawRef[i] : oldRawRef),
         parentSuspense,
         vnode,
         isUnmount
@@ -2155,9 +2158,9 @@ function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
         if (rawRef.f) {
           const existing = _isString ? canSetSetupRef(ref3) ? setupState[ref3] : refs[ref3] : ref3.value;
           if (isUnmount) {
-            isArray(existing) && remove(existing, refValue);
+            isArray$1(existing) && remove(existing, refValue);
           } else {
-            if (!isArray(existing)) {
+            if (!isArray$1(existing)) {
               if (_isString) {
                 refs[ref3] = [refValue];
                 if (canSetSetupRef(ref3)) {
@@ -2808,7 +2811,7 @@ function resolve(registry, name) {
 function renderList(source, renderItem, cache, index) {
   let ret;
   const cached = cache;
-  const sourceIsArray = isArray(source);
+  const sourceIsArray = isArray$1(source);
   if (sourceIsArray || isString(source)) {
     const sourceIsReactiveArray = sourceIsArray && isReactive(source);
     let needsWrap = false;
@@ -2978,7 +2981,7 @@ const PublicInstanceProxyHandlers = {
   }
 };
 function normalizePropsOrEmits(props) {
-  return isArray(props) ? props.reduce(
+  return isArray$1(props) ? props.reduce(
     (normalized, p) => (normalized[p] = null, normalized),
     {}
   ) : props;
@@ -3078,7 +3081,7 @@ function applyOptions(instance) {
     callHook(created, instance, "c");
   }
   function registerLifecycleHook(register, hook) {
-    if (isArray(hook)) {
+    if (isArray$1(hook)) {
       hook.forEach((_hook) => register(_hook.bind(publicThis)));
     } else if (hook) {
       register(hook.bind(publicThis));
@@ -3096,7 +3099,7 @@ function applyOptions(instance) {
   registerLifecycleHook(onBeforeUnmount, beforeUnmount);
   registerLifecycleHook(onUnmounted, unmounted);
   registerLifecycleHook(onServerPrefetch, serverPrefetch);
-  if (isArray(expose)) {
+  if (isArray$1(expose)) {
     if (expose.length) {
       const exposed = instance.exposed || (instance.exposed = {});
       expose.forEach((key) => {
@@ -3122,7 +3125,7 @@ function applyOptions(instance) {
   }
 }
 function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) {
-  if (isArray(injectOptions)) {
+  if (isArray$1(injectOptions)) {
     injectOptions = normalizeInject(injectOptions);
   }
   for (const key in injectOptions) {
@@ -3155,7 +3158,7 @@ function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) 
 }
 function callHook(hook, instance, type) {
   callWithAsyncErrorHandling(
-    isArray(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
+    isArray$1(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
     instance,
     type
   );
@@ -3174,7 +3177,7 @@ function createWatcher(raw, ctx, publicThis, key) {
       watch(getter, raw.bind(publicThis));
     }
   } else if (isObject(raw)) {
-    if (isArray(raw)) {
+    if (isArray$1(raw)) {
       raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
     } else {
       const handler = isFunction(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
@@ -3204,24 +3207,24 @@ function resolveMergedOptions(instance) {
     resolved = {};
     if (globalMixins.length) {
       globalMixins.forEach(
-        (m) => mergeOptions(resolved, m, optionMergeStrategies, true)
+        (m) => mergeOptions$1(resolved, m, optionMergeStrategies, true)
       );
     }
-    mergeOptions(resolved, base, optionMergeStrategies);
+    mergeOptions$1(resolved, base, optionMergeStrategies);
   }
   if (isObject(base)) {
     cache.set(base, resolved);
   }
   return resolved;
 }
-function mergeOptions(to, from, strats, asMixin = false) {
+function mergeOptions$1(to, from, strats, asMixin = false) {
   const { mixins, extends: extendsOptions } = from;
   if (extendsOptions) {
-    mergeOptions(to, extendsOptions, strats, true);
+    mergeOptions$1(to, extendsOptions, strats, true);
   }
   if (mixins) {
     mixins.forEach(
-      (m) => mergeOptions(to, m, strats, true)
+      (m) => mergeOptions$1(to, m, strats, true)
     );
   }
   for (const key in from) {
@@ -3281,7 +3284,7 @@ function mergeInject(to, from) {
   return mergeObjectOptions(normalizeInject(to), normalizeInject(from));
 }
 function normalizeInject(raw) {
-  if (isArray(raw)) {
+  if (isArray$1(raw)) {
     const res = {};
     for (let i = 0; i < raw.length; i++) {
       res[raw[i]] = raw[i];
@@ -3298,7 +3301,7 @@ function mergeObjectOptions(to, from) {
 }
 function mergeEmitsOrPropsOptions(to, from) {
   if (to) {
-    if (isArray(to) && isArray(from)) {
+    if (isArray$1(to) && isArray$1(from)) {
       return [.../* @__PURE__ */ new Set([...to, ...from])];
     }
     return extend(
@@ -3701,7 +3704,7 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
     }
     return EMPTY_ARR;
   }
-  if (isArray(raw)) {
+  if (isArray$1(raw)) {
     for (let i = 0; i < raw.length; i++) {
       const normalizedKey = camelize(raw[i]);
       if (validatePropName(normalizedKey)) {
@@ -3713,11 +3716,11 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
       const normalizedKey = camelize(key);
       if (validatePropName(normalizedKey)) {
         const opt = raw[key];
-        const prop = normalized[normalizedKey] = isArray(opt) || isFunction(opt) ? { type: opt } : extend({}, opt);
+        const prop = normalized[normalizedKey] = isArray$1(opt) || isFunction(opt) ? { type: opt } : extend({}, opt);
         const propType = prop.type;
         let shouldCast = false;
         let shouldCastTrue = true;
-        if (isArray(propType)) {
+        if (isArray$1(propType)) {
           for (let index = 0; index < propType.length; ++index) {
             const type = propType[index];
             const typeName = isFunction(type) && type.name;
@@ -3758,8 +3761,8 @@ function validatePropName(key) {
   return false;
 }
 const isInternalKey = (key) => key[0] === "_" || key === "$stable";
-const normalizeSlotValue = (value) => isArray(value) ? value.map(normalizeVNode) : [normalizeVNode(value)];
-const normalizeSlot = (key, rawSlot, ctx) => {
+const normalizeSlotValue = (value) => isArray$1(value) ? value.map(normalizeVNode) : [normalizeVNode(value)];
+const normalizeSlot$1 = (key, rawSlot, ctx) => {
   if (rawSlot._n) {
     return rawSlot;
   }
@@ -3776,7 +3779,7 @@ const normalizeObjectSlots = (rawSlots, slots, instance) => {
     if (isInternalKey(key)) continue;
     const value = rawSlots[key];
     if (isFunction(value)) {
-      slots[key] = normalizeSlot(key, value, ctx);
+      slots[key] = normalizeSlot$1(key, value, ctx);
     } else if (value != null) {
       const normalized = normalizeSlotValue(value);
       slots[key] = () => normalized;
@@ -5116,7 +5119,7 @@ function needTransition(parentSuspense, transition) {
 function traverseStaticChildren(n1, n2, shallow = false) {
   const ch1 = n1.children;
   const ch2 = n2.children;
-  if (isArray(ch1) && isArray(ch2)) {
+  if (isArray$1(ch1) && isArray$1(ch2)) {
     for (let i = 0; i < ch1.length; i++) {
       const c1 = ch1[i];
       let c2 = ch2[i];
@@ -5365,7 +5368,7 @@ function normalizeEmitsOptions(comp, appContext, asMixin = false) {
     }
     return null;
   }
-  if (isArray(raw)) {
+  if (isArray$1(raw)) {
     raw.forEach((key) => normalized[key] = null);
   } else {
     extend(normalized, raw);
@@ -5577,7 +5580,7 @@ function updateHOCHostEl({ vnode, parent }, el) {
 const isSuspense = (type) => type.__isSuspense;
 function queueEffectWithSuspense(fn, suspense) {
   if (suspense && suspense.pendingBranch) {
-    if (isArray(fn)) {
+    if (isArray$1(fn)) {
       suspense.effects.push(...fn);
     } else {
       suspense.effects.push(fn);
@@ -5623,6 +5626,18 @@ function createElementBlock(type, props, children, patchFlag, dynamicProps, shap
       patchFlag,
       dynamicProps,
       shapeFlag,
+      true
+    )
+  );
+}
+function createBlock(type, props, children, patchFlag, dynamicProps) {
+  return setupBlock(
+    createVNode(
+      type,
+      props,
+      children,
+      patchFlag,
+      dynamicProps,
       true
     )
   );
@@ -5730,7 +5745,7 @@ function _createVNode(type, props = null, children = null, patchFlag = 0, dynami
       props.class = normalizeClass(klass);
     }
     if (isObject(style)) {
-      if (isProxy(style) && !isArray(style)) {
+      if (isProxy(style) && !isArray$1(style)) {
         style = extend({}, style);
       }
       props.style = normalizeStyle(style);
@@ -5765,7 +5780,7 @@ function cloneVNode(vnode, extraProps, mergeRef = false, cloneTransition = false
       // #2078 in the case of <component :is="vnode" ref="extra"/>
       // if the vnode itself already has a ref, cloneVNode will need to merge
       // the refs so the single vnode can be set on multiple refs
-      mergeRef && ref3 ? isArray(ref3) ? ref3.concat(normalizeRef(extraProps)) : [ref3, normalizeRef(extraProps)] : normalizeRef(extraProps)
+      mergeRef && ref3 ? isArray$1(ref3) ? ref3.concat(normalizeRef(extraProps)) : [ref3, normalizeRef(extraProps)] : normalizeRef(extraProps)
     ) : ref3,
     scopeId: vnode.scopeId,
     slotScopeIds: vnode.slotScopeIds,
@@ -5812,7 +5827,7 @@ function createTextVNode(text = " ", flag = 0) {
 function normalizeVNode(child) {
   if (child == null || typeof child === "boolean") {
     return createVNode(Comment);
-  } else if (isArray(child)) {
+  } else if (isArray$1(child)) {
     return createVNode(
       Fragment,
       null,
@@ -5833,7 +5848,7 @@ function normalizeChildren(vnode, children) {
   const { shapeFlag } = vnode;
   if (children == null) {
     children = null;
-  } else if (isArray(children)) {
+  } else if (isArray$1(children)) {
     type = 16;
   } else if (typeof children === "object") {
     if (shapeFlag & (1 | 64)) {
@@ -5887,7 +5902,7 @@ function mergeProps(...args) {
       } else if (isOn(key)) {
         const existing = ret[key];
         const incoming = toMerge[key];
-        if (incoming && existing !== incoming && !(isArray(existing) && existing.includes(incoming))) {
+        if (incoming && existing !== incoming && !(isArray$1(existing) && existing.includes(incoming))) {
           ret[key] = existing ? [].concat(existing, incoming) : incoming;
         }
       } else if (key !== "") {
@@ -6186,10 +6201,10 @@ const computed = (getterOrOptions, debugOptions) => {
   const c = computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
   return c;
 };
-function h$1(type, propsOrChildren, children) {
+function h(type, propsOrChildren, children) {
   const l = arguments.length;
   if (l === 2) {
-    if (isObject(propsOrChildren) && !isArray(propsOrChildren)) {
+    if (isObject(propsOrChildren) && !isArray$1(propsOrChildren)) {
       if (isVNode(propsOrChildren)) {
         return createVNode(type, null, [propsOrChildren]);
       }
@@ -6214,10 +6229,10 @@ const version = "3.5.13";
 * @license MIT
 **/
 let policy = void 0;
-const tt$1 = typeof window !== "undefined" && window.trustedTypes;
-if (tt$1) {
+const tt = typeof window !== "undefined" && window.trustedTypes;
+if (tt) {
   try {
-    policy = /* @__PURE__ */ tt$1.createPolicy("vue", {
+    policy = /* @__PURE__ */ tt.createPolicy("vue", {
       createHTML: (val) => val
     });
   } catch (e) {
@@ -6360,7 +6375,7 @@ function patchStyle(el, prev, next) {
 }
 const importantRE = /\s*!important$/;
 function setStyle(style, name, val) {
-  if (isArray(val)) {
+  if (isArray$1(val)) {
     val.forEach((v) => setStyle(style, name, v));
   } else {
     if (val == null) val = "";
@@ -6504,8 +6519,8 @@ function parseName(name) {
   return [event, options];
 }
 let cachedNow = 0;
-const p$3 = /* @__PURE__ */ Promise.resolve();
-const getNow = () => cachedNow || (p$3.then(() => cachedNow = 0), cachedNow = Date.now());
+const p$1 = /* @__PURE__ */ Promise.resolve();
+const getNow = () => cachedNow || (p$1.then(() => cachedNow = 0), cachedNow = Date.now());
 function createInvoker(initialValue, instance) {
   const invoker = (e) => {
     if (!e._vts) {
@@ -6525,7 +6540,7 @@ function createInvoker(initialValue, instance) {
   return invoker;
 }
 function patchStopImmediatePropagation(e, value) {
-  if (isArray(value)) {
+  if (isArray$1(value)) {
     const originalStop = e.stopImmediatePropagation;
     e.stopImmediatePropagation = () => {
       originalStop.call(e);
@@ -7951,320 +7966,6 @@ function ViteSSG(App, fn, options = {}) {
   return createApp$1;
 }
 
-var commonjsGlobal$1 = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-function getDefaultExportFromCjs (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
-
-var dayjs_min = {exports: {}};
-
-(function (module, exports) {
-	!function(t,e){module.exports=e();}(commonjsGlobal$1,(function(){var t=1e3,e=6e4,n=36e5,r="millisecond",i="second",s="minute",u="hour",a="day",o="week",c="month",f="quarter",h="year",d="date",l="Invalid Date",$=/^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/,y=/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g,M={name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_"),ordinal:function(t){var e=["th","st","nd","rd"],n=t%100;return "["+t+(e[(n-20)%10]||e[n]||e[0])+"]"}},m=function(t,e,n){var r=String(t);return !r||r.length>=e?t:""+Array(e+1-r.length).join(n)+t},v={s:m,z:function(t){var e=-t.utcOffset(),n=Math.abs(e),r=Math.floor(n/60),i=n%60;return (e<=0?"+":"-")+m(r,2,"0")+":"+m(i,2,"0")},m:function t(e,n){if(e.date()<n.date())return -t(n,e);var r=12*(n.year()-e.year())+(n.month()-e.month()),i=e.clone().add(r,c),s=n-i<0,u=e.clone().add(r+(s?-1:1),c);return +(-(r+(n-i)/(s?i-u:u-i))||0)},a:function(t){return t<0?Math.ceil(t)||0:Math.floor(t)},p:function(t){return {M:c,y:h,w:o,d:a,D:d,h:u,m:s,s:i,ms:r,Q:f}[t]||String(t||"").toLowerCase().replace(/s$/,"")},u:function(t){return void 0===t}},g="en",D={};D[g]=M;var p="$isDayjsObject",S=function(t){return t instanceof _||!(!t||!t[p])},w=function t(e,n,r){var i;if(!e)return g;if("string"==typeof e){var s=e.toLowerCase();D[s]&&(i=s),n&&(D[s]=n,i=s);var u=e.split("-");if(!i&&u.length>1)return t(u[0])}else {var a=e.name;D[a]=e,i=a;}return !r&&i&&(g=i),i||!r&&g},O=function(t,e){if(S(t))return t.clone();var n="object"==typeof e?e:{};return n.date=t,n.args=arguments,new _(n)},b=v;b.l=w,b.i=S,b.w=function(t,e){return O(t,{locale:e.$L,utc:e.$u,x:e.$x,$offset:e.$offset})};var _=function(){function M(t){this.$L=w(t.locale,null,true),this.parse(t),this.$x=this.$x||t.x||{},this[p]=true;}var m=M.prototype;return m.parse=function(t){this.$d=function(t){var e=t.date,n=t.utc;if(null===e)return new Date(NaN);if(b.u(e))return new Date;if(e instanceof Date)return new Date(e);if("string"==typeof e&&!/Z$/i.test(e)){var r=e.match($);if(r){var i=r[2]-1||0,s=(r[7]||"0").substring(0,3);return n?new Date(Date.UTC(r[1],i,r[3]||1,r[4]||0,r[5]||0,r[6]||0,s)):new Date(r[1],i,r[3]||1,r[4]||0,r[5]||0,r[6]||0,s)}}return new Date(e)}(t),this.init();},m.init=function(){var t=this.$d;this.$y=t.getFullYear(),this.$M=t.getMonth(),this.$D=t.getDate(),this.$W=t.getDay(),this.$H=t.getHours(),this.$m=t.getMinutes(),this.$s=t.getSeconds(),this.$ms=t.getMilliseconds();},m.$utils=function(){return b},m.isValid=function(){return !(this.$d.toString()===l)},m.isSame=function(t,e){var n=O(t);return this.startOf(e)<=n&&n<=this.endOf(e)},m.isAfter=function(t,e){return O(t)<this.startOf(e)},m.isBefore=function(t,e){return this.endOf(e)<O(t)},m.$g=function(t,e,n){return b.u(t)?this[e]:this.set(n,t)},m.unix=function(){return Math.floor(this.valueOf()/1e3)},m.valueOf=function(){return this.$d.getTime()},m.startOf=function(t,e){var n=this,r=!!b.u(e)||e,f=b.p(t),l=function(t,e){var i=b.w(n.$u?Date.UTC(n.$y,e,t):new Date(n.$y,e,t),n);return r?i:i.endOf(a)},$=function(t,e){return b.w(n.toDate()[t].apply(n.toDate("s"),(r?[0,0,0,0]:[23,59,59,999]).slice(e)),n)},y=this.$W,M=this.$M,m=this.$D,v="set"+(this.$u?"UTC":"");switch(f){case h:return r?l(1,0):l(31,11);case c:return r?l(1,M):l(0,M+1);case o:var g=this.$locale().weekStart||0,D=(y<g?y+7:y)-g;return l(r?m-D:m+(6-D),M);case a:case d:return $(v+"Hours",0);case u:return $(v+"Minutes",1);case s:return $(v+"Seconds",2);case i:return $(v+"Milliseconds",3);default:return this.clone()}},m.endOf=function(t){return this.startOf(t,false)},m.$set=function(t,e){var n,o=b.p(t),f="set"+(this.$u?"UTC":""),l=(n={},n[a]=f+"Date",n[d]=f+"Date",n[c]=f+"Month",n[h]=f+"FullYear",n[u]=f+"Hours",n[s]=f+"Minutes",n[i]=f+"Seconds",n[r]=f+"Milliseconds",n)[o],$=o===a?this.$D+(e-this.$W):e;if(o===c||o===h){var y=this.clone().set(d,1);y.$d[l]($),y.init(),this.$d=y.set(d,Math.min(this.$D,y.daysInMonth())).$d;}else l&&this.$d[l]($);return this.init(),this},m.set=function(t,e){return this.clone().$set(t,e)},m.get=function(t){return this[b.p(t)]()},m.add=function(r,f){var d,l=this;r=Number(r);var $=b.p(f),y=function(t){var e=O(l);return b.w(e.date(e.date()+Math.round(t*r)),l)};if($===c)return this.set(c,this.$M+r);if($===h)return this.set(h,this.$y+r);if($===a)return y(1);if($===o)return y(7);var M=(d={},d[s]=e,d[u]=n,d[i]=t,d)[$]||1,m=this.$d.getTime()+r*M;return b.w(m,this)},m.subtract=function(t,e){return this.add(-1*t,e)},m.format=function(t){var e=this,n=this.$locale();if(!this.isValid())return n.invalidDate||l;var r=t||"YYYY-MM-DDTHH:mm:ssZ",i=b.z(this),s=this.$H,u=this.$m,a=this.$M,o=n.weekdays,c=n.months,f=n.meridiem,h=function(t,n,i,s){return t&&(t[n]||t(e,r))||i[n].slice(0,s)},d=function(t){return b.s(s%12||12,t,"0")},$=f||function(t,e,n){var r=t<12?"AM":"PM";return n?r.toLowerCase():r};return r.replace(y,(function(t,r){return r||function(t){switch(t){case "YY":return String(e.$y).slice(-2);case "YYYY":return b.s(e.$y,4,"0");case "M":return a+1;case "MM":return b.s(a+1,2,"0");case "MMM":return h(n.monthsShort,a,c,3);case "MMMM":return h(c,a);case "D":return e.$D;case "DD":return b.s(e.$D,2,"0");case "d":return String(e.$W);case "dd":return h(n.weekdaysMin,e.$W,o,2);case "ddd":return h(n.weekdaysShort,e.$W,o,3);case "dddd":return o[e.$W];case "H":return String(s);case "HH":return b.s(s,2,"0");case "h":return d(1);case "hh":return d(2);case "a":return $(s,u,true);case "A":return $(s,u,false);case "m":return String(u);case "mm":return b.s(u,2,"0");case "s":return String(e.$s);case "ss":return b.s(e.$s,2,"0");case "SSS":return b.s(e.$ms,3,"0");case "Z":return i}return null}(t)||i.replace(":","")}))},m.utcOffset=function(){return 15*-Math.round(this.$d.getTimezoneOffset()/15)},m.diff=function(r,d,l){var $,y=this,M=b.p(d),m=O(r),v=(m.utcOffset()-this.utcOffset())*e,g=this-m,D=function(){return b.m(y,m)};switch(M){case h:$=D()/12;break;case c:$=D();break;case f:$=D()/3;break;case o:$=(g-v)/6048e5;break;case a:$=(g-v)/864e5;break;case u:$=g/n;break;case s:$=g/e;break;case i:$=g/t;break;default:$=g;}return l?$:b.a($)},m.daysInMonth=function(){return this.endOf(c).$D},m.$locale=function(){return D[this.$L]},m.locale=function(t,e){if(!t)return this.$L;var n=this.clone(),r=w(t,e,true);return r&&(n.$L=r),n},m.clone=function(){return b.w(this.$d,this)},m.toDate=function(){return new Date(this.valueOf())},m.toJSON=function(){return this.isValid()?this.toISOString():null},m.toISOString=function(){return this.$d.toISOString()},m.toString=function(){return this.$d.toUTCString()},M}(),k=_.prototype;return O.prototype=k,[["$ms",r],["$s",i],["$m",s],["$H",u],["$W",a],["$M",c],["$y",h],["$D",d]].forEach((function(t){k[t[1]]=function(e){return this.$g(e,t[0],t[1])};})),O.extend=function(t,e){return t.$i||(t(e,_,O),t.$i=true),O},O.locale=w,O.isDayjs=S,O.unix=function(t){return O(1e3*t)},O.en=D[g],O.Ls=D,O.p={},O})); 
-} (dayjs_min));
-
-var dayjs_minExports = dayjs_min.exports;
-const dayjs = /*@__PURE__*/getDefaultExportFromCjs(dayjs_minExports);
-
-var relativeTime$1 = {exports: {}};
-
-(function (module, exports) {
-	!function(r,e){module.exports=e();}(commonjsGlobal$1,(function(){return function(r,e,t){r=r||{};var n=e.prototype,o={future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"};function i(r,e,t,o){return n.fromToBase(r,e,t,o)}t.en.relativeTime=o,n.fromToBase=function(e,n,i,d,u){for(var f,a,s,l=i.$locale().relativeTime||o,h=r.thresholds||[{l:"s",r:44,d:"second"},{l:"m",r:89},{l:"mm",r:44,d:"minute"},{l:"h",r:89},{l:"hh",r:21,d:"hour"},{l:"d",r:35},{l:"dd",r:25,d:"day"},{l:"M",r:45},{l:"MM",r:10,d:"month"},{l:"y",r:17},{l:"yy",d:"year"}],m=h.length,c=0;c<m;c+=1){var y=h[c];y.d&&(f=d?t(e).diff(i,y.d,true):i.diff(e,y.d,true));var p=(r.rounding||Math.round)(Math.abs(f));if(s=f>0,p<=y.r||!y.r){p<=1&&c>0&&(y=h[c-1]);var v=l[y.l];u&&(p=u(""+p)),a="string"==typeof v?v.replace("%d",p):v(p,n,y.l,s);break}}if(n)return a;var M=s?l.future:l.past;return "function"==typeof M?M(a):M.replace("%s",a)},n.to=function(r,e){return i(r,e,this,true)},n.from=function(r,e){return i(r,e,this)};var d=function(r){return r.$u?t.utc():t()};n.toNow=function(r){return this.to(d(this),r)},n.fromNow=function(r){return this.from(d(this),r)};}})); 
-} (relativeTime$1));
-
-var relativeTimeExports = relativeTime$1.exports;
-const relativeTime = /*@__PURE__*/getDefaultExportFromCjs(relativeTimeExports);
-
-const WORKING_START_DATE = "2017-04-01";
-const TELEGRAM_LINK = "https://t.me/m_nkv";
-const EMAIL_ADDRESS = "max.novikov.work@gmail.com";
-
-const getDegreeSin = (degree) => Math.sin(degree * Math.PI / 180);
-
-var ERectColor = /* @__PURE__ */ ((ERectColor2) => {
-  ERectColor2["Yellow"] = "#ffcc00";
-  ERectColor2["Blue"] = "#0066cc";
-  ERectColor2["Black"] = "#000";
-  ERectColor2["Red"] = "#fa0202";
-  return ERectColor2;
-})(ERectColor || {});
-
-const ROWS_COUNT = 35;
-const COLS_COUNT = 45;
-const CIRCLE_DEGREES = 360;
-const WAVE_SIZE = 1.25;
-const RECT_SIZE = 1;
-const SHADOW_OFFSET = 4;
-const _sfc_main$7 = /* @__PURE__ */ defineComponent({
-  __name: "CanvasAnimation",
-  setup(__props) {
-    const DEGREE_STEP = CIRCLE_DEGREES / COLS_COUNT;
-    const LAST_ROW_INDEX = Math.floor(ROWS_COUNT / 2 - 1);
-    const TOP_POSITION = WAVE_SIZE * 2 + SHADOW_OFFSET;
-    const LEFT_POSITION = 1 + SHADOW_OFFSET;
-    const IMAGE_HEIGHT = ROWS_COUNT * RECT_SIZE + TOP_POSITION * 2 + WAVE_SIZE * 2 + SHADOW_OFFSET;
-    const IMAGE_WIDTH = COLS_COUNT + LEFT_POSITION * 2 + SHADOW_OFFSET;
-    const getAnimationState = (offset) => {
-      const topColor = (
-        /*isDarkMode.value ? ERectColor.Red :*/
-        ERectColor.Blue
-      );
-      const bottomColor = (
-        /*isDarkMode.value ? ERectColor.Black :*/
-        ERectColor.Yellow
-      );
-      const matrix = [];
-      for (let row = 0; row < ROWS_COUNT; row++) {
-        matrix[row] = [];
-        for (let col = 0; col < COLS_COUNT; col++) {
-          const degree = DEGREE_STEP * offset + DEGREE_STEP * col;
-          matrix[row][col] = {
-            color: row <= LAST_ROW_INDEX ? topColor : bottomColor,
-            x: LEFT_POSITION + col * RECT_SIZE,
-            y: TOP_POSITION + row * RECT_SIZE + getDegreeSin(degree) * WAVE_SIZE
-          };
-        }
-      }
-      return matrix;
-    };
-    const step = ref(0);
-    const timeout = ref(null);
-    const initializeAnimation = () => {
-      setCanvasSize();
-      draw(0);
-      setAnimation();
-    };
-    onMounted(initializeAnimation);
-    onUnmounted(() => {
-      clearTimeout(timeout.value);
-    });
-    const canvas = ref(null);
-    const setCanvasSize = () => {
-      const ctx = canvas.value.getContext("2d");
-      canvas.value.width = IMAGE_WIDTH;
-      canvas.value.height = IMAGE_HEIGHT;
-      const dpr = window.devicePixelRatio;
-      const rect = canvas.value.getBoundingClientRect();
-      canvas.value.width = rect.width * dpr;
-      canvas.value.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      canvas.value.style.width = `${rect.width}px`;
-      canvas.value.style.height = `${rect.height}px`;
-    };
-    const setAnimation = () => {
-      requestAnimationFrame(() => {
-        step.value = step.value >= COLS_COUNT ? 0 : step.value + 1;
-        draw(step.value);
-        timeout.value = setTimeout(setAnimation, 25);
-      });
-    };
-    const draw = (offset) => {
-      const ctx = canvas.value.getContext("2d", {
-        alpha: false
-      });
-      ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = "rgba(0,0,0, 0.65)";
-      ctx.shadowOffsetY = SHADOW_OFFSET;
-      ctx.shadowOffsetX = SHADOW_OFFSET;
-      const matrix = getAnimationState(offset);
-      matrix.forEach(
-        (row) => row.forEach((col) => {
-          ctx.fillStyle = col.color;
-          ctx.fillRect(col.x, col.y, RECT_SIZE, RECT_SIZE);
-        })
-      );
-    };
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("canvas", {
-        ref_key: "canvas",
-        ref: canvas
-      }, null, 512);
-    };
-  }
-});
-
-const _sfc_main$6 = defineComponent({
-  setup() {
-    return {
-      TELEGRAM_LINK,
-      EMAIL_ADDRESS
-    };
-  }
-});
-
-const _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
-  }
-  return target;
-};
-
-const _hoisted_1$5 = { class: "flex items-center gap-x-4" };
-const _hoisted_2$4 = ["href"];
-const _hoisted_3$3 = ["href"];
-function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_font_awesome_icon = resolveComponent("font-awesome-icon");
-  return openBlock(), createElementBlock("div", _hoisted_1$5, [
-    _cache[0] || (_cache[0] = createBaseVNode("strong", null, "My contacts:", -1)),
-    createBaseVNode("a", {
-      class: "text-red-400",
-      href: `mailto:${_ctx.EMAIL_ADDRESS}`
-    }, [
-      createVNode(_component_font_awesome_icon, { icon: "at" })
-    ], 8, _hoisted_2$4),
-    createBaseVNode("a", {
-      class: "text-red-400",
-      href: _ctx.TELEGRAM_LINK
-    }, [
-      createVNode(_component_font_awesome_icon, { icon: ["fa-brands", "telegram-plane"] })
-    ], 8, _hoisted_3$3)
-  ]);
-}
-const ContactsBlock = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$3]]);
-
-const _hoisted_1$4 = { class: "text-5xl font-semibold flex" };
-const _hoisted_2$3 = { class: "content-block__wrapper mt-12" };
-const _hoisted_3$2 = { class: "mb-3" };
-const _hoisted_4$1 = { class: "whitespace-nowrap" };
-const _sfc_main$5 = /* @__PURE__ */ defineComponent({
-  __name: "ContentBlock",
-  setup(__props) {
-    dayjs.extend(relativeTime);
-    const startWorkingDate = computed(() => {
-      return dayjs(WORKING_START_DATE).fromNow(true);
-    });
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("section", null, [
-        createBaseVNode("h1", _hoisted_1$4, [
-          _cache[0] || (_cache[0] = createTextVNode(" Hello. ")),
-          createVNode(_sfc_main$7, { class: "ml-1 mt-1 sm:mt-2.5" })
-        ]),
-        createBaseVNode("div", _hoisted_2$3, [
-          createBaseVNode("p", _hoisted_3$2, [
-            _cache[2] || (_cache[2] = createTextVNode(" My name is ")),
-            _cache[3] || (_cache[3] = createBaseVNode("strong", null, "Maksym Novikov.", -1)),
-            _cache[4] || (_cache[4] = createTextVNode(" I am a Front-end engineer with ")),
-            createBaseVNode("strong", null, [
-              createBaseVNode("span", _hoisted_4$1, toDisplayString(startWorkingDate.value), 1),
-              _cache[1] || (_cache[1] = createTextVNode(" of experience"))
-            ]),
-            _cache[5] || (_cache[5] = createTextVNode(" in developing projects of different scales. "))
-          ]),
-          _cache[6] || (_cache[6] = createBaseVNode("p", { class: "mb-3" }, " My primary responsibilities are developing projects from scratch and support of existing projects. I also had an experience of team management and working with customers. ", -1)),
-          _cache[7] || (_cache[7] = createBaseVNode("p", null, " I dedicate my free time to studying and contributing to open source. ", -1))
-        ]),
-        createVNode(ContactsBlock, { class: "mt-4" })
-      ]);
-    };
-  }
-});
-
-const workExperiencesList = [
-  {
-    title: "14Four | October 2023 - Present",
-    description: "Developed creative-focused client-side applications using React (Next) and Vue (Nuxt) for industry-leading brands such as Pepsi, Toyota, and Carmax, etc. Partnered closely with clients to deploy projects seamlessly in their environments, ensuring smooth transitions and providing ongoing support to maintain and optimize their digital platforms.",
-    techStack: "Vue.js, Nuxt.js, SSR, Composition API, TypeScript, WebSocket, Element UI, React.js, Next.js."
-  },
-  {
-    title: "Milan Art Institute | April 2021 - October 2023",
-    description: "My primary responsibilities is development of social network platform frontend part and admin panel for it from scratch.",
-    techStack: "Vue.js, Nuxt.js, SSR, Composition API, TypeScript, WebSocket, Element UI, React.js, Next.js."
-  },
-  {
-    title: "Kilian business consulting GmbHv | October 2019 - March 2021",
-    description: "Was responsible for development of customer personal cabinet UI, estimating of features development, code review.",
-    techStack: "Vue.js, Vuex, Gridsome, Bootstrap."
-  },
-  {
-    title: "Empat | June 2018 - April 2021",
-    description: "Was responsible for development of CRM systems on Vue.js, development of websites with Drupal/Wordpress CMS systems, estimation of new projects, support of existing projects mentoring of trainee engineers.",
-    techStack: "Vue.js, Nuxt.js, Vuex, React.js, Next.js, Redux, Gulp, Webpack, JQuery, PHP, Wordpress."
-  },
-  {
-    title: "Schrödinger's Cat Laboratory | April 2017 – June 2018",
-    description: "My primary tasks was development of landing pages, UI part of e-commerce websites, corporative websites.",
-    techStack: "HTML, Grunt, LESS, SCSS, CSS, JS, JQuery."
-  }
-];
-
-const _sfc_main$4 = defineComponent({
-  computed: {
-    experienceList() {
-      return workExperiencesList;
-    }
-  }
-});
-
-const _hoisted_1$3 = { class: "mt-12" };
-const _hoisted_2$2 = { class: "mt-6 list-disc pl-4" };
-const _hoisted_3$1 = { class: "font-semibold mb-1" };
-const _hoisted_4 = { class: "mb-3" };
-function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("section", _hoisted_1$3, [
-    _cache[1] || (_cache[1] = createBaseVNode("h2", { class: "text-2xl font-semibold" }, "Work experience", -1)),
-    createBaseVNode("ul", _hoisted_2$2, [
-      (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.experienceList, (item, key) => {
-        return openBlock(), createElementBlock("li", {
-          key,
-          class: "mb-6"
-        }, [
-          createBaseVNode("p", _hoisted_3$1, toDisplayString(item.title), 1),
-          createBaseVNode("p", _hoisted_4, toDisplayString(item.description), 1),
-          createBaseVNode("p", null, [
-            _cache[0] || (_cache[0] = createBaseVNode("strong", null, "Tech stack:", -1)),
-            createTextVNode(" " + toDisplayString(item.techStack), 1)
-          ])
-        ]);
-      }), 128))
-    ])
-  ]);
-}
-const WorkExperience = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$2]]);
-
-const workExamplesList = [
-  "https://www.artsocial.com/",
-  "https://input.propdo.ai/il/buyer-2",
-  "https://akurateco.com/",
-  "https://express-tehbud.com/",
-  "https://www.csi.org.ua/",
-  "https://empat.tech/",
-  "https://smartdome.ch/"
-];
-
-const _sfc_main$3 = defineComponent({
-  computed: {
-    examplesList() {
-      return workExamplesList;
-    }
-  }
-});
-
-const _hoisted_1$2 = { class: "mt-12" };
-const _hoisted_2$1 = { class: "mt-6 list-disc pl-4" };
-const _hoisted_3 = ["href"];
-function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("section", _hoisted_1$2, [
-    _cache[0] || (_cache[0] = createBaseVNode("h2", { class: "text-2xl font-semibold" }, "Examples of my work", -1)),
-    createBaseVNode("ul", _hoisted_2$1, [
-      (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.examplesList, (link) => {
-        return openBlock(), createElementBlock("li", {
-          key: link,
-          class: "mb-2"
-        }, [
-          createBaseVNode("a", {
-            href: link,
-            target: "_blank",
-            class: "text-red-400 border-b-2 border-dashed border-red-400"
-          }, toDisplayString(link), 9, _hoisted_3)
-        ]);
-      }), 128))
-    ])
-  ]);
-}
-const ExamplesOfWork = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$1]]);
-
 const setInitialTheme = () => {
   if (localStorage.theme === "dark" || !("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches) {
     document.body.classList.add("dark");
@@ -8273,207 +7974,11 @@ const setInitialTheme = () => {
   }
 };
 
-const events = {};
-function getIdGenerator() {
-  let lastId = 0;
-  return function getNextUniqueId2() {
-    lastId += 1;
-    return lastId;
-  };
-}
-const getNextUniqueId = getIdGenerator();
-function on$1(eventType, callback) {
-  const id = getNextUniqueId();
-  if (!events[eventType]) events[eventType] = {};
-  events[eventType][id] = callback;
-  return {
-    off() {
-      delete events[eventType][id];
-      if (Object.keys(events[eventType]).length === 0) delete events[eventType];
-    }
-  };
-}
-function dispatch(eventType, arg) {
-  if (!events[eventType]) return;
-  Object.keys(events[eventType]).forEach((key) => events[eventType][key](arg));
-}
-const EventBus = {
-  on: on$1,
-  dispatch
-};
-
-const useLocalStorage = (storageKey, defaultValue) => {
-  const eventBusKey = `${storageKey}-change`;
-  const offEventBus = ref(null);
-  const storageValue = ref(null);
-  const getStorageValue = () => {
-    const value = localStorage.getItem(storageKey);
-    storageValue.value = value;
-    return value;
-  };
-  const rawSetStorageValue = (newVal, triggerBus) => {
-    localStorage.setItem(storageKey, newVal);
-    storageValue.value = newVal;
-    if (!triggerBus) return;
-    EventBus.dispatch(eventBusKey);
-  };
-  const setStorageValue = (newVal) => {
-    rawSetStorageValue(newVal, true);
-  };
-  onMounted(() => {
-    const value = getStorageValue();
-    if (!value) {
-      rawSetStorageValue(defaultValue);
-      getStorageValue();
-    }
-    const { off } = EventBus.on(eventBusKey, () => {
-      getStorageValue();
-    });
-    offEventBus.value = off;
-  });
-  onUnmounted(() => {
-    offEventBus.value?.();
-  });
-  return { storageValue, setStorageValue };
-};
-
-const _sfc_main$2 = /* @__PURE__ */ defineComponent({
-  __name: "ThemeSwitcher",
+const _sfc_main$7 = /* @__PURE__ */ defineComponent({
+  __name: "App",
   setup(__props) {
-    const { setStorageValue } = useLocalStorage("theme", "light");
-    const onClick = () => {
-      if (document.body.classList.contains("dark")) {
-        document.body.classList.remove("dark");
-        setStorageValue("light");
-      } else {
-        document.body.classList.add("dark");
-        setStorageValue("dark");
-      }
-    };
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("button", { onClick });
-    };
-  }
-});
-
-const ThemeSwitcher = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-828acd8f"]]);
-
-var t$2="undefined"!=typeof self?self:{};function e(e,n){t:{for(var r=["CLOSURE_FLAGS"],i=t$2,s=0;s<r.length;s++)if(null==(i=i[r[s]])){r=null;break t}r=i;}return null!=(e=r&&r[e])?e:n}function n(){throw Error("Invalid UTF8")}function r$2(t,e){return e=String.fromCharCode.apply(null,e),null==t?e:t+e}let i,s$1;const o$1="undefined"!=typeof TextDecoder;let a;const h="undefined"!=typeof TextEncoder;function c(t){if(h)t=(a||=new TextEncoder).encode(t);else {let n=0;const r=new Uint8Array(3*t.length);for(let i=0;i<t.length;i++){var e=t.charCodeAt(i);if(e<128)r[n++]=e;else {if(e<2048)r[n++]=e>>6|192;else {if(e>=55296&&e<=57343){if(e<=56319&&i<t.length){const s=t.charCodeAt(++i);if(s>=56320&&s<=57343){e=1024*(e-55296)+s-56320+65536,r[n++]=e>>18|240,r[n++]=e>>12&63|128,r[n++]=e>>6&63|128,r[n++]=63&e|128;continue}i--;}e=65533;}r[n++]=e>>12|224,r[n++]=e>>6&63|128;}r[n++]=63&e|128;}}t=n===r.length?r:r.subarray(0,n);}return t}var u,l=e(610401301,false),f=e(645172343,e(1,true)),d=e(660014094,false);const p$1=t$2.navigator;function g$1(t){return !!l&&(!!u&&u.brands.some((({brand:e})=>e&&-1!=e.indexOf(t))))}function m(e){var n;return (n=t$2.navigator)&&(n=n.userAgent)||(n=""),-1!=n.indexOf(e)}function y(){return !!l&&(!!u&&u.brands.length>0)}function _(){return y()?g$1("Chromium"):(m("Chrome")||m("CriOS"))&&!(!y()&&m("Edge"))||m("Silk")}function v(t){return v[" "](t),t}u=p$1&&p$1.userAgentData||null,v[" "]=function(){};var E=!y()&&(m("Trident")||m("MSIE"));!m("Android")||_(),_(),m("Safari")&&(_()||!y()&&m("Coast")||!y()&&m("Opera")||!y()&&m("Edge")||(y()?g$1("Microsoft Edge"):m("Edg/"))||y()&&g$1("Opera"));var w$1={},T=null;function A$1(t){var e=t.length,n=3*e/4;n%3?n=Math.floor(n):-1!="=.".indexOf(t[e-1])&&(n=-1!="=.".indexOf(t[e-2])?n-2:n-1);var r=new Uint8Array(n),i=0;return function(t,e){function n(e){for(;r<t.length;){var n=t.charAt(r++),i=T[n];if(null!=i)return i;if(!/^[\s\xa0]*$/.test(n))throw Error("Unknown base64 encoding at char: "+n)}return e}b();for(var r=0;;){var i=n(-1),s=n(0),o=n(64),a=n(64);if(64===a&&-1===i)break;e(i<<2|s>>4),64!=o&&(e(s<<4&240|o>>2),64!=a&&e(o<<6&192|a));}}(t,(function(t){r[i++]=t;})),i!==n?r.subarray(0,i):r}function b(){if(!T){T={};for(var t="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""),e=["+/=","+/","-_=","-_.","-_"],n=0;n<5;n++){var r=t.concat(e[n].split(""));w$1[n]=r;for(var i=0;i<r.length;i++){var s=r[i];void 0===T[s]&&(T[s]=i);}}}}var k="undefined"!=typeof Uint8Array,S$1=!E&&"function"==typeof btoa;function x$1(t){if(!S$1){var e;void 0===e&&(e=0),b(),e=w$1[e];var n=Array(Math.floor(t.length/3)),r=e[64]||"";let h=0,c=0;for(;h<t.length-2;h+=3){var i=t[h],s=t[h+1],o=t[h+2],a=e[i>>2];i=e[(3&i)<<4|s>>4],s=e[(15&s)<<2|o>>6],o=e[63&o],n[c++]=a+i+s+o;}switch(a=0,o=r,t.length-h){case 2:o=e[(15&(a=t[h+1]))<<2]||r;case 1:t=t[h],n[c]=e[t>>2]+e[(3&t)<<4|a>>4]+o+r;}return n.join("")}for(e="",n=0,r=t.length-10240;n<r;)e+=String.fromCharCode.apply(null,t.subarray(n,n+=10240));return e+=String.fromCharCode.apply(null,n?t.subarray(n):t),btoa(e)}const L$1=/[-_.]/g,F={"-":"+",_:"/",".":"="};function R(t){return F[t]||""}function M(t){if(!S$1)return A$1(t);L$1.test(t)&&(t=t.replace(L$1,R)),t=atob(t);const e=new Uint8Array(t.length);for(let n=0;n<t.length;n++)e[n]=t.charCodeAt(n);return e}function I(t){return k&&null!=t&&t instanceof Uint8Array}var P$1={};let O;function C(t){if(t!==P$1)throw Error("illegal external caller")}function U(){return O||=new D(null,P$1)}function N(t){C(P$1);var e=t.g;return null==(e=null==e||I(e)?e:"string"==typeof e?M(e):null)?e:t.g=e}var D=class{constructor(t,e){if(C(e),this.g=t,null!=t&&0===t.length)throw Error("ByteString should be constructed with non-empty values")}h(){return new Uint8Array(N(this)||0)}};function B(t,e){t.__closure__error__context__984382||(t.__closure__error__context__984382={}),t.__closure__error__context__984382.severity=e;}let G$1;function j(){const e=Error();B(e,"incident"),function(e){t$2.setTimeout((()=>{throw e}),0);}(e);}function V(t){return B(t=Error(t),"warning"),t}function X(){return "function"==typeof BigInt}function H(t){return Array.prototype.slice.call(t)}var W="function"==typeof Symbol&&"symbol"==typeof Symbol();function z(t){return "function"==typeof Symbol&&"symbol"==typeof Symbol()?Symbol():t}var K=z(),Y=z("0di"),$=z("2ex"),q=z("1oa"),Z=W?(t,e)=>{t[K]|=e;}:(t,e)=>{ void 0!==t.g?t.g|=e:Object.defineProperties(t,{g:{value:e,configurable:true,writable:true,enumerable:false}});},Q=W?(t,e)=>{t[K]&=~e;}:(t,e)=>{ void 0!==t.g&&(t.g&=~e);},tt=W?t=>0|t[K]:t=>0|t.g,et=W?t=>t[K]:t=>t.g,nt=W?(t,e)=>{t[K]=e;}:(t,e)=>{ void 0!==t.g?t.g=e:Object.defineProperties(t,{g:{value:e,configurable:true,writable:true,enumerable:false}});};function rt(t){return Z(t,34),t}function it(t,e){nt(e,-14591&(0|t));}function st(t,e){nt(e,-14557&(34|t));}var ot,at={},ht={};function ct(t){return !(!t||"object"!=typeof t||t.Ja!==ht)}function ut(t){return null!==t&&"object"==typeof t&&!Array.isArray(t)&&t.constructor===Object}function lt$1(t,e,n){if(null!=t)if("string"==typeof t)t=t?new D(t,P$1):U();else if(t.constructor!==D)if(I(t))t=t.length?new D(n?t:new Uint8Array(t),P$1):U();else {if(!e)throw Error();t=void 0;}return t}function ft(t){return !(!Array.isArray(t)||t.length)&&!!(1&tt(t))}const dt=[];function pt$1(t){if(2&t)throw Error()}nt(dt,55),ot=Object.freeze(dt);class gt{constructor(t,e,n){this.l=0,this.g=t,this.h=e,this.m=n;}next(){if(this.l<this.g.length){const t=this.g[this.l++];return {done:false,value:this.h?this.h.call(this.m,t):t}}return {done:true,value:void 0}}[Symbol.iterator](){return new gt(this.g,this.h,this.m)}}let mt,yt;function _t(t,e){(e=mt?e[mt]:void 0)&&(t[mt]=H(e));}var vt=Object.freeze({});var Et$1=Object.freeze({});const wt="function"==typeof Uint8Array.prototype.slice;let Tt,At$1=0,bt=0;function kt(t){const e=t>>>0;At$1=e,bt=(t-e)/4294967296>>>0;}function St$1(t){if(t<0){kt(-t);const[e,n]=Pt(At$1,bt);At$1=e>>>0,bt=n>>>0;}else kt(t);}function xt$1(t){const e=Tt||=new DataView(new ArrayBuffer(8));e.setFloat32(0,+t,true),bt=0,At$1=e.getUint32(0,true);}function Lt$1(t,e){return 4294967296*e+(t>>>0)}function Ft$1(t,e){const n=2147483648&e;return n&&(e=~e>>>0,0==(t=1+~t>>>0)&&(e=e+1>>>0)),t=Lt$1(t,e),n?-t:t}function Rt(t,e){if(t>>>=0,(e>>>=0)<=2097151)var n=""+(4294967296*e+t);else X()?n=""+(BigInt(e)<<BigInt(32)|BigInt(t)):(t=(16777215&t)+6777216*(n=16777215&(t>>>24|e<<8))+6710656*(e=e>>16&65535),n+=8147497*e,e*=2,t>=1e7&&(n+=t/1e7>>>0,t%=1e7),n>=1e7&&(e+=n/1e7>>>0,n%=1e7),n=e+Mt(n)+Mt(t));return n}function Mt(t){return t=String(t),"0000000".slice(t.length)+t}function It(t){if(t.length<16)St$1(Number(t));else if(X())t=BigInt(t),At$1=Number(t&BigInt(4294967295))>>>0,bt=Number(t>>BigInt(32)&BigInt(4294967295));else {const e=+("-"===t[0]);bt=At$1=0;const n=t.length;for(let r=e,i=(n-e)%6+e;i<=n;r=i,i+=6){const e=Number(t.slice(r,i));bt*=1e6,At$1=1e6*At$1+e,At$1>=4294967296&&(bt+=Math.trunc(At$1/4294967296),bt>>>=0,At$1>>>=0);}if(e){const[t,e]=Pt(At$1,bt);At$1=t,bt=e;}}}function Pt(t,e){return e=~e,t?t=1+~t:e+=1,[t,e]}function Ot(t){return t.Qa=true,t}var Ct$1=Ot((t=>"number"==typeof t)),Ut=Ot((t=>"string"==typeof t)),Nt=Ot((t=>"boolean"==typeof t)),Dt="function"==typeof t$2.BigInt&&"bigint"==typeof t$2.BigInt(0),Bt=Ot((t=>Dt?t>=jt&&t<=Xt:"-"===t[0]?Ht(t,Gt):Ht(t,Vt)));const Gt=Number.MIN_SAFE_INTEGER.toString(),jt=Dt?BigInt(Number.MIN_SAFE_INTEGER):void 0,Vt=Number.MAX_SAFE_INTEGER.toString(),Xt=Dt?BigInt(Number.MAX_SAFE_INTEGER):void 0;function Ht(t,e){if(t.length>e.length)return  false;if(t.length<e.length||t===e)return  true;for(let n=0;n<t.length;n++){const r=t[n],i=e[n];if(r>i)return  false;if(r<i)return  true}}function Wt$1(t){return null==t||"number"==typeof t?t:"NaN"===t||"Infinity"===t||"-Infinity"===t?Number(t):void 0}function zt(t){return null==t||"boolean"==typeof t?t:"number"==typeof t?!!t:void 0}const Kt=/^-?([1-9][0-9]*|0)(\.[0-9]+)?$/;function Yt$1(t){const e=typeof t;switch(e){case "bigint":return  true;case "number":return Number.isFinite(t)}return "string"===e&&Kt.test(t)}function $t(t){if(null==t)return t;if("string"==typeof t){if(!t)return;t=+t;}return "number"==typeof t&&Number.isFinite(t)?0|t:void 0}function qt(t){if(null==t)return t;if("string"==typeof t){if(!t)return;t=+t;}return "number"==typeof t&&Number.isFinite(t)?t>>>0:void 0}function Jt(t){return "-"!==t[0]&&(t.length<20||20===t.length&&Number(t.substring(0,6))<184467)}function Zt(t){return t=Math.trunc(t),Number.isSafeInteger(t)||(St$1(t),t=Ft$1(At$1,bt)),t}function Qt(t){var e=Math.trunc(Number(t));if(Number.isSafeInteger(e))return String(e);if(-1!==(e=t.indexOf("."))&&(t=t.substring(0,e)),!("-"===t[0]?t.length<20||20===t.length&&Number(t.substring(0,7))>-922337:t.length<19||19===t.length&&Number(t.substring(0,6))<922337))if(It(t),t=At$1,2147483648&(e=bt))if(X())t=""+(BigInt(0|e)<<BigInt(32)|BigInt(t>>>0));else {const[n,r]=Pt(t,e);t="-"+Rt(n,r);}else t=Rt(t,e);return t}function te(t){return null==t?t:"bigint"==typeof t?(Bt(t)?t=Number(t):(t=BigInt.asIntN(64,t),t=Bt(t)?Number(t):String(t)),t):Yt$1(t)?"number"==typeof t?Zt(t):Qt(t):void 0}function ee(t){if(null==t)return t;var e=typeof t;if("bigint"===e)return String(BigInt.asUintN(64,t));if(Yt$1(t)){if("string"===e)return e=Math.trunc(Number(t)),Number.isSafeInteger(e)&&e>=0?t=String(e):(-1!==(e=t.indexOf("."))&&(t=t.substring(0,e)),Jt(t)||(It(t),t=Rt(At$1,bt))),t;if("number"===e)return (t=Math.trunc(t))>=0&&Number.isSafeInteger(t)?t:function(t){if(t<0){St$1(t);const e=Rt(At$1,bt);return t=Number(e),Number.isSafeInteger(t)?t:e}return Jt(String(t))?t:(St$1(t),Lt$1(At$1,bt))}(t)}}function ne(t){if("string"!=typeof t)throw Error();return t}function re(t){if(null!=t&&"string"!=typeof t)throw Error();return t}function ie(t){return null==t||"string"==typeof t?t:void 0}function se(t,e,n,r){if(null!=t&&"object"==typeof t&&t.Y===at)return t;if(!Array.isArray(t))return n?2&r?(t=e[Y])?e=t:(rt((t=new e).u),e=e[Y]=t):e=new e:e=void 0,e;let i=n=tt(t);return 0===i&&(i|=32&r),i|=2&r,i!==n&&nt(t,i),new e(t)}function oe(t,e,n){if(e)t:{if(!Yt$1(e=t))throw V("int64");switch(typeof e){case "string":e=Qt(e);break t;case "bigint":if(t=e=BigInt.asIntN(64,e),Ut(t)){if(!/^\s*(?:-?[1-9]\d*|0)?\s*$/.test(t))throw Error(String(t))}else if(Ct$1(t)&&!Number.isSafeInteger(t))throw Error(String(t));e=Dt?BigInt(e):Nt(e)?e?"1":"0":Ut(e)?e.trim()||"0":String(e);break t;default:e=Zt(e);}}else e=te(t);return "string"==typeof(n=null==(t=e)?n?0:void 0:t)&&(e=+n,Number.isSafeInteger(e))?e:n}function ae(t){var e=he?.get(t);if(e)return e;if(Math.random()>.01)return t;if(void 0===ue)if("function"!=typeof Proxy)ue=null;else try{ue=-1!==Proxy.toString().indexOf("[native code]")?Proxy:null;}catch{ue=null;}return (e=ue)?(function(t,e){(he||=new WeakMap).set(t,e),(ce||=new WeakMap).set(e,t);}(t,e=new e(t,{set:(t,e,n)=>(j(),t[e]=n,true)})),e):t}let he,ce,ue,le,fe,de;function pe(t){switch(typeof t){case "boolean":return fe||=[0,void 0,true];case "number":return t>0?void 0:0===t?de||=[0,void 0]:[-t,void 0];case "string":return [0,t];case "object":return t}}function ge(t,e){return me(t,e[0],e[1])}function me(t,e,n){if(null==t&&(t=le),le=void 0,null==t){var r=96;n?(t=[n],r|=512):t=[],e&&(r=-16760833&r|(1023&e)<<14);}else {if(!Array.isArray(t))throw Error("narr");if(2048&(r=tt(t)))throw Error("farr");if(64&r)return t;if(r|=64,n&&(r|=512,n!==t[0]))throw Error("mid");t:{const i=(n=t).length;if(i){const t=i-1;if(ut(n[t])){if((e=t-(+!!(512&(r|=256))-1))>=1024)throw Error("pvtlmt");r=-16760833&r|(1023&e)<<14;break t}}if(e){if((e=Math.max(e,i-(+!!(512&r)-1)))>1024)throw Error("spvt");r=-16760833&r|(1023&e)<<14;}}}return nt(t,r),t}const ye={};let _e=function(){try{return v(new class extends Map{constructor(){super();}}),!1}catch{return  true}}();class ve{constructor(){this.g=new Map;}get(t){return this.g.get(t)}set(t,e){return this.g.set(t,e),this.size=this.g.size,this}delete(t){return t=this.g.delete(t),this.size=this.g.size,t}clear(){this.g.clear(),this.size=this.g.size;}has(t){return this.g.has(t)}entries(){return this.g.entries()}keys(){return this.g.keys()}values(){return this.g.values()}forEach(t,e){return this.g.forEach(t,e)}[Symbol.iterator](){return this.entries()}}const Ee=_e?(Object.setPrototypeOf(ve.prototype,Map.prototype),Object.defineProperties(ve.prototype,{size:{value:0,configurable:true,enumerable:true,writable:true}}),ve):class extends Map{constructor(){super();}};function we(t){return t}function Te(t){if(2&t.L)throw Error("Cannot mutate an immutable Map")}var Ae=class extends Ee{constructor(t,e,n=we,r=we){super();let i=tt(t);i|=64,nt(t,i),this.L=i,this.V=e,this.S=n,this.aa=this.V?be:r;for(let s=0;s<t.length;s++){const o=t[s],a=n(o[0],false,true);let h=o[1];e?void 0===h&&(h=null):h=r(o[1],false,true,void 0,void 0,i),super.set(a,h);}}oa(t=ke){if(0!==this.size)return this.Z(t)}Z(t=ke){const e=[],n=super.entries();for(var r;!(r=n.next()).done;)(r=r.value)[0]=t(r[0]),r[1]=t(r[1]),e.push(r);return e}clear(){Te(this),super.clear();}delete(t){return Te(this),super.delete(this.S(t,true,false))}entries(){var t=this.na();return new gt(t,Se,this)}keys(){return this.Ia()}values(){var t=this.na();return new gt(t,Ae.prototype.get,this)}forEach(t,e){super.forEach(((n,r)=>{t.call(e,this.get(r),r,this);}));}set(t,e){return Te(this),null==(t=this.S(t,true,false))?this:null==e?(super.delete(t),this):super.set(t,this.aa(e,true,true,this.V,false,this.L))}Oa(t){const e=this.S(t[0],false,true);t=t[1],t=this.V?void 0===t?null:t:this.aa(t,false,true,void 0,false,this.L),super.set(e,t);}has(t){return super.has(this.S(t,false,false))}get(t){t=this.S(t,false,false);const e=super.get(t);if(void 0!==e){var n=this.V;return n?((n=this.aa(e,false,true,n,this.ta,this.L))!==e&&super.set(t,n),n):e}}na(){return Array.from(super.keys())}Ia(){return super.keys()}[Symbol.iterator](){return this.entries()}};function be(t,e,n,r,i,s){return t=se(t,r,n,s),i&&(t=Ue(t)),t}function ke(t){return t}function Se(t){return [t,this.get(t)]}let xe;function Le(){return xe||=new Ae(rt([]),void 0,void 0,void 0,ye)}function Fe(t,e,n,r,i){if(null!=t){if(Array.isArray(t))t=ft(t)?void 0:i&&2&tt(t)?t:Re(t,e,n,void 0!==r,i);else if(ut(t)){const s={};for(let o in t)s[o]=Fe(t[o],e,n,r,i);t=s;}else t=e(t,r);return t}}function Re(t,e,n,r,i){const s=r||n?tt(t):0;r=r?!!(32&s):void 0;const o=H(t);for(let t=0;t<o.length;t++)o[t]=Fe(o[t],e,n,r,i);return n&&(_t(o,t),n(s,o)),o}function Me(t){return Fe(t,Ie,void 0,void 0,false)}function Ie(t){return t.Y===at?t.toJSON():t instanceof Ae?t.oa(Me):function(t){switch(typeof t){case "number":return isFinite(t)?t:String(t);case "bigint":return Bt(t)?Number(t):String(t);case "boolean":return t?1:0;case "object":if(t)if(Array.isArray(t)){if(ft(t))return}else {if(I(t))return x$1(t);if(t instanceof D){const e=t.g;return null==e?"":"string"==typeof e?e:t.g=x$1(e)}if(t instanceof Ae)return t.oa()}}return t}(t)}function Pe(t,e,n=st){if(null!=t){if(k&&t instanceof Uint8Array)return e?t:new Uint8Array(t);if(Array.isArray(t)){var r=tt(t);return 2&r?t:(e&&=0===r||!!(32&r)&&!(64&r||!(16&r)),e?(nt(t,-12293&(34|r)),t):Re(t,Pe,4&r?st:n,true,true))}return t.Y===at?(n=t.u,t=2&(r=et(n))?t:Oe(t,n,r,true)):t instanceof Ae&&!(2&t.L)&&(n=rt(t.Z(Pe)),t=new Ae(n,t.V,t.S,t.aa)),t}}function Oe(t,e,n,r){return t=t.constructor,le=e=Ce(e,n,r),e=new t(e),le=void 0,e}function Ce(t,e,n){const r=n||2&e?st:it,i=!!(32&e);return t=function(t,e,n){const r=H(t);var i=r.length;const s=256&e?r[i-1]:void 0;for(i+=s?-1:0,e=512&e?1:0;e<i;e++)r[e]=n(r[e]);if(s){e=r[e]={};for(const t in s)e[t]=n(s[t]);}return _t(r,t),r}(t,e,(t=>Pe(t,i,r))),Z(t,32|(n?2:0)),t}function Ue(t){const e=t.u,n=et(e);return 2&n?Oe(t,e,n,false):t}function Ne(t,e,n,r){return !(4&e)||null!=n}function De(t,e){return Ge(t=t.u,et(t),e)}function Be(t,e,n,r){if(!((e=r+(+!!(512&e)-1))<0||e>=t.length||e>=n))return t[e]}function Ge(t,e,n,r){if(-1===n)return null;const i=e>>14&1023||536870912;if(!(n>=i)){var s=t.length;return r&&256&e&&null!=(r=t[s-1][n])?(Be(t,e,i,n)&&null!=$&&((e=(t=G$1??={})[$]||0)>=4||(t[$]=e+1,j())),r):Be(t,e,i,n)}return 256&e?t[t.length-1][n]:void 0}function je(t,e,n,r){const i=t.u;let s=et(i);return pt$1(s),Ve(i,s,e,n,r),t}function Ve(t,e,n,r,i){const s=e>>14&1023||536870912;if(n>=s||i&&!f){let o=e;if(256&e)i=t[t.length-1];else {if(null==r)return o;i=t[s+(+!!(512&e)-1)]={},o|=256;}return i[n]=r,n<s&&(t[n+(+!!(512&e)-1)]=void 0),o!==e&&nt(t,o),o}return t[n+(+!!(512&e)-1)]=r,256&e&&(n in(t=t[t.length-1])&&delete t[n]),e}function Xe(t,e,n,r,i){var s=2&e;let o=Ge(t,e,n,i);Array.isArray(o)||(o=ot);const a=!(2&r);r=!(1&r);const h=!!(32&e);let c=tt(o);return 0!==c||!h||s||a?1&c||(c|=1,nt(o,c)):(c|=33,nt(o,c)),s?(t=false,2&c||(rt(o),t=!!(4&c)),(r||t)&&Object.freeze(o)):(s=!!(2&c)||!!(2048&c),r&&s?(o=H(o),r=1,h&&!a&&(r|=32),nt(o,r),Ve(t,e,n,o,i)):a&&32&c&&!s&&Q(o,32)),o}function He(t,e){t=t.u;let n=et(t);const r=Ge(t,n,e),i=Wt$1(r);return null!=i&&i!==r&&Ve(t,n,e,i),i}function We(t){t=t.u;let e=et(t);const n=Ge(t,e,1),r=lt$1(n,true,!!(34&e));return null!=r&&r!==n&&Ve(t,e,1,r),r}function ze(t,e,n){var r=void 0===vt?2:5;const i=t.u;var s=et(i);const o=2&s?1:r;r=Ke(i,s,e);var a=tt(r);if(Ne(t,a,void 0)){(4&a||Object.isFrozen(r))&&(r=H(r),a=fn(a,s),s=Ve(i,s,e,r));let o=t=0;for(;t<r.length;t++){const e=n(r[t]);null!=e&&(r[o++]=e);}o<t&&(r.length=o),a=-4097&(20|(a=Ye(a,s))),nt(r,a&=-8193),2&a&&Object.freeze(r);}let h;return 1===o||4===o&&32&a?$e(a)||(s=a,(a|=2)!==s&&nt(r,a),Object.freeze(r)):(n=5===o&&(!!(32&a)||$e(a)||!!he?.get(r)),(2===o||n)&&$e(a)&&(r=H(r),a=dn(a=fn(a,s),s,false),nt(r,a),s=Ve(i,s,e,r)),$e(a)||(e=a,(a=dn(a,s,false))!==e&&nt(r,a)),n&&(h=ae(r))),h||r}function Ke(t,e,n){return t=Ge(t,e,n),Array.isArray(t)?t:ot}function Ye(t,e){return 0===t&&(t=fn(t,e)),1|t}function $e(t){return !!(2&t)&&!!(4&t)||!!(2048&t)}function qe(t){t=H(t);for(let e=0;e<t.length;e++){const n=t[e]=H(t[e]);Array.isArray(n[1])&&(n[1]=rt(n[1]));}return t}function Je(t,e,n,r){t=t.u;let i=et(t);pt$1(i),Ve(t,i,e,("0"===r?0===Number(n):n===r)?void 0:n);}function Ze(t,e,n,r){const i=et(t);pt$1(i),t=Xe(t,i,e,2),r=n(r,(4&(e=tt(t))?4096&e?4096:8192&e?8192:0:void 0)??0),t.push(r);}function Qe(t){return t}function tn(t,e){var n=_s;return rn(en(t=t.u),t,et(t),n)===e?e:-1}function en(t){if(W)return t[q]??(t[q]=new Map);if(q in t)return t[q];const e=new Map;return Object.defineProperty(t,q,{value:e}),e}function nn(t,e,n,r){const i=en(t),s=rn(i,t,e,n);return s!==r&&(s&&(e=Ve(t,e,s)),i.set(n,r)),e}function rn(t,e,n,r){let i=t.get(r);if(null!=i)return i;i=0;for(let t=0;t<r.length;t++){const s=r[t];null!=Ge(e,n,s)&&(0!==i&&(n=Ve(e,n,i)),i=s);}return t.set(r,i),i}function sn(t,e,n,r){let i=et(t);const s=Ge(t,i,n,r);let o;if(null!=s&&s.Y===at)return (e=Ue(s))!==s&&Ve(t,i,n,e,r),e.u;if(Array.isArray(s)){const t=tt(s);o=2&t?Ce(s,t,false):s,o=ge(o,e);}else o=ge(void 0,e);return o!==s&&Ve(t,i,n,o,r),o}function on(t,e,n,r){t=t.u;let i=et(t);const s=Ge(t,i,n,r);return (e=se(s,e,false,i))!==s&&null!=e&&Ve(t,i,n,e,r),e}function an(t,e,n,r=false){if(null==(e=on(t,e,n,r)))return e;t=t.u;let i=et(t);if(!(2&i)){const s=Ue(e);s!==e&&Ve(t,i,n,e=s,r);}return e}function hn(t,e,n,r,i,s,o){var a=!!(2&e);i=a?1:i,s=!!s,o&&=!a,a=Ke(t,e,r);var h=tt(a),c=!!(4&h);if(!c){var u=a,l=e;const t=!!(2&(h=Ye(h,e)));t&&(l|=2);let r=!t,i=true,s=0,o=0;for(;s<u.length;s++){const e=se(u[s],n,false,l);if(e instanceof n){if(!t){const t=!!(2&tt(e.u));r&&=!t,i&&=t;}u[o++]=e;}}o<s&&(u.length=o),h|=4,h=i?16|h:-17&h,nt(u,h=r?8|h:-9&h),t&&Object.freeze(u);}if(o&&!(8&h||!a.length&&(1===i||4===i&&32&h))){for($e(h)&&(a=H(a),h=fn(h,e),e=Ve(t,e,r,a)),n=a,o=h,u=0;u<n.length;u++)(h=n[u])!==(l=Ue(h))&&(n[u]=l);o|=8,o=n.length?-17&o:16|o,nt(n,o),h=o;}let f;return 1===i||4===i&&32&h?$e(h)||(e=h,(h|=!a.length||16&h&&(!c||32&h)?2:2048)!==e&&nt(a,h),Object.freeze(a)):(c=5===i&&(!!(32&h)||$e(h)||!!he?.get(a)),(2===i||c)&&$e(h)&&(a=H(a),h=dn(h=fn(h,e),e,s),nt(a,h),e=Ve(t,e,r,a)),$e(h)||(t=h,(h=dn(h,e,s))!==t&&nt(a,h)),c&&(f=ae(a))),f||a}function cn(t,e,n){t=t.u;const r=et(t);return hn(t,r,e,n,void 0===vt?2:5,false,!(2&r))}function un(t,e,n,r,i){return null==r&&(r=void 0),je(t,n,r,i)}function ln(t,e,n,r){null==r&&(r=void 0);t:{t=t.u;let i=et(t);if(pt$1(i),null==r){const r=en(t);if(rn(r,t,i,n)!==e)break t;r.set(n,0);}else i=nn(t,i,n,e);Ve(t,i,e,r);}}function fn(t,e){return  -2049&(t=32|(2&e?2|t:-3&t))}function dn(t,e,n){return 32&e&&n||(t&=-33),t}function pn(t,e,n,r){t=t.u;const i=et(t);pt$1(i),e=hn(t,i,n,e,2,true),n=null!=r?r:new n,e.push(n),2&tt(n.u)?Q(e,8):Q(e,16);}function gn(t,e){return t??e}function mn(t,e){return $t(De(t,e))}function yn(t,e){return gn(He(t,e),0)}function _n(t,e){return gn(ie(De(t,e)),"")}function vn(t,e,n){if(null!=n&&"boolean"!=typeof n)throw t=typeof n,Error(`Expected boolean but got ${"object"!=t?t:n?Array.isArray(n)?"array":t:"null"}: ${n}`);je(t,e,n);}function En(t,e,n){if(null!=n){if("number"!=typeof n)throw V("int32");if(!Number.isFinite(n))throw V("int32");n|=0;}je(t,e,n);}function wn(t,e,n){if(null!=n&&"number"!=typeof n)throw Error(`Value of float/double field must be a number, found ${typeof n}: ${n}`);je(t,e,n);}function Tn(t,e,n){{const a=t.u;let h=et(a);if(pt$1(h),null==n)Ve(a,h,e);else {n=ce?.get(n)||n;var r,i=tt(n),s=i,o=!!(2&i)||Object.isFrozen(n);if((r=!o)&&(r=void 0===Et$1||false),Ne(t,i))for(i=21,o&&(n=H(n),s=0,i=dn(i=fn(i,h),h,true)),t=0;t<n.length;t++)n[t]=ne(n[t]);r&&(n=H(n),s=0,i=dn(i=fn(i,h),h,true)),i!==s&&nt(n,i),Ve(a,h,e,n);}}}function An(t,e){return Error(`Invalid wire type: ${t} (at position ${e})`)}function bn(){return Error("Failed to read varint, encoding is invalid.")}function kn(t,e){return Error(`Tried to read past the end of the data ${e} > ${t}`)}function Sn(t){if("string"==typeof t)return {buffer:M(t),N:false};if(Array.isArray(t))return {buffer:new Uint8Array(t),N:false};if(t.constructor===Uint8Array)return {buffer:t,N:false};if(t.constructor===ArrayBuffer)return {buffer:new Uint8Array(t),N:false};if(t.constructor===D)return {buffer:N(t)||new Uint8Array(0),N:true};if(t instanceof Uint8Array)return {buffer:new Uint8Array(t.buffer,t.byteOffset,t.byteLength),N:false};throw Error("Type not convertible to a Uint8Array, expected a Uint8Array, an ArrayBuffer, a base64 encoded string, a ByteString or an Array of numbers")}function xn(t,e){let n,r=0,i=0,s=0;const o=t.h;let a=t.g;do{n=o[a++],r|=(127&n)<<s,s+=7;}while(s<32&&128&n);for(s>32&&(i|=(127&n)>>4),s=3;s<32&&128&n;s+=7)n=o[a++],i|=(127&n)<<s;if(Cn(t,a),n<128)return e(r>>>0,i>>>0);throw bn()}function Ln(t){let e=0,n=t.g;const r=n+10,i=t.h;for(;n<r;){const r=i[n++];if(e|=r,0==(128&r))return Cn(t,n),!!(127&e)}throw bn()}function Fn(t){const e=t.h;let n=t.g,r=e[n++],i=127&r;if(128&r&&(r=e[n++],i|=(127&r)<<7,128&r&&(r=e[n++],i|=(127&r)<<14,128&r&&(r=e[n++],i|=(127&r)<<21,128&r&&(r=e[n++],i|=r<<28,128&r&&128&e[n++]&&128&e[n++]&&128&e[n++]&&128&e[n++]&&128&e[n++])))))throw bn();return Cn(t,n),i}function Rn(t){return Fn(t)>>>0}function Mn(t){var e=t.h;const n=t.g,r=e[n],i=e[n+1],s=e[n+2];return e=e[n+3],Cn(t,t.g+4),(r<<0|i<<8|s<<16|e<<24)>>>0}function In(t){var e=Mn(t);t=2*(e>>31)+1;const n=e>>>23&255;return e&=8388607,255==n?e?NaN:t*(1/0):0==n?t*Math.pow(2,-149)*e:t*Math.pow(2,n-150)*(e+Math.pow(2,23))}function Pn(t){return Fn(t)}function On(t,e,{da:n=false}={}){t.da=n,e&&(e=Sn(e),t.h=e.buffer,t.m=e.N,t.j=0,t.l=t.h.length,t.g=t.j);}function Cn(t,e){if(t.g=e,e>t.l)throw kn(t.l,e)}function Un(t,e){if(e<0)throw Error(`Tried to read a negative byte length: ${e}`);const n=t.g,r=n+e;if(r>t.l)throw kn(e,t.l-n);return t.g=r,n}function Nn(t,e){if(0==e)return U();var n=Un(t,e);return t.da&&t.m?n=t.h.subarray(n,n+e):(t=t.h,n=n===(e=n+e)?new Uint8Array(0):wt?t.slice(n,e):new Uint8Array(t.subarray(n,e))),0==n.length?U():new D(n,P$1)}Ae.prototype.toJSON=void 0,Ae.prototype.Ja=ht;var Dn=[];function Bn(t){var e=t.g;if(e.g==e.l)return  false;t.l=t.g.g;var n=Rn(t.g);if(e=n>>>3,!((n&=7)>=0&&n<=5))throw An(n,t.l);if(e<1)throw Error(`Invalid field number: ${e} (at position ${t.l})`);return t.m=e,t.h=n,true}function Gn(t){switch(t.h){case 0:0!=t.h?Gn(t):Ln(t.g);break;case 1:Cn(t=t.g,t.g+8);break;case 2:if(2!=t.h)Gn(t);else {var e=Rn(t.g);Cn(t=t.g,t.g+e);}break;case 5:Cn(t=t.g,t.g+4);break;case 3:for(e=t.m;;){if(!Bn(t))throw Error("Unmatched start-group tag: stream EOF");if(4==t.h){if(t.m!=e)throw Error("Unmatched end-group tag");break}Gn(t);}break;default:throw An(t.h,t.l)}}function jn(t,e,n){const r=t.g.l,i=Rn(t.g),s=t.g.g+i;let o=s-r;if(o<=0&&(t.g.l=s,n(e,t,void 0,void 0,void 0),o=s-t.g.g),o)throw Error(`Message parsing ended unexpectedly. Expected to read ${i} bytes, instead read ${i-o} bytes, either the data ended unexpectedly or the message misreported its own length`);return t.g.g=s,t.g.l=r,e}function Vn(t){var e=Rn(t.g),a=Un(t=t.g,e);if(t=t.h,o$1){var h,c=t;(h=s$1)||(h=s$1=new TextDecoder("utf-8",{fatal:true})),e=a+e,c=0===a&&e===c.length?c:c.subarray(a,e);try{var u=h.decode(c);}catch(t){if(void 0===i){try{h.decode(new Uint8Array([128]));}catch(t){}try{h.decode(new Uint8Array([97])),i=!0;}catch(t){i=false;}}throw !i&&(s$1=void 0),t}}else {e=(u=a)+e,a=[];let i,s=null;for(;u<e;){var l=t[u++];l<128?a.push(l):l<224?u>=e?n():(i=t[u++],l<194||128!=(192&i)?(u--,n()):a.push((31&l)<<6|63&i)):l<240?u>=e-1?n():(i=t[u++],128!=(192&i)||224===l&&i<160||237===l&&i>=160||128!=(192&(h=t[u++]))?(u--,n()):a.push((15&l)<<12|(63&i)<<6|63&h)):l<=244?u>=e-2?n():(i=t[u++],128!=(192&i)||i-144+(l<<28)>>30!=0||128!=(192&(h=t[u++]))||128!=(192&(c=t[u++]))?(u--,n()):(l=(7&l)<<18|(63&i)<<12|(63&h)<<6|63&c,l-=65536,a.push(55296+(l>>10&1023),56320+(1023&l)))):n(),a.length>=8192&&(s=r$2(s,a),a.length=0);}u=r$2(s,a);}return u}function Xn(t){const e=Rn(t.g);return Nn(t.g,e)}function Hn(t,e,n){var r=Rn(t.g);for(r=t.g.g+r;t.g.g<r;)n.push(e(t.g));}var Wn=[];let zn;function Kn(t,e,n){e.g?e.m(t,e.g,e.h,n,true):e.m(t,e.h,n,true);}var Yn=class{constructor(t,e){this.u=me(t,e);}toJSON(){return $n(this)}l(){var t=vo;return t.g?t.l(this,t.g,t.h,true):t.l(this,t.h,t.defaultValue,true)}clone(){const t=this.u;return Oe(this,t,et(t),false)}N(){return !!(2&tt(this.u))}};function $n(t){t=zn?t.u:Re(t.u,Ie,void 0,void 0,false);{var e=!zn;let c=t.length;if(c){var n=t[c-1],r=ut(n);r?c--:n=void 0;var i=t;if(r){t:{var s=n,o={};if(r=false,s)for(var a in s){if(isNaN(+a)){o[a]=s[a];continue}let t=s[a];Array.isArray(t)&&(ft(t)||ct(t)&&0===t.size)&&(t=null),null==t&&(r=true),null!=t&&(o[a]=t);}if(r){for(let t in o)break t;o=null;}else o=s;}s=null==o?null!=n:o!==n;}for(;c>0&&(null==(a=i[c-1])||ft(a)||ct(a)&&0===a.size);c--)var h=true;(i!==t||s||h)&&(e?(h||s||o)&&(i.length=c):i=Array.prototype.slice.call(i,0,c),o&&i.push(o)),h=i;}else h=t;}return h}function qn(t){return t?/^\d+$/.test(t)?(It(t),new Jn(At$1,bt)):null:Zn||=new Jn(0,0)}Yn.prototype.Y=at,Yn.prototype.toString=function(){try{return zn=!0,$n(this).toString()}finally{zn=false;}};var Jn=class{constructor(t,e){this.h=t>>>0,this.g=e>>>0;}};let Zn;function Qn(t){return t?/^-?\d+$/.test(t)?(It(t),new tr(At$1,bt)):null:er||=new tr(0,0)}var tr=class{constructor(t,e){this.h=t>>>0,this.g=e>>>0;}};let er;function nr(t,e,n){for(;n>0||e>127;)t.g.push(127&e|128),e=(e>>>7|n<<25)>>>0,n>>>=7;t.g.push(e);}function rr(t,e){for(;e>127;)t.g.push(127&e|128),e>>>=7;t.g.push(e);}function ir(t,e){if(e>=0)rr(t,e);else {for(let n=0;n<9;n++)t.g.push(127&e|128),e>>=7;t.g.push(1);}}function sr(t,e){t.g.push(e>>>0&255),t.g.push(e>>>8&255),t.g.push(e>>>16&255),t.g.push(e>>>24&255);}function or(t,e){0!==e.length&&(t.l.push(e),t.h+=e.length);}function ar(t,e,n){rr(t.g,8*e+n);}function hr(t,e){return ar(t,e,2),e=t.g.end(),or(t,e),e.push(t.h),e}function cr(t,e){var n=e.pop();for(n=t.h+t.g.length()-n;n>127;)e.push(127&n|128),n>>>=7,t.h++;e.push(n),t.h++;}function ur(t,e,n){ar(t,e,2),rr(t.g,n.length),or(t,t.g.end()),or(t,n);}function lr(t,e,n,r){null!=n&&(e=hr(t,e),r(n,t),cr(t,e));}class fr{constructor(t,e,n,r){this.g=t,this.h=e,this.l=n,this.pa=r;}}function dr(t){return Array.isArray(t)?t[0]instanceof fr?t:[gi,t]:[t,void 0]}function pr(t,e){if(Array.isArray(e)){var n=tt(e);if(4&n)return e;for(var r=0,i=0;r<e.length;r++){const n=t(e[r]);null!=n&&(e[i++]=n);}return i<r&&(e.length=i),nt(e,-12289&(5|n)),2&n&&Object.freeze(e),e}}const gr=Symbol();function mr(t){let e=t[gr];if(!e){const n=br(t),r=Ur(t),i=r.l;e=i?(t,e)=>i(t,e,r):(t,e)=>{for(;Bn(e)&&4!=e.h;){var i=e.m;let n=r[i];const a=!n;let h=false;if(!n){var s=r.U;if(s){var o=s[i];o&&(h=s.O?.[i],(!d||h)&&(s=yr(o))&&(n=r[i]=s));}}n&&n(e,t,i)||(i=(s=e).l,Gn(s),s.ia?s=void 0:(o=s.g.g-i,s.g.g=i,s=Nn(s.g,o)),i=t,s&&(mt||=Symbol(),(o=i[mt])?o.push(s):i[mt]=[s])),a&&n&&!h&&Wr++<5&&j();}n===vr||n===Er||n.j||(t[yt||=Symbol()]=n);},t[gr]=e;}return e}function yr(t){const e=(t=dr(t))[0].g;if(t=t[1]){const n=mr(t),r=Ur(t).T;return (t,i,s)=>e(t,i,s,r,n)}return e}class _r{}let vr,Er;const wr=Symbol();function Tr(t,e,n){const r=n[1];let i;if(r){const n=r[wr];i=n?n.T:pe(r[0]),t[e]=n??r;}i&&i===fe?(t.g||(t.g=new Set)).add(e):n[0]&&(t.h||(t.h=new Set)).add(e);}function Ar(t,e){return [t.l,!e||e[0]>0?void 0:e]}function br(t){var e=t[wr];if(e)return e;if(!(e=Sr(t,t[wr]=new _r,Ar,Ar,Tr)).U&&!e.h&&!e.g){let n=true;for(let t in e)isNaN(t)||(n=false);n?(pe(t[0])===fe?Er?e=Er:((e=new _r).T=pe(true),e=Er=e):e=vr||=new _r,e=t[wr]=e):e.j=true;}return e}function kr(t,e,n){t[e]=n;}function Sr(t,e,n,r,i=kr){e.T=pe(t[0]);let s=0;var o=t[++s];o&&o.constructor===Object&&(e.U=o,"function"==typeof(o=t[++s])&&(e.l=o,e.m=t[++s],o=t[++s]));const a={};for(;Array.isArray(o)&&"number"==typeof o[0]&&o[0]>0;){for(var h=0;h<o.length;h++)a[o[h]]=o;o=t[++s];}for(h=1;void 0!==o;){let l;"number"==typeof o&&(h+=o,o=t[++s]);var c=void 0;if(o instanceof fr?l=o:(l=mi,s--),l.pa){o=t[++s],c=t;var u=s;"function"==typeof o&&(o=o(),c[u]=o),c=o;}for(u=h+1,"number"==typeof(o=t[++s])&&o<0&&(u-=o,o=t[++s]);h<u;h++){const t=a[h];i(e,h,c?r(l,c,t):n(l,t));}}return e}const xr=Symbol();function Lr(t){let e=t[xr];if(!e){const n=Ir(t);e=(t,e)=>Br(t,e,n),t[xr]=e;}return e}const Fr=Symbol();function Rr(t){return t.h}function Mr(t,e){let n,r;const i=t.h;return (t,s,o)=>i(t,s,o,r||=Ir(e).T,n||=Lr(e))}function Ir(t){let e=t[Fr];return e||(e=Sr(t,t[Fr]={},Rr,Mr),Nr(t),e)}const Pr=Symbol();function Or(t,e){const n=t.g;return e?(t,r,i)=>n(t,r,i,e):n}function Cr(t,e,n){const r=t.g;let i,s;return (t,o,a)=>r(t,o,a,s||=Ur(e).T,i||=mr(e),n)}function Ur(t){let e=t[Pr];return e||(br(t),e=Sr(t,t[Pr]={},Or,Cr),Nr(t),e)}function Nr(t){Pr in t&&wr in t&&Fr in t&&(t.length=0);}function Dr(t,e){var n=t[e];if(n)return n;if(n=t.U){var r=n[e];if(r){var i=(r=dr(r))[0].h;if(r=r[1],n=n.O?.[e],!d||n){if(r){const e=Lr(r),s=Ir(r).T;n=(n=t.m)?n(s,e):(t,n,r)=>i(t,n,r,s,e);}else n=i;return t[e]=n}}}}function Br(t,e,n){for(var r=et(t),i=+!!(512&r)-1,s=t.length,o=512&r?1:0,a=s+(256&r?-1:0);o<a;o++){const r=t[o];if(null==r)continue;const s=o-i,a=Dr(n,s);if(!a)continue;const h=n.U;h?.[s]&&!h?.O?.[s]&&Wr++<5&&j(),a(e,r,s);}if(256&r){r=t[s-1];for(let t in r)i=+t,!Number.isNaN(i)&&(null!=(s=r[t])&&(a=Dr(n,i)))&&((o=n.U)?.[i]&&!o?.O?.[i]&&Wr++<5&&j(),a(e,s,i));}if(t=mt?t[mt]:void 0)for(or(e,e.g.end()),n=0;n<t.length;n++)or(e,N(t[n])||new Uint8Array(0));}function Gr(t,e){return new fr(t,e,false,false)}function jr(t,e){return new fr(t,e,true,false)}function Vr(t,e){return new fr(t,e,false,true)}function Xr(t,e,n){Ve(t,et(t),e,n);}var Hr=Vr((function(t,e,n,r,i){return 2===t.h&&(t=jn(t,ge([void 0,void 0],r),i),pt$1(r=et(e)),(i=Ge(e,r,n))instanceof Ae?0!=(2&i.L)?((i=i.Z()).push(t),Ve(e,r,n,i)):i.Oa(t):Array.isArray(i)?(2&tt(i)&&Ve(e,r,n,i=qe(i)),i.push(t)):Ve(e,r,n,[t]),true)}),(function(t,e,n,r,i){if(e instanceof Ae)e.forEach(((e,s)=>{lr(t,n,ge([s,e],r),i);}));else if(Array.isArray(e))for(let s=0;s<e.length;s++){const o=e[s];Array.isArray(o)&&lr(t,n,ge(o,r),i);}}));let Wr=0;function zr(t,e,n){e=function(t){if(null==t)return t;const e=typeof t;if("bigint"===e)return String(BigInt.asIntN(64,t));if(Yt$1(t)){if("string"===e)return Qt(t);if("number"===e)return Zt(t)}}(e),null!=e&&("string"==typeof e&&Qn(e),null!=e&&(ar(t,n,0),"number"==typeof e?(t=t.g,St$1(e),nr(t,At$1,bt)):(n=Qn(e),nr(t.g,n.h,n.g))));}function Kr(t,e,n){null!=(e=$t(e))&&null!=e&&(ar(t,n,0),ir(t.g,e));}function Yr(t,e,n){null!=(e=zt(e))&&(ar(t,n,0),t.g.g.push(e?1:0));}function $r(t,e,n){null!=(e=ie(e))&&ur(t,n,c(e));}function qr(t,e,n,r,i){lr(t,n,e instanceof Yn?e.u:Array.isArray(e)?ge(e,r):void 0,i);}function Jr(t,e,n){null!=(e=null==e||"string"==typeof e||I(e)||e instanceof D?e:void 0)&&ur(t,n,Sn(e).buffer);}function Zr(t,e,n){return (5===t.h||2===t.h)&&(e=Xe(e,et(e),n,2,false),2==t.h?Hn(t,In,e):e.push(In(t.g)),true)}var Qr,ti=Gr((function(t,e,n){if(1!==t.h)return  false;var r=t.g;t=Mn(r);const i=Mn(r);r=2*(i>>31)+1;const s=i>>>20&2047;return t=4294967296*(1048575&i)+t,Xr(e,n,2047==s?t?NaN:r*(1/0):0==s?r*Math.pow(2,-1074)*t:r*Math.pow(2,s-1075)*(t+4503599627370496)),true}),(function(t,e,n){null!=(e=Wt$1(e))&&(ar(t,n,1),t=t.g,(n=Tt||=new DataView(new ArrayBuffer(8))).setFloat64(0,+e,true),At$1=n.getUint32(0,true),bt=n.getUint32(4,true),sr(t,At$1),sr(t,bt));})),ei=Gr((function(t,e,n){return 5===t.h&&(Xr(e,n,In(t.g)),true)}),(function(t,e,n){null!=(e=Wt$1(e))&&(ar(t,n,5),t=t.g,xt$1(e),sr(t,At$1));})),ni=jr(Zr,(function(t,e,n){if(null!=(e=pr(Wt$1,e)))for(let o=0;o<e.length;o++){var r=t,i=n,s=e[o];null!=s&&(ar(r,i,5),r=r.g,xt$1(s),sr(r,At$1));}})),ri=jr(Zr,(function(t,e,n){if(null!=(e=pr(Wt$1,e))&&e.length){ar(t,n,2),rr(t.g,4*e.length);for(let r=0;r<e.length;r++)n=t.g,xt$1(e[r]),sr(n,At$1);}})),ii=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,xn(t.g,Ft$1)),true)}),zr),si=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,0===(t=xn(t.g,Ft$1))?void 0:t),true)}),zr),oi=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,xn(t.g,Lt$1)),true)}),(function(t,e,n){null!=(e=ee(e))&&("string"==typeof e&&qn(e),null!=e&&(ar(t,n,0),"number"==typeof e?(t=t.g,St$1(e),nr(t,At$1,bt)):(n=qn(e),nr(t.g,n.h,n.g))));})),ai=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,Fn(t.g)),true)}),Kr),hi=jr((function(t,e,n){return (0===t.h||2===t.h)&&(e=Xe(e,et(e),n,2,false),2==t.h?Hn(t,Fn,e):e.push(Fn(t.g)),true)}),(function(t,e,n){if(null!=(e=pr($t,e))&&e.length){n=hr(t,n);for(let n=0;n<e.length;n++)ir(t.g,e[n]);cr(t,n);}})),ci=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,0===(t=Fn(t.g))?void 0:t),true)}),Kr),ui=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,Ln(t.g)),true)}),Yr),li=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,false===(t=Ln(t.g))?void 0:t),true)}),Yr),fi=jr((function(t,e,n){return 2===t.h&&(Ze(e,n,Qe,t=Vn(t)),true)}),(function(t,e,n){if(null!=(e=pr(ie,e)))for(let o=0;o<e.length;o++){var r=t,i=n,s=e[o];null!=s&&ur(r,i,c(s));}})),di=Gr((function(t,e,n){return 2===t.h&&(Xr(e,n,""===(t=Vn(t))?void 0:t),true)}),$r),pi=Gr((function(t,e,n){return 2===t.h&&(Xr(e,n,Vn(t)),true)}),$r),gi=Vr((function(t,e,n,r,i){return 2===t.h&&(jn(t,sn(e,r,n,true),i),true)}),qr),mi=Vr((function(t,e,n,r,i){return 2===t.h&&(jn(t,sn(e,r,n),i),true)}),qr);Qr=new fr((function(t,e,n,r,i){if(2!==t.h)return  false;r=ge(void 0,r);let s=et(e);pt$1(s);let o=Xe(e,s,n,3);return s=et(e),4&tt(o)&&(o=H(o),nt(o,-2079&(1|tt(o))),Ve(e,s,n,o)),o.push(r),jn(t,r,i),true}),(function(t,e,n,r,i){if(Array.isArray(e))for(let s=0;s<e.length;s++)qr(t,e[s],n,r,i);}),true,true);var yi=Vr((function(t,e,n,r,i,s){return 2===t.h&&(nn(e,et(e),s,n),jn(t,e=sn(e,r,n),i),true)}),qr),_i=Gr((function(t,e,n){return 2===t.h&&(Xr(e,n,Xn(t)),true)}),Jr),vi=jr((function(t,e,n){return (0===t.h||2===t.h)&&(e=Xe(e,et(e),n,2,false),2==t.h?Hn(t,Rn,e):e.push(Rn(t.g)),true)}),(function(t,e,n){if(null!=(e=pr(qt,e)))for(let o=0;o<e.length;o++){var r=t,i=n,s=e[o];null!=s&&(ar(r,i,0),rr(r.g,s));}})),Ei=Gr((function(t,e,n){return 0===t.h&&(Xr(e,n,Fn(t.g)),true)}),(function(t,e,n){null!=(e=$t(e))&&(e=parseInt(e,10),ar(t,n,0),ir(t.g,e));}));class wi{constructor(t,e){this.h=t,this.g=e,this.l=an,this.m=un,this.defaultValue=void 0;}}function Ti(t,e){return new wi(t,e)}function Ai(t,e){return (n,r)=>{if(Wn.length){const t=Wn.pop();t.o(r),On(t.g,n,r),n=t;}else n=new class{constructor(t,e){if(Dn.length){const n=Dn.pop();On(n,t,e),t=n;}else t=new class{constructor(t,e){this.h=null,this.m=false,this.g=this.l=this.j=0,On(this,t,e);}clear(){this.h=null,this.m=false,this.g=this.l=this.j=0,this.da=false;}}(t,e);this.g=t,this.l=this.g.g,this.h=this.m=-1,this.o(e);}o({ia:t=false}={}){this.ia=t;}}(n,r);try{const r=new t,s=r.u;mr(e)(s,n);var i=r;}finally{n.g.clear(),n.m=-1,n.h=-1,Wn.length<100&&Wn.push(n);}return i}}function bi(t){return function(){const e=new class{constructor(){this.l=[],this.h=0,this.g=new class{constructor(){this.g=[];}length(){return this.g.length}end(){const t=this.g;return this.g=[],t}};}};Br(this.u,e,Ir(t)),or(e,e.g.end());const n=new Uint8Array(e.h),r=e.l,i=r.length;let s=0;for(let t=0;t<i;t++){const e=r[t];n.set(e,s),s+=e.length;}return e.l=[n],n}}var ki=class extends Yn{constructor(t){super(t);}},Si=[0,di,Gr((function(t,e,n){return 2===t.h&&(Xr(e,n,(t=Xn(t))===U()?void 0:t),true)}),(function(t,e,n){if(null!=e){if(e instanceof Yn){const r=e.Ra;return void(r&&(e=r(e),null!=e&&ur(t,n,Sn(e).buffer)))}if(Array.isArray(e))return}Jr(t,e,n);}))],xi=[0,ai,Ei,ui,-1,hi,Ei,-1],Li=class extends Yn{constructor(){super();}},Fi=[0,ui,pi,ui,Ei,-1,jr((function(t,e,n){return (0===t.h||2===t.h)&&(e=Xe(e,et(e),n,2,false),2==t.h?Hn(t,Pn,e):e.push(Fn(t.g)),true)}),(function(t,e,n){if(null!=(e=pr($t,e))&&e.length){n=hr(t,n);for(let n=0;n<e.length;n++)ir(t.g,e[n]);cr(t,n);}})),pi,-1,[0,ui,-1],Ei,ui],Ri=[0,pi,-2],Mi=class extends Yn{constructor(){super();}},Ii=[0],Pi=[0,ai,ui,1,ui,-3],Oi=[0,pi,ui,-1,ai,[0,[1,2,3,4,5,6],yi,Ii,yi,Fi,yi,Ri,yi,Pi,yi,xi,yi,[0,pi,-2]],[0,pi],ui,[0,[1,3],[2,4],yi,[0,hi],-1,yi,[0,fi],-1,Qr,[0,pi,-1]],pi],Ci=class extends Yn{constructor(t){super(t,2);}},Ui={},Ni=Ui.O={};Ui[336783863]=Oi,Ni[336783863]=1;var Di=[0,si,-1,li,-3,si,hi,di,ci,si,-1,li,ci,li,-2,di];function Bi(t,e){Je(t,2,re(e),"");}function Gi(t,e){Ze(t.u,3,ne,e);}function ji(t,e){Ze(t.u,4,ne,e);}var Vi=class extends Yn{constructor(t){super(t,500);}o(t){return un(this,0,7,t)}},Xi=[-1,{O:{}}],Hi=[0,pi,1,Xi],Wi=[0,pi,fi,Xi];function zi(t,e){pn(t,1,Vi,e);}function Ki(t,e){Ze(t.u,10,ne,e);}function Yi(t,e){Ze(t.u,15,ne,e);}var $i=class extends Yn{constructor(t){super(t,500);}o(t){return un(this,0,1001,t)}},qi=[-500,Qr,[-500,di,-1,fi,-3,[-2,Ui,ui],Qr,Si,ci,-1,Hi,Wi,Qr,[0,di,li],di,Di,ci,fi,987,fi],4,Qr,[-500,pi,-1,[-1,{O:{}}],998,pi],Qr,[-500,pi,fi,-1,[-2,{O:{}},ui],997,fi,-1],ci,Qr,[-500,pi,fi,Xi,998,fi],fi,ci,Hi,Wi,Qr,[0,di,-1,Xi],fi,-2,Di,di,-1,li,979,Xi,Qr,Si];$i.prototype.g=bi(qi);var Ji=Ai($i,qi),Zi=class extends Yn{constructor(t){super(t);}},Qi=class extends Yn{constructor(t){super(t);}g(){return cn(this,Zi,1)}},ts=[0,Qr,[0,ai,ei,pi,-1]],es=Ai(Qi,ts),ns=class extends Yn{constructor(t){super(t);}},rs=class extends Yn{constructor(t){super(t);}},is=class extends Yn{constructor(t){super(t);}h(){return an(this,ns,2)}g(){return cn(this,rs,5)}},ss=Ai(class extends Yn{constructor(t){super(t);}},[0,fi,hi,ri,[0,Ei,[0,ai,-3],[0,ei,-3],[0,ai,-1,[0,Qr,[0,ai,-2]]],Qr,[0,ei,-1,pi,ei]],pi,-1,ii,Qr,[0,ai,ei],fi,ii]),os=class extends Yn{constructor(t){super(t);}},as=Ai(class extends Yn{constructor(t){super(t);}},[0,Qr,[0,ei,-4]]),hs=class extends Yn{constructor(t){super(t);}},cs=Ai(class extends Yn{constructor(t){super(t);}},[0,Qr,[0,ei,-4]]),us=class extends Yn{constructor(t){super(t);}},ls=[0,ai,-1,ri,Ei],fs=class extends Yn{constructor(){super();}};fs.prototype.g=bi([0,ei,-4,ii]);var ds=class extends Yn{constructor(t){super(t);}},ps=Ai(class extends Yn{constructor(t){super(t);}},[0,Qr,[0,1,ai,pi,ts],ii]),gs=class extends Yn{constructor(t){super(t);}},ms=class extends Yn{constructor(t){super(t);}qa(){const t=We(this);return null==t?U():t}},ys=class extends Yn{constructor(t){super(t);}},_s=[1,2],vs=Ai(class extends Yn{constructor(t){super(t);}},[0,Qr,[0,_s,yi,[0,ri],yi,[0,_i],ai,pi],ii]),Es=class extends Yn{constructor(t){super(t);}},ws=[0,pi,ai,ei,fi,-1],Ts=class extends Yn{constructor(t){super(t);}},As=[0,ui,-1],bs=class extends Yn{constructor(t){super(t);}},ks=[1,2,3,4,5],Ss=class extends Yn{constructor(t){super(t);}g(){return null!=We(this)}h(){return null!=ie(De(this,2))}},xs=class extends Yn{constructor(t){super(t);}g(){return zt(De(this,2))??false}},Ls=[0,_i,pi,[0,ai,ii,-1],[0,oi,ii]],Fs=[0,Ls,ui,[0,ks,yi,Pi,yi,Fi,yi,xi,yi,Ii,yi,Ri],Ei],Rs=class extends Yn{constructor(t){super(t);}},Ms=[0,Fs,ei,-1,ai],Is=Ti(502141897,Rs);Ui[502141897]=Ms,Ni[502141897]=1;var Ps=[0,Ls];Ui[512499200]=Ps;var Os=[0,Ps];Ui[515723506]=Os;var Cs=Ai(class extends Yn{constructor(t){super(t);}},[0,[0,Ei,-1,ni,vi],ls]),Us=[0,Fs];Ui[508981768]=Us;var Ns=class extends Yn{constructor(t){super(t);}},Ds=class extends Yn{constructor(t){super(t);}},Bs=[0,Fs,ei,Us,ui],Gs=[0,Fs,Ms,Bs,ei,Os];Ui[508968149]=Bs;var js=Ti(508968150,Ds);Ui[508968150]=Gs,Ni[508968150]=1,Ni[508968149]=1;var Vs=class extends Yn{constructor(t){super(t);}},Xs=Ti(513916220,Vs);Ui[513916220]=[0,Fs,Gs,ai],Ni[513916220]=1;var Hs=class extends Yn{constructor(t){super(t);}h(){return an(this,Es,2)}g(){je(this,2);}},Ws=[0,Fs,ws];Ui[478825465]=Ws,Ni[478825465]=1;var zs=[0,Fs];Ui[478825422]=zs;var Ks=class extends Yn{constructor(t){super(t);}},Ys=class extends Yn{constructor(t){super(t);}},$s=class extends Yn{constructor(t){super(t);}},qs=class extends Yn{constructor(t){super(t);}},Js=class extends Yn{constructor(t){super(t);}},Zs=[0,Fs,zs,Ws,-1],Qs=[0,Fs,ei,ai],to=[0,Fs,ei],eo=[0,Fs,Qs,to,ei],no=[0,Fs,eo,Zs];Ui[463370452]=Zs,Ui[464864288]=Qs,Ui[474472470]=to;var ro=Ti(462713202,qs);Ui[462713202]=eo;var io=Ti(479097054,Js);Ui[479097054]=no,Ni[479097054]=1,Ni[463370452]=1,Ni[464864288]=1,Ni[462713202]=1,Ni[474472470]=1;var so=class extends Yn{constructor(t){super(t);}},oo=class extends Yn{constructor(t){super(t);}},ao=class extends Yn{constructor(t){super(t);}},ho=class extends Yn{constructor(){super();}},co=[0,Fs,ei,-1,ai],uo=[0,Fs,ei,ui];ho.prototype.g=bi([0,Fs,to,[0,Fs],Ms,Bs,co,uo]),Ui[514774813]=co,Ui[518928384]=uo;var lo=class extends Yn{constructor(t){super(t);}},fo=Ti(456383383,lo);Ui[456383383]=[0,Fs,ws],Ni[456383383]=1;var po=class extends Yn{constructor(t){super(t);}},go=Ti(476348187,po);Ui[476348187]=[0,Fs,As],Ni[476348187]=1;var mo$1=class mo extends Yn{constructor(t){super(t);}},yo=class extends Yn{constructor(t){super(t);}},_o=[0,Ei,-1],vo=Ti(458105876,class extends Yn{constructor(t){super(t);}g(){var t=this.u;const e=et(t);const n=2&e;return t=function(t,e,n){var r=yo;const i=2&e;let s=false;if(null==n){if(i)return Le();n=[];}else if(n.constructor===Ae){if(0==(2&n.L)||i)return n;n=n.Z();}else Array.isArray(n)?s=!!(2&tt(n)):n=[];if(i){if(!n.length)return Le();s||(s=true,rt(n));}else s&&(s=false,n=qe(n));return s||(64&tt(n)?Q(n,32):32&e&&Z(n,32)),Ve(t,e,2,r=new Ae(n,r,oe,void 0),false),r}(t,e,Ge(t,e,2)),!n&&yo&&(t.ta=true),t}});Ui[458105876]=[0,_o,Hr,[true,ii,[0,pi,-1,fi]]],Ni[458105876]=1;var Eo=class extends Yn{constructor(t){super(t);}},wo=Ti(458105758,Eo);Ui[458105758]=[0,Fs,pi,_o],Ni[458105758]=1;var To=class extends Yn{constructor(t){super(t);}},Ao=Ti(443442058,To);Ui[443442058]=[0,Fs,pi,ai,ei,fi,-1],Ni[443442058]=1,Ni[514774813]=1;var bo=class extends Yn{constructor(t){super(t);}},ko=Ti(516587230,bo);function So(t,e){return e=e?e.clone():new Es,void 0!==t.displayNamesLocale?je(e,1,re(t.displayNamesLocale)):void 0===t.displayNamesLocale&&je(e,1),void 0!==t.maxResults?En(e,2,t.maxResults):"maxResults"in t&&je(e,2),void 0!==t.scoreThreshold?wn(e,3,t.scoreThreshold):"scoreThreshold"in t&&je(e,3),void 0!==t.categoryAllowlist?Tn(e,4,t.categoryAllowlist):"categoryAllowlist"in t&&je(e,4),void 0!==t.categoryDenylist?Tn(e,5,t.categoryDenylist):"categoryDenylist"in t&&je(e,5),e}function xo(t,e=-1,n=""){return {categories:t.map((t=>({index:gn(mn(t,1),0)??-1,score:yn(t,2)??0,categoryName:_n(t,3)??"",displayName:_n(t,4)??""}))),headIndex:e,headName:n}}function Lo(t){var e=ze(t,3,Wt$1),n=ze(t,2,$t),r=ze(t,1,ie),i=ze(t,9,ie);const s={categories:[],keypoints:[]};for(let t=0;t<e.length;t++)s.categories.push({score:e[t],index:n[t]??-1,categoryName:r[t]??"",displayName:i[t]??""});if((e=an(t,is,4)?.h())&&(s.boundingBox={originX:mn(e,1)??0,originY:mn(e,2)??0,width:mn(e,3)??0,height:mn(e,4)??0,angle:0}),an(t,is,4)?.g().length)for(const e of an(t,is,4).g())s.keypoints.push({x:He(e,1)??0,y:He(e,2)??0,score:He(e,4)??0,label:ie(De(e,3))??""});return s}function Fo(t){const e=[];for(const n of cn(t,hs,1))e.push({x:yn(n,1)??0,y:yn(n,2)??0,z:yn(n,3)??0,visibility:yn(n,4)??0});return e}function Ro(t){const e=[];for(const n of cn(t,os,1))e.push({x:yn(n,1)??0,y:yn(n,2)??0,z:yn(n,3)??0,visibility:yn(n,4)??0});return e}function Mo(t){return Array.from(t,(t=>t>127?t-256:t))}function Io(t,e){if(t.length!==e.length)throw Error(`Cannot compute cosine similarity between embeddings of different sizes (${t.length} vs. ${e.length}).`);let n=0,r=0,i=0;for(let s=0;s<t.length;s++)n+=t[s]*e[s],r+=t[s]*t[s],i+=e[s]*e[s];if(r<=0||i<=0)throw Error("Cannot compute cosine similarity on embedding with 0 norm.");return n/Math.sqrt(r*i)}let Po;Ui[516587230]=[0,Fs,co,uo,ei],Ni[516587230]=1,Ni[518928384]=1;const Oo=new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]);async function Co(){if(void 0===Po)try{await WebAssembly.instantiate(Oo),Po=!0;}catch{Po=false;}return Po}async function Uo(t,e=""){const n=await Co()?"wasm_internal":"wasm_nosimd_internal";return {wasmLoaderPath:`${e}/${t}_${n}.js`,wasmBinaryPath:`${e}/${t}_${n}.wasm`}}var No=class{};function Do(){var t=navigator;return "undefined"!=typeof OffscreenCanvas&&(!function(t=navigator){return (t=t.userAgent).includes("Safari")&&!t.includes("Chrome")}(t)||!!((t=t.userAgent.match(/Version\/([\d]+).*Safari/))&&t.length>=1&&Number(t[1])>=17))}async function Bo(t){if("function"!=typeof importScripts){const e=document.createElement("script");return e.src=t.toString(),e.crossOrigin="anonymous",new Promise(((t,n)=>{e.addEventListener("load",(()=>{t();}),false),e.addEventListener("error",(t=>{n(t);}),false),document.body.appendChild(e);}))}importScripts(t.toString());}function Go(t){return void 0!==t.videoWidth?[t.videoWidth,t.videoHeight]:void 0!==t.naturalWidth?[t.naturalWidth,t.naturalHeight]:void 0!==t.displayWidth?[t.displayWidth,t.displayHeight]:[t.width,t.height]}function jo(t,e,n){t.m||console.error("No wasm multistream support detected: ensure dependency inclusion of :gl_graph_runner_internal_multi_input target"),n(e=t.i.stringToNewUTF8(e)),t.i._free(e);}function Vo(t,e,n){if(!t.i.canvas)throw Error("No OpenGL canvas configured.");if(n?t.i._bindTextureToStream(n):t.i._bindTextureToCanvas(),!(n=t.i.canvas.getContext("webgl2")||t.i.canvas.getContext("webgl")))throw Error("Failed to obtain WebGL context from the provided canvas. `getContext()` should only be invoked with `webgl` or `webgl2`.");t.i.gpuOriginForWebTexturesIsBottomLeft&&n.pixelStorei(n.UNPACK_FLIP_Y_WEBGL,true),n.texImage2D(n.TEXTURE_2D,0,n.RGBA,n.RGBA,n.UNSIGNED_BYTE,e),t.i.gpuOriginForWebTexturesIsBottomLeft&&n.pixelStorei(n.UNPACK_FLIP_Y_WEBGL,false);const[r,i]=Go(e);return !t.l||r===t.i.canvas.width&&i===t.i.canvas.height||(t.i.canvas.width=r,t.i.canvas.height=i),[r,i]}function Xo(t,e,n){t.m||console.error("No wasm multistream support detected: ensure dependency inclusion of :gl_graph_runner_internal_multi_input target");const r=new Uint32Array(e.length);for(let n=0;n<e.length;n++)r[n]=t.i.stringToNewUTF8(e[n]);e=t.i._malloc(4*r.length),t.i.HEAPU32.set(r,e>>2),n(e);for(const e of r)t.i._free(e);t.i._free(e);}function Ho(t,e,n){t.i.simpleListeners=t.i.simpleListeners||{},t.i.simpleListeners[e]=n;}function Wo(t,e,n){let r=[];t.i.simpleListeners=t.i.simpleListeners||{},t.i.simpleListeners[e]=(t,e,i)=>{e?(n(r,i),r=[]):r.push(t);};}No.forVisionTasks=function(t){return Uo("vision",t)},No.forTextTasks=function(t){return Uo("text",t)},No.forGenAiExperimentalTasks=function(t){return Uo("genai_experimental",t)},No.forGenAiTasks=function(t){return Uo("genai",t)},No.forAudioTasks=function(t){return Uo("audio",t)},No.isSimdSupported=function(){return Co()};async function zo(t,e,n,r){return t=await(async(t,e,n,r,i)=>{if(e&&await Bo(e),!self.ModuleFactory)throw Error("ModuleFactory not set.");if(n&&(await Bo(n),!self.ModuleFactory))throw Error("ModuleFactory not set.");return self.Module&&i&&((e=self.Module).locateFile=i.locateFile,i.mainScriptUrlOrBlob&&(e.mainScriptUrlOrBlob=i.mainScriptUrlOrBlob)),i=await self.ModuleFactory(self.Module||i),self.ModuleFactory=self.Module=void 0,new t(i,r)})(t,n.wasmLoaderPath,n.assetLoaderPath,e,{locateFile:t=>t.endsWith(".wasm")?n.wasmBinaryPath.toString():n.assetBinaryPath&&t.endsWith(".data")?n.assetBinaryPath.toString():t}),await t.o(r),t}function Ko(t,e){const n=an(t.baseOptions,Ss,1)||new Ss;"string"==typeof e?(je(n,2,re(e)),je(n,1)):e instanceof Uint8Array&&(je(n,1,lt$1(e,false,false)),je(n,2)),un(t.baseOptions,0,1,n);}function Yo(t){try{const e=t.G.length;if(1===e)throw Error(t.G[0].message);if(e>1)throw Error("Encountered multiple errors: "+t.G.map((t=>t.message)).join(", "))}finally{t.G=[];}}function $o(t,e){t.B=Math.max(t.B,e);}function qo(t,e){t.A=new Vi,Bi(t.A,"PassThroughCalculator"),Gi(t.A,"free_memory"),ji(t.A,"free_memory_unused_out"),Ki(e,"free_memory"),zi(e,t.A);}function Jo(t,e){Gi(t.A,e),ji(t.A,e+"_unused_out");}function Zo(t){t.g.addBoolToStream(true,"free_memory",t.B);}var Qo=class{constructor(t){this.g=t,this.G=[],this.B=0,this.g.setAutoRenderToScreen(false);}l(t,e=true){if(e){const e=t.baseOptions||{};if(t.baseOptions?.modelAssetBuffer&&t.baseOptions?.modelAssetPath)throw Error("Cannot set both baseOptions.modelAssetPath and baseOptions.modelAssetBuffer");if(!(an(this.baseOptions,Ss,1)?.g()||an(this.baseOptions,Ss,1)?.h()||t.baseOptions?.modelAssetBuffer||t.baseOptions?.modelAssetPath))throw Error("Either baseOptions.modelAssetPath or baseOptions.modelAssetBuffer must be set");if(function(t,e){let n=an(t.baseOptions,bs,3);if(!n){var r=n=new bs,i=new Mi;ln(r,4,ks,i);}"delegate"in e&&("GPU"===e.delegate?(e=n,r=new Li,ln(e,2,ks,r)):(e=n,r=new Mi,ln(e,4,ks,r))),un(t.baseOptions,0,3,n);}(this,e),e.modelAssetPath)return fetch(e.modelAssetPath.toString()).then((t=>{if(t.ok)return t.arrayBuffer();throw Error(`Failed to fetch model: ${e.modelAssetPath} (${t.status})`)})).then((t=>{try{this.g.i.FS_unlink("/model.dat");}catch{}this.g.i.FS_createDataFile("/","model.dat",new Uint8Array(t),true,false,false),Ko(this,"/model.dat"),this.m(),this.I();}));if(e.modelAssetBuffer instanceof Uint8Array)Ko(this,e.modelAssetBuffer);else if(e.modelAssetBuffer)return async function(t){const e=[];for(var n=0;;){const{done:r,value:i}=await t.read();if(r)break;e.push(i),n+=i.length;}if(0===e.length)return new Uint8Array(0);if(1===e.length)return e[0];t=new Uint8Array(n),n=0;for(const r of e)t.set(r,n),n+=r.length;return t}(e.modelAssetBuffer).then((t=>{Ko(this,t),this.m(),this.I();}))}return this.m(),this.I(),Promise.resolve()}I(){}fa(){let t;if(this.g.fa((e=>{t=Ji(e);})),!t)throw Error("Failed to retrieve CalculatorGraphConfig");return t}setGraph(t,e){this.g.attachErrorListener(((t,e)=>{this.G.push(Error(e));})),this.g.Ma(),this.g.setGraph(t,e),this.A=void 0,Yo(this);}finishProcessing(){this.g.finishProcessing(),Yo(this);}close(){this.A=void 0,this.g.closeGraph();}};function ta(t,e){if(!t)throw Error(`Unable to obtain required WebGL resource: ${e}`);return t}Qo.prototype.close=Qo.prototype.close,function(e,n){e=e.split(".");var r,i=t$2;e[0]in i||void 0===i.execScript||i.execScript("var "+e[0]);for(;e.length&&(r=e.shift());)e.length||void 0===n?i=i[r]&&i[r]!==Object.prototype[r]?i[r]:i[r]={}:i[r]=n;}("TaskRunner",Qo);class ea{constructor(t,e,n,r){this.g=t,this.h=e,this.m=n,this.l=r;}bind(){this.g.bindVertexArray(this.h);}close(){this.g.deleteVertexArray(this.h),this.g.deleteBuffer(this.m),this.g.deleteBuffer(this.l);}}function na(t,e,n){const r=t.g;if(n=ta(r.createShader(n),"Failed to create WebGL shader"),r.shaderSource(n,e),r.compileShader(n),!r.getShaderParameter(n,r.COMPILE_STATUS))throw Error(`Could not compile WebGL shader: ${r.getShaderInfoLog(n)}`);return r.attachShader(t.h,n),n}function ra(t,e){const n=t.g,r=ta(n.createVertexArray(),"Failed to create vertex array");n.bindVertexArray(r);const i=ta(n.createBuffer(),"Failed to create buffer");n.bindBuffer(n.ARRAY_BUFFER,i),n.enableVertexAttribArray(t.P),n.vertexAttribPointer(t.P,2,n.FLOAT,false,0,0),n.bufferData(n.ARRAY_BUFFER,new Float32Array([-1,-1,-1,1,1,1,1,-1]),n.STATIC_DRAW);const s=ta(n.createBuffer(),"Failed to create buffer");return n.bindBuffer(n.ARRAY_BUFFER,s),n.enableVertexAttribArray(t.I),n.vertexAttribPointer(t.I,2,n.FLOAT,false,0,0),n.bufferData(n.ARRAY_BUFFER,new Float32Array(e?[0,1,0,0,1,0,1,1]:[0,0,0,1,1,1,1,0]),n.STATIC_DRAW),n.bindBuffer(n.ARRAY_BUFFER,null),n.bindVertexArray(null),new ea(n,r,i,s)}function ia(t,e){if(t.g){if(e!==t.g)throw Error("Cannot change GL context once initialized")}else t.g=e;}function sa(t,e,n,r){return ia(t,e),t.h||(t.m(),t.C()),n?(t.s||(t.s=ra(t,true)),n=t.s):(t.v||(t.v=ra(t,false)),n=t.v),e.useProgram(t.h),n.bind(),t.l(),t=r(),n.g.bindVertexArray(null),t}function oa(t,e,n){return ia(t,e),t=ta(e.createTexture(),"Failed to create texture"),e.bindTexture(e.TEXTURE_2D,t),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,n??e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,n??e.LINEAR),e.bindTexture(e.TEXTURE_2D,null),t}function aa(t,e,n){ia(t,e),t.A||(t.A=ta(e.createFramebuffer(),"Failed to create framebuffe.")),e.bindFramebuffer(e.FRAMEBUFFER,t.A),e.framebufferTexture2D(e.FRAMEBUFFER,e.COLOR_ATTACHMENT0,e.TEXTURE_2D,n,0);}function ha(t){t.g?.bindFramebuffer(t.g.FRAMEBUFFER,null);}var ca=class{G(){return "\n  precision mediump float;\n  varying vec2 vTex;\n  uniform sampler2D inputTexture;\n  void main() {\n    gl_FragColor = texture2D(inputTexture, vTex);\n  }\n "}m(){const t=this.g;if(this.h=ta(t.createProgram(),"Failed to create WebGL program"),this.ca=na(this,"\n  attribute vec2 aVertex;\n  attribute vec2 aTex;\n  varying vec2 vTex;\n  void main(void) {\n    gl_Position = vec4(aVertex, 0.0, 1.0);\n    vTex = aTex;\n  }",t.VERTEX_SHADER),this.ba=na(this,this.G(),t.FRAGMENT_SHADER),t.linkProgram(this.h),!t.getProgramParameter(this.h,t.LINK_STATUS))throw Error(`Error during program linking: ${t.getProgramInfoLog(this.h)}`);this.P=t.getAttribLocation(this.h,"aVertex"),this.I=t.getAttribLocation(this.h,"aTex");}C(){}l(){}close(){if(this.h){const t=this.g;t.deleteProgram(this.h),t.deleteShader(this.ca),t.deleteShader(this.ba);}this.A&&this.g.deleteFramebuffer(this.A),this.v&&this.v.close(),this.s&&this.s.close();}};var ua$1=class ua extends ca{G(){return "\n  precision mediump float;\n  uniform sampler2D backgroundTexture;\n  uniform sampler2D maskTexture;\n  uniform sampler2D colorMappingTexture;\n  varying vec2 vTex;\n  void main() {\n    vec4 backgroundColor = texture2D(backgroundTexture, vTex);\n    float category = texture2D(maskTexture, vTex).r;\n    vec4 categoryColor = texture2D(colorMappingTexture, vec2(category, 0.0));\n    gl_FragColor = mix(backgroundColor, categoryColor, categoryColor.a);\n  }\n "}C(){const t=this.g;t.activeTexture(t.TEXTURE1),this.B=oa(this,t,t.LINEAR),t.activeTexture(t.TEXTURE2),this.j=oa(this,t,t.NEAREST);}m(){super.m();const t=this.g;this.K=ta(t.getUniformLocation(this.h,"backgroundTexture"),"Uniform location"),this.W=ta(t.getUniformLocation(this.h,"colorMappingTexture"),"Uniform location"),this.J=ta(t.getUniformLocation(this.h,"maskTexture"),"Uniform location");}l(){super.l();const t=this.g;t.uniform1i(this.J,0),t.uniform1i(this.K,1),t.uniform1i(this.W,2);}close(){this.B&&this.g.deleteTexture(this.B),this.j&&this.g.deleteTexture(this.j),super.close();}},la=class extends ca{G(){return "\n  precision mediump float;\n  uniform sampler2D maskTexture;\n  uniform sampler2D defaultTexture;\n  uniform sampler2D overlayTexture;\n  varying vec2 vTex;\n  void main() {\n    float confidence = texture2D(maskTexture, vTex).r;\n    vec4 defaultColor = texture2D(defaultTexture, vTex);\n    vec4 overlayColor = texture2D(overlayTexture, vTex);\n    // Apply the alpha from the overlay and merge in the default color\n    overlayColor = mix(defaultColor, overlayColor, overlayColor.a);\n    gl_FragColor = mix(defaultColor, overlayColor, confidence);\n  }\n "}C(){const t=this.g;t.activeTexture(t.TEXTURE1),this.j=oa(this,t),t.activeTexture(t.TEXTURE2),this.B=oa(this,t);}m(){super.m();const t=this.g;this.J=ta(t.getUniformLocation(this.h,"defaultTexture"),"Uniform location"),this.K=ta(t.getUniformLocation(this.h,"overlayTexture"),"Uniform location"),this.H=ta(t.getUniformLocation(this.h,"maskTexture"),"Uniform location");}l(){super.l();const t=this.g;t.uniform1i(this.H,0),t.uniform1i(this.J,1),t.uniform1i(this.K,2);}close(){this.j&&this.g.deleteTexture(this.j),this.B&&this.g.deleteTexture(this.B),super.close();}};function fa(t,e){switch(e){case 0:return t.g.find((t=>t instanceof Uint8Array));case 1:return t.g.find((t=>t instanceof Float32Array));case 2:return t.g.find((t=>"undefined"!=typeof WebGLTexture&&t instanceof WebGLTexture));default:throw Error(`Type is not supported: ${e}`)}}function da(t){var e=fa(t,1);if(!e){if(e=fa(t,0))e=new Float32Array(e).map((t=>t/255));else {e=new Float32Array(t.width*t.height);const r=ga$1(t);var n=ya(t);if(aa(n,r,pa(t)),"iPad Simulator;iPhone Simulator;iPod Simulator;iPad;iPhone;iPod".split(";").includes(navigator.platform)||navigator.userAgent.includes("Mac")&&"ontouchend"in self.document){n=new Float32Array(t.width*t.height*4),r.readPixels(0,0,t.width,t.height,r.RGBA,r.FLOAT,n);for(let t=0,r=0;t<e.length;++t,r+=4)e[t]=n[r];}else r.readPixels(0,0,t.width,t.height,r.RED,r.FLOAT,e);}t.g.push(e);}return e}function pa(t){let e=fa(t,2);if(!e){const n=ga$1(t);e=_a(t);const r=da(t),i=ma$1(t);n.texImage2D(n.TEXTURE_2D,0,i,t.width,t.height,0,n.RED,n.FLOAT,r),va(t);}return e}function ga$1(t){if(!t.canvas)throw Error("Conversion to different image formats require that a canvas is passed when initializing the image.");return t.h||(t.h=ta(t.canvas.getContext("webgl2"),"You cannot use a canvas that is already bound to a different type of rendering context.")),t.h}function ma$1(t){if(t=ga$1(t),!Ea)if(t.getExtension("EXT_color_buffer_float")&&t.getExtension("OES_texture_float_linear")&&t.getExtension("EXT_float_blend"))Ea=t.R32F;else {if(!t.getExtension("EXT_color_buffer_half_float"))throw Error("GPU does not fully support 4-channel float32 or float16 formats");Ea=t.R16F;}return Ea}function ya(t){return t.l||(t.l=new ca),t.l}function _a(t){const e=ga$1(t);e.viewport(0,0,t.width,t.height),e.activeTexture(e.TEXTURE0);let n=fa(t,2);return n||(n=oa(ya(t),e,t.m?e.LINEAR:e.NEAREST),t.g.push(n),t.j=true),e.bindTexture(e.TEXTURE_2D,n),n}function va(t){t.h.bindTexture(t.h.TEXTURE_2D,null);}var Ea,wa$1=class wa{constructor(t,e,n,r,i,s,o){this.g=t,this.m=e,this.j=n,this.canvas=r,this.l=i,this.width=s,this.height=o,this.j&&(0===--Ta&&console.error("You seem to be creating MPMask instances without invoking .close(). This leaks resources."));}Ha(){return !!fa(this,0)}la(){return !!fa(this,1)}R(){return !!fa(this,2)}ka(){return (e=fa(t=this,0))||(e=da(t),e=new Uint8Array(e.map((t=>255*t))),t.g.push(e)),e;var t,e;}ja(){return da(this)}M(){return pa(this)}clone(){const t=[];for(const e of this.g){let n;if(e instanceof Uint8Array)n=new Uint8Array(e);else if(e instanceof Float32Array)n=new Float32Array(e);else {if(!(e instanceof WebGLTexture))throw Error(`Type is not supported: ${e}`);{const t=ga$1(this),e=ya(this);t.activeTexture(t.TEXTURE1),n=oa(e,t,this.m?t.LINEAR:t.NEAREST),t.bindTexture(t.TEXTURE_2D,n);const r=ma$1(this);t.texImage2D(t.TEXTURE_2D,0,r,this.width,this.height,0,t.RED,t.FLOAT,null),t.bindTexture(t.TEXTURE_2D,null),aa(e,t,n),sa(e,t,false,(()=>{_a(this),t.clearColor(0,0,0,0),t.clear(t.COLOR_BUFFER_BIT),t.drawArrays(t.TRIANGLE_FAN,0,4),va(this);})),ha(e),va(this);}}t.push(n);}return new wa$1(t,this.m,this.R(),this.canvas,this.l,this.width,this.height)}close(){this.j&&ga$1(this).deleteTexture(fa(this,2)),Ta=-1;}};wa$1.prototype.close=wa$1.prototype.close,wa$1.prototype.clone=wa$1.prototype.clone,wa$1.prototype.getAsWebGLTexture=wa$1.prototype.M,wa$1.prototype.getAsFloat32Array=wa$1.prototype.ja,wa$1.prototype.getAsUint8Array=wa$1.prototype.ka,wa$1.prototype.hasWebGLTexture=wa$1.prototype.R,wa$1.prototype.hasFloat32Array=wa$1.prototype.la,wa$1.prototype.hasUint8Array=wa$1.prototype.Ha;var Ta=250;const Aa={color:"white",lineWidth:4,radius:6};function ba(t){return {...Aa,fillColor:(t=t||{}).color,...t}}function ka(t,e){return t instanceof Function?t(e):t}function Sa(t,e,n){return Math.max(Math.min(e,n),Math.min(Math.max(e,n),t))}function xa(t){if(!t.l)throw Error("CPU rendering requested but CanvasRenderingContext2D not provided.");return t.l}function La(t){if(!t.j)throw Error("GPU rendering requested but WebGL2RenderingContext not provided.");return t.j}function Fa(t,e,n){if(e.R())n(e.M());else {const r=e.la()?e.ja():e.ka();t.m=t.m??new ca;const i=La(t);n((t=new wa$1([r],e.m,false,i.canvas,t.m,e.width,e.height)).M()),t.close();}}function Ra(t,e,n,r){const i=function(t){return t.g||(t.g=new ua$1),t.g}(t),s=La(t),o=Array.isArray(n)?new ImageData(new Uint8ClampedArray(n),1,1):n;sa(i,s,true,(()=>{!function(t,e,n,r){const i=t.g;if(i.activeTexture(i.TEXTURE0),i.bindTexture(i.TEXTURE_2D,e),i.activeTexture(i.TEXTURE1),i.bindTexture(i.TEXTURE_2D,t.B),i.texImage2D(i.TEXTURE_2D,0,i.RGBA,i.RGBA,i.UNSIGNED_BYTE,n),t.H&&function(t,e){if(t!==e)return  false;t=t.entries(),e=e.entries();for(const[r,i]of t){t=r;const s=i;var n=e.next();if(n.done)return  false;const[o,a]=n.value;if(n=a,t!==o||s[0]!==n[0]||s[1]!==n[1]||s[2]!==n[2]||s[3]!==n[3])return  false}return !!e.next().done}(t.H,r))i.activeTexture(i.TEXTURE2),i.bindTexture(i.TEXTURE_2D,t.j);else {t.H=r;const e=Array(1024).fill(0);r.forEach(((t,n)=>{if(4!==t.length)throw Error(`Color at index ${n} is not a four-channel value.`);e[4*n]=t[0],e[4*n+1]=t[1],e[4*n+2]=t[2],e[4*n+3]=t[3];})),i.activeTexture(i.TEXTURE2),i.bindTexture(i.TEXTURE_2D,t.j),i.texImage2D(i.TEXTURE_2D,0,i.RGBA,256,1,0,i.RGBA,i.UNSIGNED_BYTE,new Uint8Array(e));}}(i,e,o,r),s.clearColor(0,0,0,0),s.clear(s.COLOR_BUFFER_BIT),s.drawArrays(s.TRIANGLE_FAN,0,4);const t=i.g;t.activeTexture(t.TEXTURE0),t.bindTexture(t.TEXTURE_2D,null),t.activeTexture(t.TEXTURE1),t.bindTexture(t.TEXTURE_2D,null),t.activeTexture(t.TEXTURE2),t.bindTexture(t.TEXTURE_2D,null);}));}function Ma(t,e,n,r){const i=La(t),s=function(t){return t.h||(t.h=new la),t.h}(t),o=Array.isArray(n)?new ImageData(new Uint8ClampedArray(n),1,1):n,a=Array.isArray(r)?new ImageData(new Uint8ClampedArray(r),1,1):r;sa(s,i,true,(()=>{var t=s.g;t.activeTexture(t.TEXTURE0),t.bindTexture(t.TEXTURE_2D,e),t.activeTexture(t.TEXTURE1),t.bindTexture(t.TEXTURE_2D,s.j),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,t.RGBA,t.UNSIGNED_BYTE,o),t.activeTexture(t.TEXTURE2),t.bindTexture(t.TEXTURE_2D,s.B),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,t.RGBA,t.UNSIGNED_BYTE,a),i.clearColor(0,0,0,0),i.clear(i.COLOR_BUFFER_BIT),i.drawArrays(i.TRIANGLE_FAN,0,4),i.bindTexture(i.TEXTURE_2D,null),(t=s.g).activeTexture(t.TEXTURE0),t.bindTexture(t.TEXTURE_2D,null),t.activeTexture(t.TEXTURE1),t.bindTexture(t.TEXTURE_2D,null),t.activeTexture(t.TEXTURE2),t.bindTexture(t.TEXTURE_2D,null);}));}var Ia$1=class Ia{constructor(t,e){t instanceof CanvasRenderingContext2D||t instanceof OffscreenCanvasRenderingContext2D?(this.l=t,this.j=e):this.j=t;}Aa(t,e){if(t){var n=xa(this);e=ba(e),n.save();var r=n.canvas,i=0;for(const s of t)n.fillStyle=ka(e.fillColor,{index:i,from:s}),n.strokeStyle=ka(e.color,{index:i,from:s}),n.lineWidth=ka(e.lineWidth,{index:i,from:s}),(t=new Path2D).arc(s.x*r.width,s.y*r.height,ka(e.radius,{index:i,from:s}),0,2*Math.PI),n.fill(t),n.stroke(t),++i;n.restore();}}za(t,e,n){if(t&&e){var r=xa(this);n=ba(n),r.save();var i=r.canvas,s=0;for(const o of e){r.beginPath(),e=t[o.start];const a=t[o.end];e&&a&&(r.strokeStyle=ka(n.color,{index:s,from:e,to:a}),r.lineWidth=ka(n.lineWidth,{index:s,from:e,to:a}),r.moveTo(e.x*i.width,e.y*i.height),r.lineTo(a.x*i.width,a.y*i.height)),++s,r.stroke();}r.restore();}}wa(t,e){const n=xa(this);e=ba(e),n.save(),n.beginPath(),n.lineWidth=ka(e.lineWidth,{}),n.strokeStyle=ka(e.color,{}),n.fillStyle=ka(e.fillColor,{}),n.moveTo(t.originX,t.originY),n.lineTo(t.originX+t.width,t.originY),n.lineTo(t.originX+t.width,t.originY+t.height),n.lineTo(t.originX,t.originY+t.height),n.lineTo(t.originX,t.originY),n.stroke(),n.fill(),n.restore();}xa(t,e,n=[0,0,0,255]){this.l?function(t,e,n,r){const i=La(t);Fa(t,e,(e=>{Ra(t,e,n,r),(e=xa(t)).drawImage(i.canvas,0,0,e.canvas.width,e.canvas.height);}));}(this,t,n,e):Ra(this,t.M(),n,e);}ya(t,e,n){this.l?function(t,e,n,r){const i=La(t);Fa(t,e,(e=>{Ma(t,e,n,r),(e=xa(t)).drawImage(i.canvas,0,0,e.canvas.width,e.canvas.height);}));}(this,t,e,n):Ma(this,t.M(),e,n);}close(){this.g?.close(),this.g=void 0,this.h?.close(),this.h=void 0,this.m?.close(),this.m=void 0;}};function Pa(t,e){switch(e){case 0:return t.g.find((t=>t instanceof ImageData));case 1:return t.g.find((t=>"undefined"!=typeof ImageBitmap&&t instanceof ImageBitmap));case 2:return t.g.find((t=>"undefined"!=typeof WebGLTexture&&t instanceof WebGLTexture));default:throw Error(`Type is not supported: ${e}`)}}function Oa(t){var e=Pa(t,0);if(!e){e=Ua(t);const n=Na(t),r=new Uint8Array(t.width*t.height*4);aa(n,e,Ca(t)),e.readPixels(0,0,t.width,t.height,e.RGBA,e.UNSIGNED_BYTE,r),ha(n),e=new ImageData(new Uint8ClampedArray(r.buffer),t.width,t.height),t.g.push(e);}return e}function Ca(t){let e=Pa(t,2);if(!e){const n=Ua(t);e=Da(t);const r=Pa(t,1)||Oa(t);n.texImage2D(n.TEXTURE_2D,0,n.RGBA,n.RGBA,n.UNSIGNED_BYTE,r),Ba(t);}return e}function Ua(t){if(!t.canvas)throw Error("Conversion to different image formats require that a canvas is passed when iniitializing the image.");return t.h||(t.h=ta(t.canvas.getContext("webgl2"),"You cannot use a canvas that is already bound to a different type of rendering context.")),t.h}function Na(t){return t.l||(t.l=new ca),t.l}function Da(t){const e=Ua(t);e.viewport(0,0,t.width,t.height),e.activeTexture(e.TEXTURE0);let n=Pa(t,2);return n||(n=oa(Na(t),e),t.g.push(n),t.m=true),e.bindTexture(e.TEXTURE_2D,n),n}function Ba(t){t.h.bindTexture(t.h.TEXTURE_2D,null);}function Ga(t){const e=Ua(t);return sa(Na(t),e,true,(()=>function(t,e){const n=t.canvas;if(n.width===t.width&&n.height===t.height)return e();const r=n.width,i=n.height;return n.width=t.width,n.height=t.height,t=e(),n.width=r,n.height=i,t}(t,(()=>{if(e.bindFramebuffer(e.FRAMEBUFFER,null),e.clearColor(0,0,0,0),e.clear(e.COLOR_BUFFER_BIT),e.drawArrays(e.TRIANGLE_FAN,0,4),!(t.canvas instanceof OffscreenCanvas))throw Error("Conversion to ImageBitmap requires that the MediaPipe Tasks is initialized with an OffscreenCanvas");return t.canvas.transferToImageBitmap()}))))}Ia$1.prototype.close=Ia$1.prototype.close,Ia$1.prototype.drawConfidenceMask=Ia$1.prototype.ya,Ia$1.prototype.drawCategoryMask=Ia$1.prototype.xa,Ia$1.prototype.drawBoundingBox=Ia$1.prototype.wa,Ia$1.prototype.drawConnectors=Ia$1.prototype.za,Ia$1.prototype.drawLandmarks=Ia$1.prototype.Aa,Ia$1.lerp=function(t,e,n,r,i){return Sa(r*(1-(t-e)/(n-e))+i*(1-(n-t)/(n-e)),r,i)},Ia$1.clamp=Sa;var ja=class{constructor(t,e,n,r,i,s,o){this.g=t,this.j=e,this.m=n,this.canvas=r,this.l=i,this.width=s,this.height=o,(this.j||this.m)&&(0===--Va&&console.error("You seem to be creating MPImage instances without invoking .close(). This leaks resources."));}Ga(){return !!Pa(this,0)}ma(){return !!Pa(this,1)}R(){return !!Pa(this,2)}Ea(){return Oa(this)}Da(){var t=Pa(this,1);return t||(Ca(this),Da(this),t=Ga(this),Ba(this),this.g.push(t),this.j=true),t}M(){return Ca(this)}clone(){const t=[];for(const e of this.g){let n;if(e instanceof ImageData)n=new ImageData(e.data,this.width,this.height);else if(e instanceof WebGLTexture){const t=Ua(this),e=Na(this);t.activeTexture(t.TEXTURE1),n=oa(e,t),t.bindTexture(t.TEXTURE_2D,n),t.texImage2D(t.TEXTURE_2D,0,t.RGBA,this.width,this.height,0,t.RGBA,t.UNSIGNED_BYTE,null),t.bindTexture(t.TEXTURE_2D,null),aa(e,t,n),sa(e,t,false,(()=>{Da(this),t.clearColor(0,0,0,0),t.clear(t.COLOR_BUFFER_BIT),t.drawArrays(t.TRIANGLE_FAN,0,4),Ba(this);})),ha(e),Ba(this);}else {if(!(e instanceof ImageBitmap))throw Error(`Type is not supported: ${e}`);Ca(this),Da(this),n=Ga(this),Ba(this);}t.push(n);}return new ja(t,this.ma(),this.R(),this.canvas,this.l,this.width,this.height)}close(){this.j&&Pa(this,1).close(),this.m&&Ua(this).deleteTexture(Pa(this,2)),Va=-1;}};ja.prototype.close=ja.prototype.close,ja.prototype.clone=ja.prototype.clone,ja.prototype.getAsWebGLTexture=ja.prototype.M,ja.prototype.getAsImageBitmap=ja.prototype.Da,ja.prototype.getAsImageData=ja.prototype.Ea,ja.prototype.hasWebGLTexture=ja.prototype.R,ja.prototype.hasImageBitmap=ja.prototype.ma,ja.prototype.hasImageData=ja.prototype.Ga;var Va=250;function Xa(...t){return t.map((([t,e])=>({start:t,end:e})))}const Ha=function(t){return class extends t{Ma(){this.i._registerModelResourcesGraphService();}}}((Wa=class{constructor(t,e){this.l=true,this.i=t,this.g=null,this.h=0,this.m="function"==typeof this.i._addIntToInputStream,void 0!==e?this.i.canvas=e:Do()?this.i.canvas=new OffscreenCanvas(1,1):(console.warn("OffscreenCanvas not supported and GraphRunner constructor glCanvas parameter is undefined. Creating backup canvas."),this.i.canvas=document.createElement("canvas"));}async initializeGraph(t){const e=await(await fetch(t)).arrayBuffer();t=!(t.endsWith(".pbtxt")||t.endsWith(".textproto")),this.setGraph(new Uint8Array(e),t);}setGraphFromString(t){this.setGraph((new TextEncoder).encode(t),false);}setGraph(t,e){const n=t.length,r=this.i._malloc(n);this.i.HEAPU8.set(t,r),e?this.i._changeBinaryGraph(n,r):this.i._changeTextGraph(n,r),this.i._free(r);}configureAudio(t,e,n,r,i){this.i._configureAudio||console.warn('Attempting to use configureAudio without support for input audio. Is build dep ":gl_graph_runner_audio" missing?'),jo(this,r||"input_audio",(r=>{jo(this,i=i||"audio_header",(i=>{this.i._configureAudio(r,i,t,e,n);}));}));}setAutoResizeCanvas(t){this.l=t;}setAutoRenderToScreen(t){this.i._setAutoRenderToScreen(t);}setGpuBufferVerticalFlip(t){this.i.gpuOriginForWebTexturesIsBottomLeft=t;}fa(t){Ho(this,"__graph_config__",(e=>{t(e);})),jo(this,"__graph_config__",(t=>{this.i._getGraphConfig(t,void 0);})),delete this.i.simpleListeners.__graph_config__;}attachErrorListener(t){this.i.errorListener=t;}attachEmptyPacketListener(t,e){this.i.emptyPacketListeners=this.i.emptyPacketListeners||{},this.i.emptyPacketListeners[t]=e;}addAudioToStream(t,e,n){this.addAudioToStreamWithShape(t,0,0,e,n);}addAudioToStreamWithShape(t,e,n,r,i){const s=4*t.length;this.h!==s&&(this.g&&this.i._free(this.g),this.g=this.i._malloc(s),this.h=s),this.i.HEAPF32.set(t,this.g/4),jo(this,r,(t=>{this.i._addAudioToInputStream(this.g,e,n,t,i);}));}addGpuBufferToStream(t,e,n){jo(this,e,(e=>{const[r,i]=Vo(this,t,e);this.i._addBoundTextureToStream(e,r,i,n);}));}addBoolToStream(t,e,n){jo(this,e,(e=>{this.i._addBoolToInputStream(t,e,n);}));}addDoubleToStream(t,e,n){jo(this,e,(e=>{this.i._addDoubleToInputStream(t,e,n);}));}addFloatToStream(t,e,n){jo(this,e,(e=>{this.i._addFloatToInputStream(t,e,n);}));}addIntToStream(t,e,n){jo(this,e,(e=>{this.i._addIntToInputStream(t,e,n);}));}addUintToStream(t,e,n){jo(this,e,(e=>{this.i._addUintToInputStream(t,e,n);}));}addStringToStream(t,e,n){jo(this,e,(e=>{jo(this,t,(t=>{this.i._addStringToInputStream(t,e,n);}));}));}addStringRecordToStream(t,e,n){jo(this,e,(e=>{Xo(this,Object.keys(t),(r=>{Xo(this,Object.values(t),(i=>{this.i._addFlatHashMapToInputStream(r,i,Object.keys(t).length,e,n);}));}));}));}addProtoToStream(t,e,n,r){jo(this,n,(n=>{jo(this,e,(e=>{const i=this.i._malloc(t.length);this.i.HEAPU8.set(t,i),this.i._addProtoToInputStream(i,t.length,e,n,r),this.i._free(i);}));}));}addEmptyPacketToStream(t,e){jo(this,t,(t=>{this.i._addEmptyPacketToInputStream(t,e);}));}addBoolVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateBoolVector(t.length);if(!r)throw Error("Unable to allocate new bool vector on heap.");for(const e of t)this.i._addBoolVectorEntry(r,e);this.i._addBoolVectorToInputStream(r,e,n);}));}addDoubleVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateDoubleVector(t.length);if(!r)throw Error("Unable to allocate new double vector on heap.");for(const e of t)this.i._addDoubleVectorEntry(r,e);this.i._addDoubleVectorToInputStream(r,e,n);}));}addFloatVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateFloatVector(t.length);if(!r)throw Error("Unable to allocate new float vector on heap.");for(const e of t)this.i._addFloatVectorEntry(r,e);this.i._addFloatVectorToInputStream(r,e,n);}));}addIntVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateIntVector(t.length);if(!r)throw Error("Unable to allocate new int vector on heap.");for(const e of t)this.i._addIntVectorEntry(r,e);this.i._addIntVectorToInputStream(r,e,n);}));}addUintVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateUintVector(t.length);if(!r)throw Error("Unable to allocate new unsigned int vector on heap.");for(const e of t)this.i._addUintVectorEntry(r,e);this.i._addUintVectorToInputStream(r,e,n);}));}addStringVectorToStream(t,e,n){jo(this,e,(e=>{const r=this.i._allocateStringVector(t.length);if(!r)throw Error("Unable to allocate new string vector on heap.");for(const e of t)jo(this,e,(t=>{this.i._addStringVectorEntry(r,t);}));this.i._addStringVectorToInputStream(r,e,n);}));}addBoolToInputSidePacket(t,e){jo(this,e,(e=>{this.i._addBoolToInputSidePacket(t,e);}));}addDoubleToInputSidePacket(t,e){jo(this,e,(e=>{this.i._addDoubleToInputSidePacket(t,e);}));}addFloatToInputSidePacket(t,e){jo(this,e,(e=>{this.i._addFloatToInputSidePacket(t,e);}));}addIntToInputSidePacket(t,e){jo(this,e,(e=>{this.i._addIntToInputSidePacket(t,e);}));}addUintToInputSidePacket(t,e){jo(this,e,(e=>{this.i._addUintToInputSidePacket(t,e);}));}addStringToInputSidePacket(t,e){jo(this,e,(e=>{jo(this,t,(t=>{this.i._addStringToInputSidePacket(t,e);}));}));}addProtoToInputSidePacket(t,e,n){jo(this,n,(n=>{jo(this,e,(e=>{const r=this.i._malloc(t.length);this.i.HEAPU8.set(t,r),this.i._addProtoToInputSidePacket(r,t.length,e,n),this.i._free(r);}));}));}addBoolVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateBoolVector(t.length);if(!n)throw Error("Unable to allocate new bool vector on heap.");for(const e of t)this.i._addBoolVectorEntry(n,e);this.i._addBoolVectorToInputSidePacket(n,e);}));}addDoubleVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateDoubleVector(t.length);if(!n)throw Error("Unable to allocate new double vector on heap.");for(const e of t)this.i._addDoubleVectorEntry(n,e);this.i._addDoubleVectorToInputSidePacket(n,e);}));}addFloatVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateFloatVector(t.length);if(!n)throw Error("Unable to allocate new float vector on heap.");for(const e of t)this.i._addFloatVectorEntry(n,e);this.i._addFloatVectorToInputSidePacket(n,e);}));}addIntVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateIntVector(t.length);if(!n)throw Error("Unable to allocate new int vector on heap.");for(const e of t)this.i._addIntVectorEntry(n,e);this.i._addIntVectorToInputSidePacket(n,e);}));}addUintVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateUintVector(t.length);if(!n)throw Error("Unable to allocate new unsigned int vector on heap.");for(const e of t)this.i._addUintVectorEntry(n,e);this.i._addUintVectorToInputSidePacket(n,e);}));}addStringVectorToInputSidePacket(t,e){jo(this,e,(e=>{const n=this.i._allocateStringVector(t.length);if(!n)throw Error("Unable to allocate new string vector on heap.");for(const e of t)jo(this,e,(t=>{this.i._addStringVectorEntry(n,t);}));this.i._addStringVectorToInputSidePacket(n,e);}));}attachBoolListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachBoolListener(t);}));}attachBoolVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachBoolVectorListener(t);}));}attachIntListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachIntListener(t);}));}attachIntVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachIntVectorListener(t);}));}attachUintListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachUintListener(t);}));}attachUintVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachUintVectorListener(t);}));}attachDoubleListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachDoubleListener(t);}));}attachDoubleVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachDoubleVectorListener(t);}));}attachFloatListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachFloatListener(t);}));}attachFloatVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachFloatVectorListener(t);}));}attachStringListener(t,e){Ho(this,t,e),jo(this,t,(t=>{this.i._attachStringListener(t);}));}attachStringVectorListener(t,e){Wo(this,t,e),jo(this,t,(t=>{this.i._attachStringVectorListener(t);}));}attachProtoListener(t,e,n){Ho(this,t,e),jo(this,t,(t=>{this.i._attachProtoListener(t,n||false);}));}attachProtoVectorListener(t,e,n){Wo(this,t,e),jo(this,t,(t=>{this.i._attachProtoVectorListener(t,n||false);}));}attachAudioListener(t,e,n){this.i._attachAudioListener||console.warn('Attempting to use attachAudioListener without support for output audio. Is build dep ":gl_graph_runner_audio_out" missing?'),Ho(this,t,((t,n)=>{t=new Float32Array(t.buffer,t.byteOffset,t.length/4),e(t,n);})),jo(this,t,(t=>{this.i._attachAudioListener(t,n||false);}));}finishProcessing(){this.i._waitUntilIdle();}closeGraph(){this.i._closeGraph(),this.i.simpleListeners=void 0,this.i.emptyPacketListeners=void 0;}},class extends Wa{get ha(){return this.i}sa(t,e,n){jo(this,e,(e=>{const[r,i]=Vo(this,t,e);this.ha._addBoundTextureAsImageToStream(e,r,i,n);}));}X(t,e){Ho(this,t,e),jo(this,t,(t=>{this.ha._attachImageListener(t);}));}ea(t,e){Wo(this,t,e),jo(this,t,(t=>{this.ha._attachImageVectorListener(t);}));}}));var Wa,za=class extends Ha{};async function Ka(t,e,n){return async function(t,e,n,r){return zo(t,e,n,r)}(t,n.canvas??(Do()?void 0:document.createElement("canvas")),e,n)}function Ya(t,e,n,r){if(t.W){const s=new fs;if(n?.regionOfInterest){if(!t.ra)throw Error("This task doesn't support region-of-interest.");var i=n.regionOfInterest;if(i.left>=i.right||i.top>=i.bottom)throw Error("Expected RectF with left < right and top < bottom.");if(i.left<0||i.top<0||i.right>1||i.bottom>1)throw Error("Expected RectF values to be in [0,1].");wn(s,1,(i.left+i.right)/2),wn(s,2,(i.top+i.bottom)/2),wn(s,4,i.right-i.left),wn(s,3,i.bottom-i.top);}else wn(s,1,.5),wn(s,2,.5),wn(s,4,1),wn(s,3,1);if(n?.rotationDegrees){if(n?.rotationDegrees%90!=0)throw Error("Expected rotation to be a multiple of 90°.");if(wn(s,5,-Math.PI*n.rotationDegrees/180),n?.rotationDegrees%180!=0){const[t,r]=Go(e);n=yn(s,3)*r/t,i=yn(s,4)*t/r,wn(s,4,n),wn(s,3,i);}}t.g.addProtoToStream(s.g(),"mediapipe.NormalizedRect",t.W,r);}t.g.sa(e,t.ca,r??performance.now()),t.finishProcessing();}function $a(t,e,n){if(t.baseOptions?.g())throw Error("Task is not initialized with image mode. 'runningMode' must be set to 'IMAGE'.");Ya(t,e,n,t.B+1);}function qa(t,e,n,r){if(!t.baseOptions?.g())throw Error("Task is not initialized with video mode. 'runningMode' must be set to 'VIDEO'.");Ya(t,e,n,r);}function Ja(t,e,n,r){var i=e.data;const s=e.width,o=s*(e=e.height);if((i instanceof Uint8Array||i instanceof Float32Array)&&i.length!==o)throw Error("Unsupported channel count: "+i.length/o);return t=new wa$1([i],n,false,t.g.i.canvas,t.P,s,e),r?t.clone():t}var Za=class extends Qo{constructor(t,e,n,r){super(t),this.g=t,this.ca=e,this.W=n,this.ra=r,this.P=new ca;}l(t,e=true){if("runningMode"in t&&vn(this.baseOptions,2,!!t.runningMode&&"IMAGE"!==t.runningMode),void 0!==t.canvas&&this.g.i.canvas!==t.canvas)throw Error("You must create a new task to reset the canvas.");return super.l(t,e)}close(){this.P.close(),super.close();}};Za.prototype.close=Za.prototype.close;var Qa=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect_in",false),this.j={detections:[]},un(t=this.h=new Rs,0,1,e=new xs),wn(this.h,2,.5),wn(this.h,3,.3);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return "minDetectionConfidence"in t&&wn(this.h,2,t.minDetectionConfidence??.5),"minSuppressionThreshold"in t&&wn(this.h,3,t.minSuppressionThreshold??.3),this.l(t)}D(t,e){return this.j={detections:[]},$a(this,t,e),this.j}F(t,e,n){return this.j={detections:[]},qa(this,t,n,e),this.j}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect_in"),Yi(t,"detections");const e=new Ci;Kn(e,Is,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.face_detector.FaceDetectorGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect_in"),ji(n,"DETECTIONS:detections"),n.o(e),zi(t,n),this.g.attachProtoVectorListener("detections",((t,e)=>{for(const e of t)t=ss(e),this.j.detections.push(Lo(t));$o(this,e);})),this.g.attachEmptyPacketListener("detections",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Qa.prototype.detectForVideo=Qa.prototype.F,Qa.prototype.detect=Qa.prototype.D,Qa.prototype.setOptions=Qa.prototype.o,Qa.createFromModelPath=async function(t,e){return Ka(Qa,t,{baseOptions:{modelAssetPath:e}})},Qa.createFromModelBuffer=function(t,e){return Ka(Qa,t,{baseOptions:{modelAssetBuffer:e}})},Qa.createFromOptions=function(t,e){return Ka(Qa,t,e)};var th=Xa([61,146],[146,91],[91,181],[181,84],[84,17],[17,314],[314,405],[405,321],[321,375],[375,291],[61,185],[185,40],[40,39],[39,37],[37,0],[0,267],[267,269],[269,270],[270,409],[409,291],[78,95],[95,88],[88,178],[178,87],[87,14],[14,317],[317,402],[402,318],[318,324],[324,308],[78,191],[191,80],[80,81],[81,82],[82,13],[13,312],[312,311],[311,310],[310,415],[415,308]),eh=Xa([263,249],[249,390],[390,373],[373,374],[374,380],[380,381],[381,382],[382,362],[263,466],[466,388],[388,387],[387,386],[386,385],[385,384],[384,398],[398,362]),nh=Xa([276,283],[283,282],[282,295],[295,285],[300,293],[293,334],[334,296],[296,336]),rh=Xa([474,475],[475,476],[476,477],[477,474]),ih=Xa([33,7],[7,163],[163,144],[144,145],[145,153],[153,154],[154,155],[155,133],[33,246],[246,161],[161,160],[160,159],[159,158],[158,157],[157,173],[173,133]),sh=Xa([46,53],[53,52],[52,65],[65,55],[70,63],[63,105],[105,66],[66,107]),oh=Xa([469,470],[470,471],[471,472],[472,469]),ah=Xa([10,338],[338,297],[297,332],[332,284],[284,251],[251,389],[389,356],[356,454],[454,323],[323,361],[361,288],[288,397],[397,365],[365,379],[379,378],[378,400],[400,377],[377,152],[152,148],[148,176],[176,149],[149,150],[150,136],[136,172],[172,58],[58,132],[132,93],[93,234],[234,127],[127,162],[162,21],[21,54],[54,103],[103,67],[67,109],[109,10]),hh=[...th,...eh,...nh,...ih,...sh,...ah],ch=Xa([127,34],[34,139],[139,127],[11,0],[0,37],[37,11],[232,231],[231,120],[120,232],[72,37],[37,39],[39,72],[128,121],[121,47],[47,128],[232,121],[121,128],[128,232],[104,69],[69,67],[67,104],[175,171],[171,148],[148,175],[118,50],[50,101],[101,118],[73,39],[39,40],[40,73],[9,151],[151,108],[108,9],[48,115],[115,131],[131,48],[194,204],[204,211],[211,194],[74,40],[40,185],[185,74],[80,42],[42,183],[183,80],[40,92],[92,186],[186,40],[230,229],[229,118],[118,230],[202,212],[212,214],[214,202],[83,18],[18,17],[17,83],[76,61],[61,146],[146,76],[160,29],[29,30],[30,160],[56,157],[157,173],[173,56],[106,204],[204,194],[194,106],[135,214],[214,192],[192,135],[203,165],[165,98],[98,203],[21,71],[71,68],[68,21],[51,45],[45,4],[4,51],[144,24],[24,23],[23,144],[77,146],[146,91],[91,77],[205,50],[50,187],[187,205],[201,200],[200,18],[18,201],[91,106],[106,182],[182,91],[90,91],[91,181],[181,90],[85,84],[84,17],[17,85],[206,203],[203,36],[36,206],[148,171],[171,140],[140,148],[92,40],[40,39],[39,92],[193,189],[189,244],[244,193],[159,158],[158,28],[28,159],[247,246],[246,161],[161,247],[236,3],[3,196],[196,236],[54,68],[68,104],[104,54],[193,168],[168,8],[8,193],[117,228],[228,31],[31,117],[189,193],[193,55],[55,189],[98,97],[97,99],[99,98],[126,47],[47,100],[100,126],[166,79],[79,218],[218,166],[155,154],[154,26],[26,155],[209,49],[49,131],[131,209],[135,136],[136,150],[150,135],[47,126],[126,217],[217,47],[223,52],[52,53],[53,223],[45,51],[51,134],[134,45],[211,170],[170,140],[140,211],[67,69],[69,108],[108,67],[43,106],[106,91],[91,43],[230,119],[119,120],[120,230],[226,130],[130,247],[247,226],[63,53],[53,52],[52,63],[238,20],[20,242],[242,238],[46,70],[70,156],[156,46],[78,62],[62,96],[96,78],[46,53],[53,63],[63,46],[143,34],[34,227],[227,143],[123,117],[117,111],[111,123],[44,125],[125,19],[19,44],[236,134],[134,51],[51,236],[216,206],[206,205],[205,216],[154,153],[153,22],[22,154],[39,37],[37,167],[167,39],[200,201],[201,208],[208,200],[36,142],[142,100],[100,36],[57,212],[212,202],[202,57],[20,60],[60,99],[99,20],[28,158],[158,157],[157,28],[35,226],[226,113],[113,35],[160,159],[159,27],[27,160],[204,202],[202,210],[210,204],[113,225],[225,46],[46,113],[43,202],[202,204],[204,43],[62,76],[76,77],[77,62],[137,123],[123,116],[116,137],[41,38],[38,72],[72,41],[203,129],[129,142],[142,203],[64,98],[98,240],[240,64],[49,102],[102,64],[64,49],[41,73],[73,74],[74,41],[212,216],[216,207],[207,212],[42,74],[74,184],[184,42],[169,170],[170,211],[211,169],[170,149],[149,176],[176,170],[105,66],[66,69],[69,105],[122,6],[6,168],[168,122],[123,147],[147,187],[187,123],[96,77],[77,90],[90,96],[65,55],[55,107],[107,65],[89,90],[90,180],[180,89],[101,100],[100,120],[120,101],[63,105],[105,104],[104,63],[93,137],[137,227],[227,93],[15,86],[86,85],[85,15],[129,102],[102,49],[49,129],[14,87],[87,86],[86,14],[55,8],[8,9],[9,55],[100,47],[47,121],[121,100],[145,23],[23,22],[22,145],[88,89],[89,179],[179,88],[6,122],[122,196],[196,6],[88,95],[95,96],[96,88],[138,172],[172,136],[136,138],[215,58],[58,172],[172,215],[115,48],[48,219],[219,115],[42,80],[80,81],[81,42],[195,3],[3,51],[51,195],[43,146],[146,61],[61,43],[171,175],[175,199],[199,171],[81,82],[82,38],[38,81],[53,46],[46,225],[225,53],[144,163],[163,110],[110,144],[52,65],[65,66],[66,52],[229,228],[228,117],[117,229],[34,127],[127,234],[234,34],[107,108],[108,69],[69,107],[109,108],[108,151],[151,109],[48,64],[64,235],[235,48],[62,78],[78,191],[191,62],[129,209],[209,126],[126,129],[111,35],[35,143],[143,111],[117,123],[123,50],[50,117],[222,65],[65,52],[52,222],[19,125],[125,141],[141,19],[221,55],[55,65],[65,221],[3,195],[195,197],[197,3],[25,7],[7,33],[33,25],[220,237],[237,44],[44,220],[70,71],[71,139],[139,70],[122,193],[193,245],[245,122],[247,130],[130,33],[33,247],[71,21],[21,162],[162,71],[170,169],[169,150],[150,170],[188,174],[174,196],[196,188],[216,186],[186,92],[92,216],[2,97],[97,167],[167,2],[141,125],[125,241],[241,141],[164,167],[167,37],[37,164],[72,38],[38,12],[12,72],[38,82],[82,13],[13,38],[63,68],[68,71],[71,63],[226,35],[35,111],[111,226],[101,50],[50,205],[205,101],[206,92],[92,165],[165,206],[209,198],[198,217],[217,209],[165,167],[167,97],[97,165],[220,115],[115,218],[218,220],[133,112],[112,243],[243,133],[239,238],[238,241],[241,239],[214,135],[135,169],[169,214],[190,173],[173,133],[133,190],[171,208],[208,32],[32,171],[125,44],[44,237],[237,125],[86,87],[87,178],[178,86],[85,86],[86,179],[179,85],[84,85],[85,180],[180,84],[83,84],[84,181],[181,83],[201,83],[83,182],[182,201],[137,93],[93,132],[132,137],[76,62],[62,183],[183,76],[61,76],[76,184],[184,61],[57,61],[61,185],[185,57],[212,57],[57,186],[186,212],[214,207],[207,187],[187,214],[34,143],[143,156],[156,34],[79,239],[239,237],[237,79],[123,137],[137,177],[177,123],[44,1],[1,4],[4,44],[201,194],[194,32],[32,201],[64,102],[102,129],[129,64],[213,215],[215,138],[138,213],[59,166],[166,219],[219,59],[242,99],[99,97],[97,242],[2,94],[94,141],[141,2],[75,59],[59,235],[235,75],[24,110],[110,228],[228,24],[25,130],[130,226],[226,25],[23,24],[24,229],[229,23],[22,23],[23,230],[230,22],[26,22],[22,231],[231,26],[112,26],[26,232],[232,112],[189,190],[190,243],[243,189],[221,56],[56,190],[190,221],[28,56],[56,221],[221,28],[27,28],[28,222],[222,27],[29,27],[27,223],[223,29],[30,29],[29,224],[224,30],[247,30],[30,225],[225,247],[238,79],[79,20],[20,238],[166,59],[59,75],[75,166],[60,75],[75,240],[240,60],[147,177],[177,215],[215,147],[20,79],[79,166],[166,20],[187,147],[147,213],[213,187],[112,233],[233,244],[244,112],[233,128],[128,245],[245,233],[128,114],[114,188],[188,128],[114,217],[217,174],[174,114],[131,115],[115,220],[220,131],[217,198],[198,236],[236,217],[198,131],[131,134],[134,198],[177,132],[132,58],[58,177],[143,35],[35,124],[124,143],[110,163],[163,7],[7,110],[228,110],[110,25],[25,228],[356,389],[389,368],[368,356],[11,302],[302,267],[267,11],[452,350],[350,349],[349,452],[302,303],[303,269],[269,302],[357,343],[343,277],[277,357],[452,453],[453,357],[357,452],[333,332],[332,297],[297,333],[175,152],[152,377],[377,175],[347,348],[348,330],[330,347],[303,304],[304,270],[270,303],[9,336],[336,337],[337,9],[278,279],[279,360],[360,278],[418,262],[262,431],[431,418],[304,408],[408,409],[409,304],[310,415],[415,407],[407,310],[270,409],[409,410],[410,270],[450,348],[348,347],[347,450],[422,430],[430,434],[434,422],[313,314],[314,17],[17,313],[306,307],[307,375],[375,306],[387,388],[388,260],[260,387],[286,414],[414,398],[398,286],[335,406],[406,418],[418,335],[364,367],[367,416],[416,364],[423,358],[358,327],[327,423],[251,284],[284,298],[298,251],[281,5],[5,4],[4,281],[373,374],[374,253],[253,373],[307,320],[320,321],[321,307],[425,427],[427,411],[411,425],[421,313],[313,18],[18,421],[321,405],[405,406],[406,321],[320,404],[404,405],[405,320],[315,16],[16,17],[17,315],[426,425],[425,266],[266,426],[377,400],[400,369],[369,377],[322,391],[391,269],[269,322],[417,465],[465,464],[464,417],[386,257],[257,258],[258,386],[466,260],[260,388],[388,466],[456,399],[399,419],[419,456],[284,332],[332,333],[333,284],[417,285],[285,8],[8,417],[346,340],[340,261],[261,346],[413,441],[441,285],[285,413],[327,460],[460,328],[328,327],[355,371],[371,329],[329,355],[392,439],[439,438],[438,392],[382,341],[341,256],[256,382],[429,420],[420,360],[360,429],[364,394],[394,379],[379,364],[277,343],[343,437],[437,277],[443,444],[444,283],[283,443],[275,440],[440,363],[363,275],[431,262],[262,369],[369,431],[297,338],[338,337],[337,297],[273,375],[375,321],[321,273],[450,451],[451,349],[349,450],[446,342],[342,467],[467,446],[293,334],[334,282],[282,293],[458,461],[461,462],[462,458],[276,353],[353,383],[383,276],[308,324],[324,325],[325,308],[276,300],[300,293],[293,276],[372,345],[345,447],[447,372],[352,345],[345,340],[340,352],[274,1],[1,19],[19,274],[456,248],[248,281],[281,456],[436,427],[427,425],[425,436],[381,256],[256,252],[252,381],[269,391],[391,393],[393,269],[200,199],[199,428],[428,200],[266,330],[330,329],[329,266],[287,273],[273,422],[422,287],[250,462],[462,328],[328,250],[258,286],[286,384],[384,258],[265,353],[353,342],[342,265],[387,259],[259,257],[257,387],[424,431],[431,430],[430,424],[342,353],[353,276],[276,342],[273,335],[335,424],[424,273],[292,325],[325,307],[307,292],[366,447],[447,345],[345,366],[271,303],[303,302],[302,271],[423,266],[266,371],[371,423],[294,455],[455,460],[460,294],[279,278],[278,294],[294,279],[271,272],[272,304],[304,271],[432,434],[434,427],[427,432],[272,407],[407,408],[408,272],[394,430],[430,431],[431,394],[395,369],[369,400],[400,395],[334,333],[333,299],[299,334],[351,417],[417,168],[168,351],[352,280],[280,411],[411,352],[325,319],[319,320],[320,325],[295,296],[296,336],[336,295],[319,403],[403,404],[404,319],[330,348],[348,349],[349,330],[293,298],[298,333],[333,293],[323,454],[454,447],[447,323],[15,16],[16,315],[315,15],[358,429],[429,279],[279,358],[14,15],[15,316],[316,14],[285,336],[336,9],[9,285],[329,349],[349,350],[350,329],[374,380],[380,252],[252,374],[318,402],[402,403],[403,318],[6,197],[197,419],[419,6],[318,319],[319,325],[325,318],[367,364],[364,365],[365,367],[435,367],[367,397],[397,435],[344,438],[438,439],[439,344],[272,271],[271,311],[311,272],[195,5],[5,281],[281,195],[273,287],[287,291],[291,273],[396,428],[428,199],[199,396],[311,271],[271,268],[268,311],[283,444],[444,445],[445,283],[373,254],[254,339],[339,373],[282,334],[334,296],[296,282],[449,347],[347,346],[346,449],[264,447],[447,454],[454,264],[336,296],[296,299],[299,336],[338,10],[10,151],[151,338],[278,439],[439,455],[455,278],[292,407],[407,415],[415,292],[358,371],[371,355],[355,358],[340,345],[345,372],[372,340],[346,347],[347,280],[280,346],[442,443],[443,282],[282,442],[19,94],[94,370],[370,19],[441,442],[442,295],[295,441],[248,419],[419,197],[197,248],[263,255],[255,359],[359,263],[440,275],[275,274],[274,440],[300,383],[383,368],[368,300],[351,412],[412,465],[465,351],[263,467],[467,466],[466,263],[301,368],[368,389],[389,301],[395,378],[378,379],[379,395],[412,351],[351,419],[419,412],[436,426],[426,322],[322,436],[2,164],[164,393],[393,2],[370,462],[462,461],[461,370],[164,0],[0,267],[267,164],[302,11],[11,12],[12,302],[268,12],[12,13],[13,268],[293,300],[300,301],[301,293],[446,261],[261,340],[340,446],[330,266],[266,425],[425,330],[426,423],[423,391],[391,426],[429,355],[355,437],[437,429],[391,327],[327,326],[326,391],[440,457],[457,438],[438,440],[341,382],[382,362],[362,341],[459,457],[457,461],[461,459],[434,430],[430,394],[394,434],[414,463],[463,362],[362,414],[396,369],[369,262],[262,396],[354,461],[461,457],[457,354],[316,403],[403,402],[402,316],[315,404],[404,403],[403,315],[314,405],[405,404],[404,314],[313,406],[406,405],[405,313],[421,418],[418,406],[406,421],[366,401],[401,361],[361,366],[306,408],[408,407],[407,306],[291,409],[409,408],[408,291],[287,410],[410,409],[409,287],[432,436],[436,410],[410,432],[434,416],[416,411],[411,434],[264,368],[368,383],[383,264],[309,438],[438,457],[457,309],[352,376],[376,401],[401,352],[274,275],[275,4],[4,274],[421,428],[428,262],[262,421],[294,327],[327,358],[358,294],[433,416],[416,367],[367,433],[289,455],[455,439],[439,289],[462,370],[370,326],[326,462],[2,326],[326,370],[370,2],[305,460],[460,455],[455,305],[254,449],[449,448],[448,254],[255,261],[261,446],[446,255],[253,450],[450,449],[449,253],[252,451],[451,450],[450,252],[256,452],[452,451],[451,256],[341,453],[453,452],[452,341],[413,464],[464,463],[463,413],[441,413],[413,414],[414,441],[258,442],[442,441],[441,258],[257,443],[443,442],[442,257],[259,444],[444,443],[443,259],[260,445],[445,444],[444,260],[467,342],[342,445],[445,467],[459,458],[458,250],[250,459],[289,392],[392,290],[290,289],[290,328],[328,460],[460,290],[376,433],[433,435],[435,376],[250,290],[290,392],[392,250],[411,416],[416,433],[433,411],[341,463],[463,464],[464,341],[453,464],[464,465],[465,453],[357,465],[465,412],[412,357],[343,412],[412,399],[399,343],[360,363],[363,440],[440,360],[437,399],[399,456],[456,437],[420,456],[456,363],[363,420],[401,435],[435,288],[288,401],[372,383],[383,353],[353,372],[339,255],[255,249],[249,339],[448,261],[261,255],[255,448],[133,243],[243,190],[190,133],[133,155],[155,112],[112,133],[33,246],[246,247],[247,33],[33,130],[130,25],[25,33],[398,384],[384,286],[286,398],[362,398],[398,414],[414,362],[362,463],[463,341],[341,362],[263,359],[359,467],[467,263],[263,249],[249,255],[255,263],[466,467],[467,260],[260,466],[75,60],[60,166],[166,75],[238,239],[239,79],[79,238],[162,127],[127,139],[139,162],[72,11],[11,37],[37,72],[121,232],[232,120],[120,121],[73,72],[72,39],[39,73],[114,128],[128,47],[47,114],[233,232],[232,128],[128,233],[103,104],[104,67],[67,103],[152,175],[175,148],[148,152],[119,118],[118,101],[101,119],[74,73],[73,40],[40,74],[107,9],[9,108],[108,107],[49,48],[48,131],[131,49],[32,194],[194,211],[211,32],[184,74],[74,185],[185,184],[191,80],[80,183],[183,191],[185,40],[40,186],[186,185],[119,230],[230,118],[118,119],[210,202],[202,214],[214,210],[84,83],[83,17],[17,84],[77,76],[76,146],[146,77],[161,160],[160,30],[30,161],[190,56],[56,173],[173,190],[182,106],[106,194],[194,182],[138,135],[135,192],[192,138],[129,203],[203,98],[98,129],[54,21],[21,68],[68,54],[5,51],[51,4],[4,5],[145,144],[144,23],[23,145],[90,77],[77,91],[91,90],[207,205],[205,187],[187,207],[83,201],[201,18],[18,83],[181,91],[91,182],[182,181],[180,90],[90,181],[181,180],[16,85],[85,17],[17,16],[205,206],[206,36],[36,205],[176,148],[148,140],[140,176],[165,92],[92,39],[39,165],[245,193],[193,244],[244,245],[27,159],[159,28],[28,27],[30,247],[247,161],[161,30],[174,236],[236,196],[196,174],[103,54],[54,104],[104,103],[55,193],[193,8],[8,55],[111,117],[117,31],[31,111],[221,189],[189,55],[55,221],[240,98],[98,99],[99,240],[142,126],[126,100],[100,142],[219,166],[166,218],[218,219],[112,155],[155,26],[26,112],[198,209],[209,131],[131,198],[169,135],[135,150],[150,169],[114,47],[47,217],[217,114],[224,223],[223,53],[53,224],[220,45],[45,134],[134,220],[32,211],[211,140],[140,32],[109,67],[67,108],[108,109],[146,43],[43,91],[91,146],[231,230],[230,120],[120,231],[113,226],[226,247],[247,113],[105,63],[63,52],[52,105],[241,238],[238,242],[242,241],[124,46],[46,156],[156,124],[95,78],[78,96],[96,95],[70,46],[46,63],[63,70],[116,143],[143,227],[227,116],[116,123],[123,111],[111,116],[1,44],[44,19],[19,1],[3,236],[236,51],[51,3],[207,216],[216,205],[205,207],[26,154],[154,22],[22,26],[165,39],[39,167],[167,165],[199,200],[200,208],[208,199],[101,36],[36,100],[100,101],[43,57],[57,202],[202,43],[242,20],[20,99],[99,242],[56,28],[28,157],[157,56],[124,35],[35,113],[113,124],[29,160],[160,27],[27,29],[211,204],[204,210],[210,211],[124,113],[113,46],[46,124],[106,43],[43,204],[204,106],[96,62],[62,77],[77,96],[227,137],[137,116],[116,227],[73,41],[41,72],[72,73],[36,203],[203,142],[142,36],[235,64],[64,240],[240,235],[48,49],[49,64],[64,48],[42,41],[41,74],[74,42],[214,212],[212,207],[207,214],[183,42],[42,184],[184,183],[210,169],[169,211],[211,210],[140,170],[170,176],[176,140],[104,105],[105,69],[69,104],[193,122],[122,168],[168,193],[50,123],[123,187],[187,50],[89,96],[96,90],[90,89],[66,65],[65,107],[107,66],[179,89],[89,180],[180,179],[119,101],[101,120],[120,119],[68,63],[63,104],[104,68],[234,93],[93,227],[227,234],[16,15],[15,85],[85,16],[209,129],[129,49],[49,209],[15,14],[14,86],[86,15],[107,55],[55,9],[9,107],[120,100],[100,121],[121,120],[153,145],[145,22],[22,153],[178,88],[88,179],[179,178],[197,6],[6,196],[196,197],[89,88],[88,96],[96,89],[135,138],[138,136],[136,135],[138,215],[215,172],[172,138],[218,115],[115,219],[219,218],[41,42],[42,81],[81,41],[5,195],[195,51],[51,5],[57,43],[43,61],[61,57],[208,171],[171,199],[199,208],[41,81],[81,38],[38,41],[224,53],[53,225],[225,224],[24,144],[144,110],[110,24],[105,52],[52,66],[66,105],[118,229],[229,117],[117,118],[227,34],[34,234],[234,227],[66,107],[107,69],[69,66],[10,109],[109,151],[151,10],[219,48],[48,235],[235,219],[183,62],[62,191],[191,183],[142,129],[129,126],[126,142],[116,111],[111,143],[143,116],[118,117],[117,50],[50,118],[223,222],[222,52],[52,223],[94,19],[19,141],[141,94],[222,221],[221,65],[65,222],[196,3],[3,197],[197,196],[45,220],[220,44],[44,45],[156,70],[70,139],[139,156],[188,122],[122,245],[245,188],[139,71],[71,162],[162,139],[149,170],[170,150],[150,149],[122,188],[188,196],[196,122],[206,216],[216,92],[92,206],[164,2],[2,167],[167,164],[242,141],[141,241],[241,242],[0,164],[164,37],[37,0],[11,72],[72,12],[12,11],[12,38],[38,13],[13,12],[70,63],[63,71],[71,70],[31,226],[226,111],[111,31],[36,101],[101,205],[205,36],[203,206],[206,165],[165,203],[126,209],[209,217],[217,126],[98,165],[165,97],[97,98],[237,220],[220,218],[218,237],[237,239],[239,241],[241,237],[210,214],[214,169],[169,210],[140,171],[171,32],[32,140],[241,125],[125,237],[237,241],[179,86],[86,178],[178,179],[180,85],[85,179],[179,180],[181,84],[84,180],[180,181],[182,83],[83,181],[181,182],[194,201],[201,182],[182,194],[177,137],[137,132],[132,177],[184,76],[76,183],[183,184],[185,61],[61,184],[184,185],[186,57],[57,185],[185,186],[216,212],[212,186],[186,216],[192,214],[214,187],[187,192],[139,34],[34,156],[156,139],[218,79],[79,237],[237,218],[147,123],[123,177],[177,147],[45,44],[44,4],[4,45],[208,201],[201,32],[32,208],[98,64],[64,129],[129,98],[192,213],[213,138],[138,192],[235,59],[59,219],[219,235],[141,242],[242,97],[97,141],[97,2],[2,141],[141,97],[240,75],[75,235],[235,240],[229,24],[24,228],[228,229],[31,25],[25,226],[226,31],[230,23],[23,229],[229,230],[231,22],[22,230],[230,231],[232,26],[26,231],[231,232],[233,112],[112,232],[232,233],[244,189],[189,243],[243,244],[189,221],[221,190],[190,189],[222,28],[28,221],[221,222],[223,27],[27,222],[222,223],[224,29],[29,223],[223,224],[225,30],[30,224],[224,225],[113,247],[247,225],[225,113],[99,60],[60,240],[240,99],[213,147],[147,215],[215,213],[60,20],[20,166],[166,60],[192,187],[187,213],[213,192],[243,112],[112,244],[244,243],[244,233],[233,245],[245,244],[245,128],[128,188],[188,245],[188,114],[114,174],[174,188],[134,131],[131,220],[220,134],[174,217],[217,236],[236,174],[236,198],[198,134],[134,236],[215,177],[177,58],[58,215],[156,143],[143,124],[124,156],[25,110],[110,7],[7,25],[31,228],[228,25],[25,31],[264,356],[356,368],[368,264],[0,11],[11,267],[267,0],[451,452],[452,349],[349,451],[267,302],[302,269],[269,267],[350,357],[357,277],[277,350],[350,452],[452,357],[357,350],[299,333],[333,297],[297,299],[396,175],[175,377],[377,396],[280,347],[347,330],[330,280],[269,303],[303,270],[270,269],[151,9],[9,337],[337,151],[344,278],[278,360],[360,344],[424,418],[418,431],[431,424],[270,304],[304,409],[409,270],[272,310],[310,407],[407,272],[322,270],[270,410],[410,322],[449,450],[450,347],[347,449],[432,422],[422,434],[434,432],[18,313],[313,17],[17,18],[291,306],[306,375],[375,291],[259,387],[387,260],[260,259],[424,335],[335,418],[418,424],[434,364],[364,416],[416,434],[391,423],[423,327],[327,391],[301,251],[251,298],[298,301],[275,281],[281,4],[4,275],[254,373],[373,253],[253,254],[375,307],[307,321],[321,375],[280,425],[425,411],[411,280],[200,421],[421,18],[18,200],[335,321],[321,406],[406,335],[321,320],[320,405],[405,321],[314,315],[315,17],[17,314],[423,426],[426,266],[266,423],[396,377],[377,369],[369,396],[270,322],[322,269],[269,270],[413,417],[417,464],[464,413],[385,386],[386,258],[258,385],[248,456],[456,419],[419,248],[298,284],[284,333],[333,298],[168,417],[417,8],[8,168],[448,346],[346,261],[261,448],[417,413],[413,285],[285,417],[326,327],[327,328],[328,326],[277,355],[355,329],[329,277],[309,392],[392,438],[438,309],[381,382],[382,256],[256,381],[279,429],[429,360],[360,279],[365,364],[364,379],[379,365],[355,277],[277,437],[437,355],[282,443],[443,283],[283,282],[281,275],[275,363],[363,281],[395,431],[431,369],[369,395],[299,297],[297,337],[337,299],[335,273],[273,321],[321,335],[348,450],[450,349],[349,348],[359,446],[446,467],[467,359],[283,293],[293,282],[282,283],[250,458],[458,462],[462,250],[300,276],[276,383],[383,300],[292,308],[308,325],[325,292],[283,276],[276,293],[293,283],[264,372],[372,447],[447,264],[346,352],[352,340],[340,346],[354,274],[274,19],[19,354],[363,456],[456,281],[281,363],[426,436],[436,425],[425,426],[380,381],[381,252],[252,380],[267,269],[269,393],[393,267],[421,200],[200,428],[428,421],[371,266],[266,329],[329,371],[432,287],[287,422],[422,432],[290,250],[250,328],[328,290],[385,258],[258,384],[384,385],[446,265],[265,342],[342,446],[386,387],[387,257],[257,386],[422,424],[424,430],[430,422],[445,342],[342,276],[276,445],[422,273],[273,424],[424,422],[306,292],[292,307],[307,306],[352,366],[366,345],[345,352],[268,271],[271,302],[302,268],[358,423],[423,371],[371,358],[327,294],[294,460],[460,327],[331,279],[279,294],[294,331],[303,271],[271,304],[304,303],[436,432],[432,427],[427,436],[304,272],[272,408],[408,304],[395,394],[394,431],[431,395],[378,395],[395,400],[400,378],[296,334],[334,299],[299,296],[6,351],[351,168],[168,6],[376,352],[352,411],[411,376],[307,325],[325,320],[320,307],[285,295],[295,336],[336,285],[320,319],[319,404],[404,320],[329,330],[330,349],[349,329],[334,293],[293,333],[333,334],[366,323],[323,447],[447,366],[316,15],[15,315],[315,316],[331,358],[358,279],[279,331],[317,14],[14,316],[316,317],[8,285],[285,9],[9,8],[277,329],[329,350],[350,277],[253,374],[374,252],[252,253],[319,318],[318,403],[403,319],[351,6],[6,419],[419,351],[324,318],[318,325],[325,324],[397,367],[367,365],[365,397],[288,435],[435,397],[397,288],[278,344],[344,439],[439,278],[310,272],[272,311],[311,310],[248,195],[195,281],[281,248],[375,273],[273,291],[291,375],[175,396],[396,199],[199,175],[312,311],[311,268],[268,312],[276,283],[283,445],[445,276],[390,373],[373,339],[339,390],[295,282],[282,296],[296,295],[448,449],[449,346],[346,448],[356,264],[264,454],[454,356],[337,336],[336,299],[299,337],[337,338],[338,151],[151,337],[294,278],[278,455],[455,294],[308,292],[292,415],[415,308],[429,358],[358,355],[355,429],[265,340],[340,372],[372,265],[352,346],[346,280],[280,352],[295,442],[442,282],[282,295],[354,19],[19,370],[370,354],[285,441],[441,295],[295,285],[195,248],[248,197],[197,195],[457,440],[440,274],[274,457],[301,300],[300,368],[368,301],[417,351],[351,465],[465,417],[251,301],[301,389],[389,251],[394,395],[395,379],[379,394],[399,412],[412,419],[419,399],[410,436],[436,322],[322,410],[326,2],[2,393],[393,326],[354,370],[370,461],[461,354],[393,164],[164,267],[267,393],[268,302],[302,12],[12,268],[312,268],[268,13],[13,312],[298,293],[293,301],[301,298],[265,446],[446,340],[340,265],[280,330],[330,425],[425,280],[322,426],[426,391],[391,322],[420,429],[429,437],[437,420],[393,391],[391,326],[326,393],[344,440],[440,438],[438,344],[458,459],[459,461],[461,458],[364,434],[434,394],[394,364],[428,396],[396,262],[262,428],[274,354],[354,457],[457,274],[317,316],[316,402],[402,317],[316,315],[315,403],[403,316],[315,314],[314,404],[404,315],[314,313],[313,405],[405,314],[313,421],[421,406],[406,313],[323,366],[366,361],[361,323],[292,306],[306,407],[407,292],[306,291],[291,408],[408,306],[291,287],[287,409],[409,291],[287,432],[432,410],[410,287],[427,434],[434,411],[411,427],[372,264],[264,383],[383,372],[459,309],[309,457],[457,459],[366,352],[352,401],[401,366],[1,274],[274,4],[4,1],[418,421],[421,262],[262,418],[331,294],[294,358],[358,331],[435,433],[433,367],[367,435],[392,289],[289,439],[439,392],[328,462],[462,326],[326,328],[94,2],[2,370],[370,94],[289,305],[305,455],[455,289],[339,254],[254,448],[448,339],[359,255],[255,446],[446,359],[254,253],[253,449],[449,254],[253,252],[252,450],[450,253],[252,256],[256,451],[451,252],[256,341],[341,452],[452,256],[414,413],[413,463],[463,414],[286,441],[441,414],[414,286],[286,258],[258,441],[441,286],[258,257],[257,442],[442,258],[257,259],[259,443],[443,257],[259,260],[260,444],[444,259],[260,467],[467,445],[445,260],[309,459],[459,250],[250,309],[305,289],[289,290],[290,305],[305,290],[290,460],[460,305],[401,376],[376,435],[435,401],[309,250],[250,392],[392,309],[376,411],[411,433],[433,376],[453,341],[341,464],[464,453],[357,453],[453,465],[465,357],[343,357],[357,412],[412,343],[437,343],[343,399],[399,437],[344,360],[360,440],[440,344],[420,437],[437,456],[456,420],[360,420],[420,363],[363,360],[361,401],[401,288],[288,361],[265,372],[372,353],[353,265],[390,339],[339,249],[249,390],[339,448],[448,255],[255,339]);function uh(t){t.j={faceLandmarks:[],faceBlendshapes:[],facialTransformationMatrixes:[]};}var lh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",false),this.j={faceLandmarks:[],faceBlendshapes:[],facialTransformationMatrixes:[]},this.outputFacialTransformationMatrixes=this.outputFaceBlendshapes=false,un(t=this.h=new Ds,0,1,e=new xs),this.v=new Ns,un(this.h,0,3,this.v),this.s=new Rs,un(this.h,0,2,this.s),En(this.s,4,1),wn(this.s,2,.5),wn(this.v,2,.5),wn(this.h,4,.5);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return "numFaces"in t&&En(this.s,4,t.numFaces??1),"minFaceDetectionConfidence"in t&&wn(this.s,2,t.minFaceDetectionConfidence??.5),"minTrackingConfidence"in t&&wn(this.h,4,t.minTrackingConfidence??.5),"minFacePresenceConfidence"in t&&wn(this.v,2,t.minFacePresenceConfidence??.5),"outputFaceBlendshapes"in t&&(this.outputFaceBlendshapes=!!t.outputFaceBlendshapes),"outputFacialTransformationMatrixes"in t&&(this.outputFacialTransformationMatrixes=!!t.outputFacialTransformationMatrixes),this.l(t)}D(t,e){return uh(this),$a(this,t,e),this.j}F(t,e,n){return uh(this),qa(this,t,n,e),this.j}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"face_landmarks");const e=new Ci;Kn(e,js,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.face_landmarker.FaceLandmarkerGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"NORM_LANDMARKS:face_landmarks"),n.o(e),zi(t,n),this.g.attachProtoVectorListener("face_landmarks",((t,e)=>{for(const e of t)t=cs(e),this.j.faceLandmarks.push(Fo(t));$o(this,e);})),this.g.attachEmptyPacketListener("face_landmarks",(t=>{$o(this,t);})),this.outputFaceBlendshapes&&(Yi(t,"blendshapes"),ji(n,"BLENDSHAPES:blendshapes"),this.g.attachProtoVectorListener("blendshapes",((t,e)=>{if(this.outputFaceBlendshapes)for(const e of t)t=es(e),this.j.faceBlendshapes.push(xo(t.g()??[]));$o(this,e);})),this.g.attachEmptyPacketListener("blendshapes",(t=>{$o(this,t);}))),this.outputFacialTransformationMatrixes&&(Yi(t,"face_geometry"),ji(n,"FACE_GEOMETRY:face_geometry"),this.g.attachProtoVectorListener("face_geometry",((t,e)=>{if(this.outputFacialTransformationMatrixes)for(const e of t)(t=an(Cs(e),us,2))&&this.j.facialTransformationMatrixes.push({rows:gn(mn(t,1),0)??0,columns:gn(mn(t,2),0)??0,data:ze(t,3,Wt$1).slice()??[]});$o(this,e);})),this.g.attachEmptyPacketListener("face_geometry",(t=>{$o(this,t);}))),t=t.g(),this.setGraph(new Uint8Array(t),true);}};lh.prototype.detectForVideo=lh.prototype.F,lh.prototype.detect=lh.prototype.D,lh.prototype.setOptions=lh.prototype.o,lh.createFromModelPath=function(t,e){return Ka(lh,t,{baseOptions:{modelAssetPath:e}})},lh.createFromModelBuffer=function(t,e){return Ka(lh,t,{baseOptions:{modelAssetBuffer:e}})},lh.createFromOptions=function(t,e){return Ka(lh,t,e)},lh.FACE_LANDMARKS_LIPS=th,lh.FACE_LANDMARKS_LEFT_EYE=eh,lh.FACE_LANDMARKS_LEFT_EYEBROW=nh,lh.FACE_LANDMARKS_LEFT_IRIS=rh,lh.FACE_LANDMARKS_RIGHT_EYE=ih,lh.FACE_LANDMARKS_RIGHT_EYEBROW=sh,lh.FACE_LANDMARKS_RIGHT_IRIS=oh,lh.FACE_LANDMARKS_FACE_OVAL=ah,lh.FACE_LANDMARKS_CONTOURS=hh,lh.FACE_LANDMARKS_TESSELATION=ch;var fh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",true),un(t=this.j=new Vs,0,1,e=new xs);}get baseOptions(){return an(this.j,xs,1)}set baseOptions(t){un(this.j,0,1,t);}o(t){return super.l(t)}Pa(t,e,n){const r="function"!=typeof e?e:{};if(this.h="function"==typeof e?e:n,$a(this,t,r??{}),!this.h)return this.s}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"stylized_image");const e=new Ci;Kn(e,Xs,this.j);const n=new Vi;Bi(n,"mediapipe.tasks.vision.face_stylizer.FaceStylizerGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"STYLIZED_IMAGE:stylized_image"),n.o(e),zi(t,n),this.g.X("stylized_image",((t,e)=>{var n=!this.h,r=t.data,i=t.width;const s=i*(t=t.height);if(r instanceof Uint8Array)if(r.length===3*s){const e=new Uint8ClampedArray(4*s);for(let t=0;t<s;++t)e[4*t]=r[3*t],e[4*t+1]=r[3*t+1],e[4*t+2]=r[3*t+2],e[4*t+3]=255;r=new ImageData(e,i,t);}else {if(r.length!==4*s)throw Error("Unsupported channel count: "+r.length/s);r=new ImageData(new Uint8ClampedArray(r.buffer,r.byteOffset,r.length),i,t);}else if(!(r instanceof WebGLTexture))throw Error(`Unsupported format: ${r.constructor.name}`);i=new ja([r],false,false,this.g.i.canvas,this.P,i,t),this.s=n=n?i.clone():i,this.h&&this.h(n),$o(this,e);})),this.g.attachEmptyPacketListener("stylized_image",(t=>{this.s=null,this.h&&this.h(null),$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};fh.prototype.stylize=fh.prototype.Pa,fh.prototype.setOptions=fh.prototype.o,fh.createFromModelPath=function(t,e){return Ka(fh,t,{baseOptions:{modelAssetPath:e}})},fh.createFromModelBuffer=function(t,e){return Ka(fh,t,{baseOptions:{modelAssetBuffer:e}})},fh.createFromOptions=function(t,e){return Ka(fh,t,e)};var dh=Xa([0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]);function ph(t){t.gestures=[],t.landmarks=[],t.worldLandmarks=[],t.handedness=[];}function gh(t){return 0===t.gestures.length?{gestures:[],landmarks:[],worldLandmarks:[],handedness:[],handednesses:[]}:{gestures:t.gestures,landmarks:t.landmarks,worldLandmarks:t.worldLandmarks,handedness:t.handedness,handednesses:t.handedness}}function mh(t,e=true){const n=[];for(const i of t){var r=es(i);t=[];for(const n of r.g())r=e&&null!=mn(n,1)?gn(mn(n,1),0):-1,t.push({score:yn(n,2)??0,index:r,categoryName:_n(n,3)??"",displayName:_n(n,4)??""});n.push(t);}return n}var yh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",false),this.gestures=[],this.landmarks=[],this.worldLandmarks=[],this.handedness=[],un(t=this.j=new Js,0,1,e=new xs),this.s=new qs,un(this.j,0,2,this.s),this.C=new $s,un(this.s,0,3,this.C),this.v=new Ys,un(this.s,0,2,this.v),this.h=new Ks,un(this.j,0,3,this.h),wn(this.v,2,.5),wn(this.s,4,.5),wn(this.C,2,.5);}get baseOptions(){return an(this.j,xs,1)}set baseOptions(t){un(this.j,0,1,t);}o(t){if(En(this.v,3,t.numHands??1),"minHandDetectionConfidence"in t&&wn(this.v,2,t.minHandDetectionConfidence??.5),"minTrackingConfidence"in t&&wn(this.s,4,t.minTrackingConfidence??.5),"minHandPresenceConfidence"in t&&wn(this.C,2,t.minHandPresenceConfidence??.5),t.cannedGesturesClassifierOptions){var e=new Hs,n=e,r=So(t.cannedGesturesClassifierOptions,an(this.h,Hs,3)?.h());un(n,0,2,r),un(this.h,0,3,e);}else void 0===t.cannedGesturesClassifierOptions&&an(this.h,Hs,3)?.g();return t.customGesturesClassifierOptions?(un(n=e=new Hs,0,2,r=So(t.customGesturesClassifierOptions,an(this.h,Hs,4)?.h())),un(this.h,0,4,e)):void 0===t.customGesturesClassifierOptions&&an(this.h,Hs,4)?.g(),this.l(t)}Ka(t,e){return ph(this),$a(this,t,e),gh(this)}La(t,e,n){return ph(this),qa(this,t,n,e),gh(this)}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"hand_gestures"),Yi(t,"hand_landmarks"),Yi(t,"world_hand_landmarks"),Yi(t,"handedness");const e=new Ci;Kn(e,io,this.j);const n=new Vi;Bi(n,"mediapipe.tasks.vision.gesture_recognizer.GestureRecognizerGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"HAND_GESTURES:hand_gestures"),ji(n,"LANDMARKS:hand_landmarks"),ji(n,"WORLD_LANDMARKS:world_hand_landmarks"),ji(n,"HANDEDNESS:handedness"),n.o(e),zi(t,n),this.g.attachProtoVectorListener("hand_landmarks",((t,e)=>{for(const e of t){t=cs(e);const n=[];for(const e of cn(t,hs,1))n.push({x:yn(e,1)??0,y:yn(e,2)??0,z:yn(e,3)??0,visibility:yn(e,4)??0});this.landmarks.push(n);}$o(this,e);})),this.g.attachEmptyPacketListener("hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoVectorListener("world_hand_landmarks",((t,e)=>{for(const e of t){t=as(e);const n=[];for(const e of cn(t,os,1))n.push({x:yn(e,1)??0,y:yn(e,2)??0,z:yn(e,3)??0,visibility:yn(e,4)??0});this.worldLandmarks.push(n);}$o(this,e);})),this.g.attachEmptyPacketListener("world_hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoVectorListener("hand_gestures",((t,e)=>{this.gestures.push(...mh(t,false)),$o(this,e);})),this.g.attachEmptyPacketListener("hand_gestures",(t=>{$o(this,t);})),this.g.attachProtoVectorListener("handedness",((t,e)=>{this.handedness.push(...mh(t)),$o(this,e);})),this.g.attachEmptyPacketListener("handedness",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};function _h(t){return {landmarks:t.landmarks,worldLandmarks:t.worldLandmarks,handednesses:t.handedness,handedness:t.handedness}}yh.prototype.recognizeForVideo=yh.prototype.La,yh.prototype.recognize=yh.prototype.Ka,yh.prototype.setOptions=yh.prototype.o,yh.createFromModelPath=function(t,e){return Ka(yh,t,{baseOptions:{modelAssetPath:e}})},yh.createFromModelBuffer=function(t,e){return Ka(yh,t,{baseOptions:{modelAssetBuffer:e}})},yh.createFromOptions=function(t,e){return Ka(yh,t,e)},yh.HAND_CONNECTIONS=dh;var vh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",false),this.landmarks=[],this.worldLandmarks=[],this.handedness=[],un(t=this.h=new qs,0,1,e=new xs),this.s=new $s,un(this.h,0,3,this.s),this.j=new Ys,un(this.h,0,2,this.j),En(this.j,3,1),wn(this.j,2,.5),wn(this.s,2,.5),wn(this.h,4,.5);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return "numHands"in t&&En(this.j,3,t.numHands??1),"minHandDetectionConfidence"in t&&wn(this.j,2,t.minHandDetectionConfidence??.5),"minTrackingConfidence"in t&&wn(this.h,4,t.minTrackingConfidence??.5),"minHandPresenceConfidence"in t&&wn(this.s,2,t.minHandPresenceConfidence??.5),this.l(t)}D(t,e){return this.landmarks=[],this.worldLandmarks=[],this.handedness=[],$a(this,t,e),_h(this)}F(t,e,n){return this.landmarks=[],this.worldLandmarks=[],this.handedness=[],qa(this,t,n,e),_h(this)}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"hand_landmarks"),Yi(t,"world_hand_landmarks"),Yi(t,"handedness");const e=new Ci;Kn(e,ro,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.hand_landmarker.HandLandmarkerGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"LANDMARKS:hand_landmarks"),ji(n,"WORLD_LANDMARKS:world_hand_landmarks"),ji(n,"HANDEDNESS:handedness"),n.o(e),zi(t,n),this.g.attachProtoVectorListener("hand_landmarks",((t,e)=>{for(const e of t)t=cs(e),this.landmarks.push(Fo(t));$o(this,e);})),this.g.attachEmptyPacketListener("hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoVectorListener("world_hand_landmarks",((t,e)=>{for(const e of t)t=as(e),this.worldLandmarks.push(Ro(t));$o(this,e);})),this.g.attachEmptyPacketListener("world_hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoVectorListener("handedness",((t,e)=>{var n=this.handedness,r=n.push;const i=[];for(const e of t){t=es(e);const n=[];for(const e of t.g())n.push({score:yn(e,2)??0,index:gn(mn(e,1),0)??-1,categoryName:_n(e,3)??"",displayName:_n(e,4)??""});i.push(n);}r.call(n,...i),$o(this,e);})),this.g.attachEmptyPacketListener("handedness",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};vh.prototype.detectForVideo=vh.prototype.F,vh.prototype.detect=vh.prototype.D,vh.prototype.setOptions=vh.prototype.o,vh.createFromModelPath=function(t,e){return Ka(vh,t,{baseOptions:{modelAssetPath:e}})},vh.createFromModelBuffer=function(t,e){return Ka(vh,t,{baseOptions:{modelAssetBuffer:e}})},vh.createFromOptions=function(t,e){return Ka(vh,t,e)},vh.HAND_CONNECTIONS=dh;var Eh=Xa([0,1],[1,2],[2,3],[3,7],[0,4],[4,5],[5,6],[6,8],[9,10],[11,12],[11,13],[13,15],[15,17],[15,19],[15,21],[17,19],[12,14],[14,16],[16,18],[16,20],[16,22],[18,20],[11,23],[12,24],[23,24],[23,25],[24,26],[25,27],[26,28],[27,29],[28,30],[29,31],[30,32],[27,31],[28,32]);function wh(t){t.h={faceLandmarks:[],faceBlendshapes:[],poseLandmarks:[],poseWorldLandmarks:[],poseSegmentationMasks:[],leftHandLandmarks:[],leftHandWorldLandmarks:[],rightHandLandmarks:[],rightHandWorldLandmarks:[]};}function Th(t){try{if(!t.C)return t.h;t.C(t.h);}finally{Zo(t);}}function Ah(t,e){t=cs(t),e.push(Fo(t));}var bh=class extends Za{constructor(t,e){super(new za(t,e),"input_frames_image",null,false),this.h={faceLandmarks:[],faceBlendshapes:[],poseLandmarks:[],poseWorldLandmarks:[],poseSegmentationMasks:[],leftHandLandmarks:[],leftHandWorldLandmarks:[],rightHandLandmarks:[],rightHandWorldLandmarks:[]},this.outputPoseSegmentationMasks=this.outputFaceBlendshapes=false,un(t=this.j=new ho,0,1,e=new xs),this.J=new $s,un(this.j,0,2,this.J),this.ba=new so,un(this.j,0,3,this.ba),this.s=new Rs,un(this.j,0,4,this.s),this.H=new Ns,un(this.j,0,5,this.H),this.v=new oo,un(this.j,0,6,this.v),this.K=new ao,un(this.j,0,7,this.K),wn(this.s,2,.5),wn(this.s,3,.3),wn(this.H,2,.5),wn(this.v,2,.5),wn(this.v,3,.3),wn(this.K,2,.5),wn(this.J,2,.5);}get baseOptions(){return an(this.j,xs,1)}set baseOptions(t){un(this.j,0,1,t);}o(t){return "minFaceDetectionConfidence"in t&&wn(this.s,2,t.minFaceDetectionConfidence??.5),"minFaceSuppressionThreshold"in t&&wn(this.s,3,t.minFaceSuppressionThreshold??.3),"minFacePresenceConfidence"in t&&wn(this.H,2,t.minFacePresenceConfidence??.5),"outputFaceBlendshapes"in t&&(this.outputFaceBlendshapes=!!t.outputFaceBlendshapes),"minPoseDetectionConfidence"in t&&wn(this.v,2,t.minPoseDetectionConfidence??.5),"minPoseSuppressionThreshold"in t&&wn(this.v,3,t.minPoseSuppressionThreshold??.3),"minPosePresenceConfidence"in t&&wn(this.K,2,t.minPosePresenceConfidence??.5),"outputPoseSegmentationMasks"in t&&(this.outputPoseSegmentationMasks=!!t.outputPoseSegmentationMasks),"minHandLandmarksConfidence"in t&&wn(this.J,2,t.minHandLandmarksConfidence??.5),this.l(t)}D(t,e,n){const r="function"!=typeof e?e:{};return this.C="function"==typeof e?e:n,wh(this),$a(this,t,r),Th(this)}F(t,e,n,r){const i="function"!=typeof n?n:{};return this.C="function"==typeof n?n:r,wh(this),qa(this,t,i,e),Th(this)}m(){var t=new $i;Ki(t,"input_frames_image"),Yi(t,"pose_landmarks"),Yi(t,"pose_world_landmarks"),Yi(t,"face_landmarks"),Yi(t,"left_hand_landmarks"),Yi(t,"left_hand_world_landmarks"),Yi(t,"right_hand_landmarks"),Yi(t,"right_hand_world_landmarks");const e=new Ci,n=new ki;Je(n,1,re("type.googleapis.com/mediapipe.tasks.vision.holistic_landmarker.proto.HolisticLandmarkerGraphOptions"),""),function(t,e){if(null!=e)if(Array.isArray(e))je(t,2,Re(e,Ie,void 0,void 0,false));else {if(!("string"==typeof e||e instanceof D||I(e)))throw Error("invalid value in Any.value field: "+e+" expected a ByteString, a base64 encoded string, a Uint8Array or a jspb array");Je(t,2,lt$1(e,false,false),U());}}(n,this.j.g());const r=new Vi;Bi(r,"mediapipe.tasks.vision.holistic_landmarker.HolisticLandmarkerGraph"),pn(r,8,ki,n),Gi(r,"IMAGE:input_frames_image"),ji(r,"POSE_LANDMARKS:pose_landmarks"),ji(r,"POSE_WORLD_LANDMARKS:pose_world_landmarks"),ji(r,"FACE_LANDMARKS:face_landmarks"),ji(r,"LEFT_HAND_LANDMARKS:left_hand_landmarks"),ji(r,"LEFT_HAND_WORLD_LANDMARKS:left_hand_world_landmarks"),ji(r,"RIGHT_HAND_LANDMARKS:right_hand_landmarks"),ji(r,"RIGHT_HAND_WORLD_LANDMARKS:right_hand_world_landmarks"),r.o(e),zi(t,r),qo(this,t),this.g.attachProtoListener("pose_landmarks",((t,e)=>{Ah(t,this.h.poseLandmarks),$o(this,e);})),this.g.attachEmptyPacketListener("pose_landmarks",(t=>{$o(this,t);})),this.g.attachProtoListener("pose_world_landmarks",((t,e)=>{var n=this.h.poseWorldLandmarks;t=as(t),n.push(Ro(t)),$o(this,e);})),this.g.attachEmptyPacketListener("pose_world_landmarks",(t=>{$o(this,t);})),this.outputPoseSegmentationMasks&&(ji(r,"POSE_SEGMENTATION_MASK:pose_segmentation_mask"),Jo(this,"pose_segmentation_mask"),this.g.X("pose_segmentation_mask",((t,e)=>{this.h.poseSegmentationMasks=[Ja(this,t,true,!this.C)],$o(this,e);})),this.g.attachEmptyPacketListener("pose_segmentation_mask",(t=>{this.h.poseSegmentationMasks=[],$o(this,t);}))),this.g.attachProtoListener("face_landmarks",((t,e)=>{Ah(t,this.h.faceLandmarks),$o(this,e);})),this.g.attachEmptyPacketListener("face_landmarks",(t=>{$o(this,t);})),this.outputFaceBlendshapes&&(Yi(t,"extra_blendshapes"),ji(r,"FACE_BLENDSHAPES:extra_blendshapes"),this.g.attachProtoListener("extra_blendshapes",((t,e)=>{var n=this.h.faceBlendshapes;this.outputFaceBlendshapes&&(t=es(t),n.push(xo(t.g()??[]))),$o(this,e);})),this.g.attachEmptyPacketListener("extra_blendshapes",(t=>{$o(this,t);}))),this.g.attachProtoListener("left_hand_landmarks",((t,e)=>{Ah(t,this.h.leftHandLandmarks),$o(this,e);})),this.g.attachEmptyPacketListener("left_hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoListener("left_hand_world_landmarks",((t,e)=>{var n=this.h.leftHandWorldLandmarks;t=as(t),n.push(Ro(t)),$o(this,e);})),this.g.attachEmptyPacketListener("left_hand_world_landmarks",(t=>{$o(this,t);})),this.g.attachProtoListener("right_hand_landmarks",((t,e)=>{Ah(t,this.h.rightHandLandmarks),$o(this,e);})),this.g.attachEmptyPacketListener("right_hand_landmarks",(t=>{$o(this,t);})),this.g.attachProtoListener("right_hand_world_landmarks",((t,e)=>{var n=this.h.rightHandWorldLandmarks;t=as(t),n.push(Ro(t)),$o(this,e);})),this.g.attachEmptyPacketListener("right_hand_world_landmarks",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};bh.prototype.detectForVideo=bh.prototype.F,bh.prototype.detect=bh.prototype.D,bh.prototype.setOptions=bh.prototype.o,bh.createFromModelPath=function(t,e){return Ka(bh,t,{baseOptions:{modelAssetPath:e}})},bh.createFromModelBuffer=function(t,e){return Ka(bh,t,{baseOptions:{modelAssetBuffer:e}})},bh.createFromOptions=function(t,e){return Ka(bh,t,e)},bh.HAND_CONNECTIONS=dh,bh.POSE_CONNECTIONS=Eh,bh.FACE_LANDMARKS_LIPS=th,bh.FACE_LANDMARKS_LEFT_EYE=eh,bh.FACE_LANDMARKS_LEFT_EYEBROW=nh,bh.FACE_LANDMARKS_LEFT_IRIS=rh,bh.FACE_LANDMARKS_RIGHT_EYE=ih,bh.FACE_LANDMARKS_RIGHT_EYEBROW=sh,bh.FACE_LANDMARKS_RIGHT_IRIS=oh,bh.FACE_LANDMARKS_FACE_OVAL=ah,bh.FACE_LANDMARKS_CONTOURS=hh,bh.FACE_LANDMARKS_TESSELATION=ch;var kh=class extends Za{constructor(t,e){super(new za(t,e),"input_image","norm_rect",true),this.j={classifications:[]},un(t=this.h=new lo,0,1,e=new xs);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return un(this.h,0,2,So(t,an(this.h,Es,2))),this.l(t)}ua(t,e){return this.j={classifications:[]},$a(this,t,e),this.j}va(t,e,n){return this.j={classifications:[]},qa(this,t,n,e),this.j}m(){var t=new $i;Ki(t,"input_image"),Ki(t,"norm_rect"),Yi(t,"classifications");const e=new Ci;Kn(e,fo,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.image_classifier.ImageClassifierGraph"),Gi(n,"IMAGE:input_image"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"CLASSIFICATIONS:classifications"),n.o(e),zi(t,n),this.g.attachProtoListener("classifications",((t,e)=>{this.j=function(t){const e={classifications:cn(t,ds,1).map((t=>xo(an(t,Qi,4)?.g()??[],gn(mn(t,2),0),_n(t,3))))};return null!=te(De(t,2))&&(e.timestampMs=gn(te(De(t,2)),0)),e}(ps(t)),$o(this,e);})),this.g.attachEmptyPacketListener("classifications",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};kh.prototype.classifyForVideo=kh.prototype.va,kh.prototype.classify=kh.prototype.ua,kh.prototype.setOptions=kh.prototype.o,kh.createFromModelPath=function(t,e){return Ka(kh,t,{baseOptions:{modelAssetPath:e}})},kh.createFromModelBuffer=function(t,e){return Ka(kh,t,{baseOptions:{modelAssetBuffer:e}})},kh.createFromOptions=function(t,e){return Ka(kh,t,e)};var Sh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",true),this.h=new po,this.embeddings={embeddings:[]},un(t=this.h,0,1,e=new xs);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){var e=this.h,n=an(this.h,Ts,2);return n=n?n.clone():new Ts,void 0!==t.l2Normalize?vn(n,1,t.l2Normalize):"l2Normalize"in t&&je(n,1),void 0!==t.quantize?vn(n,2,t.quantize):"quantize"in t&&je(n,2),un(e,0,2,n),this.l(t)}Ba(t,e){return $a(this,t,e),this.embeddings}Ca(t,e,n){return qa(this,t,n,e),this.embeddings}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"embeddings_out");const e=new Ci;Kn(e,go,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.image_embedder.ImageEmbedderGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"EMBEDDINGS:embeddings_out"),n.o(e),zi(t,n),this.g.attachProtoListener("embeddings_out",((t,e)=>{t=vs(t),this.embeddings=function(t){return {embeddings:cn(t,ys,1).map((t=>{const e={headIndex:gn(mn(t,3),0)??-1,headName:_n(t,4)??""};if(void 0!==on(t,gs,tn(t,1)))t=ze(t=an(t,gs,tn(t,1)),1,Wt$1),e.floatEmbedding=t.slice();else {const n=new Uint8Array(0);e.quantizedEmbedding=an(t,ms,tn(t,2))?.qa()?.h()??n;}return e})),timestampMs:gn(te(De(t,2)),0)}}(t),$o(this,e);})),this.g.attachEmptyPacketListener("embeddings_out",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Sh.cosineSimilarity=function(t,e){if(t.floatEmbedding&&e.floatEmbedding)t=Io(t.floatEmbedding,e.floatEmbedding);else {if(!t.quantizedEmbedding||!e.quantizedEmbedding)throw Error("Cannot compute cosine similarity between quantized and float embeddings.");t=Io(Mo(t.quantizedEmbedding),Mo(e.quantizedEmbedding));}return t},Sh.prototype.embedForVideo=Sh.prototype.Ca,Sh.prototype.embed=Sh.prototype.Ba,Sh.prototype.setOptions=Sh.prototype.o,Sh.createFromModelPath=function(t,e){return Ka(Sh,t,{baseOptions:{modelAssetPath:e}})},Sh.createFromModelBuffer=function(t,e){return Ka(Sh,t,{baseOptions:{modelAssetBuffer:e}})},Sh.createFromOptions=function(t,e){return Ka(Sh,t,e)};var xh=class{constructor(t,e,n){this.confidenceMasks=t,this.categoryMask=e,this.qualityScores=n;}close(){this.confidenceMasks?.forEach((t=>{t.close();})),this.categoryMask?.close();}};function Lh(t){t.categoryMask=void 0,t.confidenceMasks=void 0,t.qualityScores=void 0;}function Fh(t){try{const e=new xh(t.confidenceMasks,t.categoryMask,t.qualityScores);if(!t.j)return e;t.j(e);}finally{Zo(t);}}xh.prototype.close=xh.prototype.close;var Rh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",false),this.s=[],this.outputCategoryMask=false,this.outputConfidenceMasks=true,this.h=new Eo,this.v=new mo$1,un(this.h,0,3,this.v),un(t=this.h,0,1,e=new xs);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return void 0!==t.displayNamesLocale?je(this.h,2,re(t.displayNamesLocale)):"displayNamesLocale"in t&&je(this.h,2),"outputCategoryMask"in t&&(this.outputCategoryMask=t.outputCategoryMask??false),"outputConfidenceMasks"in t&&(this.outputConfidenceMasks=t.outputConfidenceMasks??true),super.l(t)}I(){!function(t){const e=cn(t.fa(),Vi,1).filter((t=>_n(t,1).includes("mediapipe.tasks.TensorsToSegmentationCalculator")));if(t.s=[],e.length>1)throw Error("The graph has more than one mediapipe.tasks.TensorsToSegmentationCalculator.");1===e.length&&(an(e[0],Ci,7)?.l()?.g()??new Map).forEach(((e,n)=>{t.s[Number(n)]=_n(e,1);}));}(this);}ga(t,e,n){const r="function"!=typeof e?e:{};return this.j="function"==typeof e?e:n,Lh(this),$a(this,t,r),Fh(this)}Na(t,e,n,r){const i="function"!=typeof n?n:{};return this.j="function"==typeof n?n:r,Lh(this),qa(this,t,i,e),Fh(this)}Fa(){return this.s}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect");const e=new Ci;Kn(e,wo,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.image_segmenter.ImageSegmenterGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),n.o(e),zi(t,n),qo(this,t),this.outputConfidenceMasks&&(Yi(t,"confidence_masks"),ji(n,"CONFIDENCE_MASKS:confidence_masks"),Jo(this,"confidence_masks"),this.g.ea("confidence_masks",((t,e)=>{this.confidenceMasks=t.map((t=>Ja(this,t,true,!this.j))),$o(this,e);})),this.g.attachEmptyPacketListener("confidence_masks",(t=>{this.confidenceMasks=[],$o(this,t);}))),this.outputCategoryMask&&(Yi(t,"category_mask"),ji(n,"CATEGORY_MASK:category_mask"),Jo(this,"category_mask"),this.g.X("category_mask",((t,e)=>{this.categoryMask=Ja(this,t,false,!this.j),$o(this,e);})),this.g.attachEmptyPacketListener("category_mask",(t=>{this.categoryMask=void 0,$o(this,t);}))),Yi(t,"quality_scores"),ji(n,"QUALITY_SCORES:quality_scores"),this.g.attachFloatVectorListener("quality_scores",((t,e)=>{this.qualityScores=t,$o(this,e);})),this.g.attachEmptyPacketListener("quality_scores",(t=>{this.categoryMask=void 0,$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Rh.prototype.getLabels=Rh.prototype.Fa,Rh.prototype.segmentForVideo=Rh.prototype.Na,Rh.prototype.segment=Rh.prototype.ga,Rh.prototype.setOptions=Rh.prototype.o,Rh.createFromModelPath=function(t,e){return Ka(Rh,t,{baseOptions:{modelAssetPath:e}})},Rh.createFromModelBuffer=function(t,e){return Ka(Rh,t,{baseOptions:{modelAssetBuffer:e}})},Rh.createFromOptions=function(t,e){return Ka(Rh,t,e)};var Mh=class{constructor(t,e,n){this.confidenceMasks=t,this.categoryMask=e,this.qualityScores=n;}close(){this.confidenceMasks?.forEach((t=>{t.close();})),this.categoryMask?.close();}};Mh.prototype.close=Mh.prototype.close;var Ih=class extends Yn{constructor(t){super(t);}},Ph=[0,ai,-2],Oh=[0,ti,-3,ui,ti,-1],Ch=[0,Oh],Uh=[0,Oh,ai,-1],Nh=class extends Yn{constructor(t){super(t);}},Dh=[0,ti,-1,ui],Bh=class extends Yn{constructor(){super();}},Gh=class extends Yn{constructor(t){super(t);}},jh=[1,2,3,4,5,6,7,8,9,10,14,15],Vh=class extends Yn{constructor(){super();}};Vh.prototype.g=bi([0,Qr,[0,jh,yi,Oh,yi,[0,Oh,Ph],yi,Ch,yi,[0,Ch,Ph],yi,Dh,yi,[0,ti,-3,ui,Ei],yi,[0,ti,-3,ui],yi,[0,pi,ti,-2,ui,ai,ui,-1,2,ti,Ph],yi,Uh,yi,[0,Uh,Ph],ti,Ph,pi,yi,[0,ti,-3,ui,Ph,-1],yi,[0,Qr,Dh]],pi,[0,pi,ai,-1,ui]]);var Xh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect_in",false),this.outputCategoryMask=false,this.outputConfidenceMasks=true,this.h=new Eo,this.s=new mo$1,un(this.h,0,3,this.s),un(t=this.h,0,1,e=new xs);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return "outputCategoryMask"in t&&(this.outputCategoryMask=t.outputCategoryMask??false),"outputConfidenceMasks"in t&&(this.outputConfidenceMasks=t.outputConfidenceMasks??true),super.l(t)}ga(t,e,n,r){const i="function"!=typeof n?n:{};this.j="function"==typeof n?n:r,this.qualityScores=this.categoryMask=this.confidenceMasks=void 0,n=this.B+1,r=new Vh;const s=new Gh;var o=new Ih;if(En(o,1,255),un(s,0,12,o),e.keypoint&&e.scribble)throw Error("Cannot provide both keypoint and scribble.");if(e.keypoint){var a=new Nh;vn(a,3,true),wn(a,1,e.keypoint.x),wn(a,2,e.keypoint.y),ln(s,5,jh,a);}else {if(!e.scribble)throw Error("Must provide either a keypoint or a scribble.");for(a of(o=new Bh,e.scribble))vn(e=new Nh,3,true),wn(e,1,a.x),wn(e,2,a.y),pn(o,1,Nh,e);ln(s,15,jh,o);}pn(r,1,Gh,s),this.g.addProtoToStream(r.g(),"drishti.RenderData","roi_in",n),$a(this,t,i);t:{try{const t=new Mh(this.confidenceMasks,this.categoryMask,this.qualityScores);if(!this.j){var h=t;break t}this.j(t);}finally{Zo(this);}h=void 0;}return h}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"roi_in"),Ki(t,"norm_rect_in");const e=new Ci;Kn(e,wo,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.interactive_segmenter.InteractiveSegmenterGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"ROI:roi_in"),Gi(n,"NORM_RECT:norm_rect_in"),n.o(e),zi(t,n),qo(this,t),this.outputConfidenceMasks&&(Yi(t,"confidence_masks"),ji(n,"CONFIDENCE_MASKS:confidence_masks"),Jo(this,"confidence_masks"),this.g.ea("confidence_masks",((t,e)=>{this.confidenceMasks=t.map((t=>Ja(this,t,true,!this.j))),$o(this,e);})),this.g.attachEmptyPacketListener("confidence_masks",(t=>{this.confidenceMasks=[],$o(this,t);}))),this.outputCategoryMask&&(Yi(t,"category_mask"),ji(n,"CATEGORY_MASK:category_mask"),Jo(this,"category_mask"),this.g.X("category_mask",((t,e)=>{this.categoryMask=Ja(this,t,false,!this.j),$o(this,e);})),this.g.attachEmptyPacketListener("category_mask",(t=>{this.categoryMask=void 0,$o(this,t);}))),Yi(t,"quality_scores"),ji(n,"QUALITY_SCORES:quality_scores"),this.g.attachFloatVectorListener("quality_scores",((t,e)=>{this.qualityScores=t,$o(this,e);})),this.g.attachEmptyPacketListener("quality_scores",(t=>{this.categoryMask=void 0,$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Xh.prototype.segment=Xh.prototype.ga,Xh.prototype.setOptions=Xh.prototype.o,Xh.createFromModelPath=function(t,e){return Ka(Xh,t,{baseOptions:{modelAssetPath:e}})},Xh.createFromModelBuffer=function(t,e){return Ka(Xh,t,{baseOptions:{modelAssetBuffer:e}})},Xh.createFromOptions=function(t,e){return Ka(Xh,t,e)};var Hh=class extends Za{constructor(t,e){super(new za(t,e),"input_frame_gpu","norm_rect",false),this.j={detections:[]},un(t=this.h=new To,0,1,e=new xs);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return void 0!==t.displayNamesLocale?je(this.h,2,re(t.displayNamesLocale)):"displayNamesLocale"in t&&je(this.h,2),void 0!==t.maxResults?En(this.h,3,t.maxResults):"maxResults"in t&&je(this.h,3),void 0!==t.scoreThreshold?wn(this.h,4,t.scoreThreshold):"scoreThreshold"in t&&je(this.h,4),void 0!==t.categoryAllowlist?Tn(this.h,5,t.categoryAllowlist):"categoryAllowlist"in t&&je(this.h,5),void 0!==t.categoryDenylist?Tn(this.h,6,t.categoryDenylist):"categoryDenylist"in t&&je(this.h,6),this.l(t)}D(t,e){return this.j={detections:[]},$a(this,t,e),this.j}F(t,e,n){return this.j={detections:[]},qa(this,t,n,e),this.j}m(){var t=new $i;Ki(t,"input_frame_gpu"),Ki(t,"norm_rect"),Yi(t,"detections");const e=new Ci;Kn(e,Ao,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.ObjectDetectorGraph"),Gi(n,"IMAGE:input_frame_gpu"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"DETECTIONS:detections"),n.o(e),zi(t,n),this.g.attachProtoVectorListener("detections",((t,e)=>{for(const e of t)t=ss(e),this.j.detections.push(Lo(t));$o(this,e);})),this.g.attachEmptyPacketListener("detections",(t=>{$o(this,t);})),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Hh.prototype.detectForVideo=Hh.prototype.F,Hh.prototype.detect=Hh.prototype.D,Hh.prototype.setOptions=Hh.prototype.o,Hh.createFromModelPath=async function(t,e){return Ka(Hh,t,{baseOptions:{modelAssetPath:e}})},Hh.createFromModelBuffer=function(t,e){return Ka(Hh,t,{baseOptions:{modelAssetBuffer:e}})},Hh.createFromOptions=function(t,e){return Ka(Hh,t,e)};var Wh=class{constructor(t,e,n){this.landmarks=t,this.worldLandmarks=e,this.segmentationMasks=n;}close(){this.segmentationMasks?.forEach((t=>{t.close();}));}};function zh(t){t.landmarks=[],t.worldLandmarks=[],t.segmentationMasks=void 0;}function Kh(t){try{const e=new Wh(t.landmarks,t.worldLandmarks,t.segmentationMasks);if(!t.s)return e;t.s(e);}finally{Zo(t);}}Wh.prototype.close=Wh.prototype.close;var Yh=class extends Za{constructor(t,e){super(new za(t,e),"image_in","norm_rect",false),this.landmarks=[],this.worldLandmarks=[],this.outputSegmentationMasks=false,un(t=this.h=new bo,0,1,e=new xs),this.v=new ao,un(this.h,0,3,this.v),this.j=new oo,un(this.h,0,2,this.j),En(this.j,4,1),wn(this.j,2,.5),wn(this.v,2,.5),wn(this.h,4,.5);}get baseOptions(){return an(this.h,xs,1)}set baseOptions(t){un(this.h,0,1,t);}o(t){return "numPoses"in t&&En(this.j,4,t.numPoses??1),"minPoseDetectionConfidence"in t&&wn(this.j,2,t.minPoseDetectionConfidence??.5),"minTrackingConfidence"in t&&wn(this.h,4,t.minTrackingConfidence??.5),"minPosePresenceConfidence"in t&&wn(this.v,2,t.minPosePresenceConfidence??.5),"outputSegmentationMasks"in t&&(this.outputSegmentationMasks=t.outputSegmentationMasks??false),this.l(t)}D(t,e,n){const r="function"!=typeof e?e:{};return this.s="function"==typeof e?e:n,zh(this),$a(this,t,r),Kh(this)}F(t,e,n,r){const i="function"!=typeof n?n:{};return this.s="function"==typeof n?n:r,zh(this),qa(this,t,i,e),Kh(this)}m(){var t=new $i;Ki(t,"image_in"),Ki(t,"norm_rect"),Yi(t,"normalized_landmarks"),Yi(t,"world_landmarks"),Yi(t,"segmentation_masks");const e=new Ci;Kn(e,ko,this.h);const n=new Vi;Bi(n,"mediapipe.tasks.vision.pose_landmarker.PoseLandmarkerGraph"),Gi(n,"IMAGE:image_in"),Gi(n,"NORM_RECT:norm_rect"),ji(n,"NORM_LANDMARKS:normalized_landmarks"),ji(n,"WORLD_LANDMARKS:world_landmarks"),n.o(e),zi(t,n),qo(this,t),this.g.attachProtoVectorListener("normalized_landmarks",((t,e)=>{this.landmarks=[];for(const e of t)t=cs(e),this.landmarks.push(Fo(t));$o(this,e);})),this.g.attachEmptyPacketListener("normalized_landmarks",(t=>{this.landmarks=[],$o(this,t);})),this.g.attachProtoVectorListener("world_landmarks",((t,e)=>{this.worldLandmarks=[];for(const e of t)t=as(e),this.worldLandmarks.push(Ro(t));$o(this,e);})),this.g.attachEmptyPacketListener("world_landmarks",(t=>{this.worldLandmarks=[],$o(this,t);})),this.outputSegmentationMasks&&(ji(n,"SEGMENTATION_MASK:segmentation_masks"),Jo(this,"segmentation_masks"),this.g.ea("segmentation_masks",((t,e)=>{this.segmentationMasks=t.map((t=>Ja(this,t,true,!this.s))),$o(this,e);})),this.g.attachEmptyPacketListener("segmentation_masks",(t=>{this.segmentationMasks=[],$o(this,t);}))),t=t.g(),this.setGraph(new Uint8Array(t),true);}};Yh.prototype.detectForVideo=Yh.prototype.F,Yh.prototype.detect=Yh.prototype.D,Yh.prototype.setOptions=Yh.prototype.o,Yh.createFromModelPath=function(t,e){return Ka(Yh,t,{baseOptions:{modelAssetPath:e}})},Yh.createFromModelBuffer=function(t,e){return Ka(Yh,t,{baseOptions:{modelAssetBuffer:e}})},Yh.createFromOptions=function(t,e){return Ka(Yh,t,e)},Yh.POSE_CONNECTIONS=Eh;
-
-const _hoisted_1$1 = { class: "relative -scale-x-100" };
-const videoWidth = 700;
-const _sfc_main$1 = /* @__PURE__ */ defineComponent({
-  __name: "WebCam",
-  setup(__props) {
-    const constraints = {
-      audio: false,
-      video: true
-    };
-    const faceLandMarker = ref(null);
-    const videoRef = ref(null);
-    const canvasRef = ref(null);
-    const createFaceLandMarker = async () => {
-      const filesetResolver = await No.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.15/wasm"
-      );
-      faceLandMarker.value = await lh.createFromOptions(
-        filesetResolver,
-        {
-          baseOptions: {
-            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU"
-          },
-          runningMode: "VIDEO",
-          numFaces: 1
-        }
-      );
-    };
-    const faceResults = ref(null);
-    const drawingUtils = ref(null);
-    const createDrawingUtils = () => {
-      const canvasCtx = canvasRef.value.getContext("2d");
-      drawingUtils.value = new Ia$1(canvasCtx);
-    };
-    const lastVideoTime = ref(-1);
-    const predictWebcam = async () => {
-      if (!faceLandMarker.value || !videoRef.value) {
-        console.error("Face Landmarker or Video element not initialized");
-        return;
-      }
-      try {
-        const ratio = videoRef.value.videoHeight / videoRef.value.videoWidth;
-        videoRef.value.style.width = videoWidth + "px";
-        videoRef.value.style.height = videoWidth * ratio + "px";
-        canvasRef.value.style.width = videoWidth + "px";
-        canvasRef.value.style.height = videoWidth * ratio + "px";
-        canvasRef.value.width = videoRef.value.videoWidth;
-        canvasRef.value.height = videoRef.value.videoHeight;
-        await faceLandMarker.value.setOptions({ runningMode: "VIDEO" });
-        const startTimeMs = performance.now();
-        if (lastVideoTime.value !== videoRef.value.currentTime) {
-          lastVideoTime.value = videoRef.value.currentTime;
-          faceResults.value = faceLandMarker.value.detectForVideo(
-            videoRef.value,
-            startTimeMs
-          );
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    const animationFrameId = ref(null);
-    const initWebcam = async (videoRef2) => {
-      videoRef2.value.srcObject = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
-      videoRef2.value.addEventListener("loadeddata", predictWebcam);
-    };
-    onMounted(async () => {
-      try {
-        await Promise.all([createFaceLandMarker(), initWebcam(videoRef)]);
-        createDrawingUtils();
-        const loop = async () => {
-          await predictWebcam();
-          animationFrameId.value = requestAnimationFrame(loop);
-        };
-        await loop();
-      } catch (error) {
-        console.error(error);
-      }
-    });
-    onBeforeUnmount(() => {
-      if (!animationFrameId.value) return;
-      window.cancelAnimationFrame(animationFrameId.value);
-    });
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$1, [
-        createBaseVNode("video", {
-          ref_key: "videoRef",
-          ref: videoRef,
-          autoplay: "",
-          playsinline: ""
-        }, null, 512),
-        createBaseVNode("canvas", {
-          ref_key: "canvasRef",
-          ref: canvasRef,
-          class: "absolute top-0 left-0 w-full h-full"
-        }, null, 512)
-      ]);
-    };
-  }
-});
-
-const _sfc_main = defineComponent({
-  components: {
-    WebCam: _sfc_main$1,
-    ThemeSwitcher,
-    ContentBlock: _sfc_main$5,
-    WorkExperience,
-    ExamplesOfWork
-  },
-  setup() {
     useHead({
-      title: "Maksym Novikov's website",
+      title: "Maksym Novikov | Frontend Engineer",
       meta: [
         {
           name: "description",
@@ -8485,7 +7990,7 @@ const _sfc_main = defineComponent({
         },
         {
           property: "og:title",
-          content: "Maksym Novikov's website"
+          content: "Maksym Novikov | Frontend Engineer"
         },
         {
           property: "og:description",
@@ -8497,29 +8002,15 @@ const _sfc_main = defineComponent({
         }
       ]
     });
-  },
-  beforeMount() {
-    setInitialTheme();
+    onBeforeMount(() => {
+      setInitialTheme();
+    });
+    return (_ctx, _cache) => {
+      const _component_RouterView = resolveComponent("RouterView");
+      return openBlock(), createBlock(_component_RouterView);
+    };
   }
 });
-
-const _hoisted_1 = { class: "min-h-screen bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 px-4 py-10 sm:px-12 sm:py-16" };
-const _hoisted_2 = { class: "wrapper flex-grow w-full" };
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_content_block = resolveComponent("content-block");
-  const _component_work_experience = resolveComponent("work-experience");
-  const _component_examples_of_work = resolveComponent("examples-of-work");
-  const _component_theme_switcher = resolveComponent("theme-switcher");
-  return openBlock(), createElementBlock("main", _hoisted_1, [
-    createBaseVNode("div", _hoisted_2, [
-      createVNode(_component_content_block),
-      createVNode(_component_work_experience),
-      createVNode(_component_examples_of_work)
-    ]),
-    createVNode(_component_theme_switcher)
-  ]);
-}
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c2806b9f"]]);
 
 /*!
  * Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com
@@ -8569,14 +8060,14 @@ function _toPropertyKey(t2) {
   var i = _toPrimitive(t2, "string");
   return "symbol" == typeof i ? i : i + "";
 }
-const noop = () => {
+const noop$1 = () => {
 };
 let _WINDOW = {};
 let _DOCUMENT = {};
 let _MUTATION_OBSERVER = null;
 let _PERFORMANCE = {
-  mark: noop,
-  measure: noop
+  mark: noop$1,
+  measure: noop$1
 };
 try {
   if (typeof window !== "undefined") _WINDOW = window;
@@ -10080,11 +9571,11 @@ function findIcon(iconName, prefix) {
     }));
   });
 }
-const noop$1 = () => {
+const noop$1$1 = () => {
 };
 const p$2 = config.measurePerformance && PERFORMANCE && PERFORMANCE.mark && PERFORMANCE.measure ? PERFORMANCE : {
-  mark: noop$1,
-  measure: noop$1
+  mark: noop$1$1,
+  measure: noop$1$1
 };
 const preamble = 'FA "6.7.2"';
 const begin = (name) => {
@@ -11362,7 +10853,7 @@ function _objectWithoutProperties(source, excluded) {
   }
   return target;
 }
-var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+var commonjsGlobal$1 = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var humps$1 = { exports: {} };
 (function(module) {
   (function(global2) {
@@ -11463,7 +10954,7 @@ var humps$1 = { exports: {} };
     } else {
       global2.humps = humps2;
     }
-  })(commonjsGlobal);
+  })(commonjsGlobal$1);
 })(humps$1);
 var humps = humps$1.exports;
 var _excluded = ["class", "style"];
@@ -11515,7 +11006,7 @@ function convert(abstractElement) {
   });
   attrs.class;
   var _attrs$style = attrs.style, aStyle = _attrs$style === void 0 ? {} : _attrs$style, otherAttrs = _objectWithoutProperties(attrs, _excluded);
-  return h$1(abstractElement.tag, _objectSpread2(_objectSpread2(_objectSpread2({}, props), {}, {
+  return h(abstractElement.tag, _objectSpread2(_objectSpread2(_objectSpread2({}, props), {}, {
     class: mixins.class,
     style: _objectSpread2(_objectSpread2({}, mixins.style), aStyle)
   }, mixins.attrs), otherAttrs), children);
@@ -11727,6 +11218,12 @@ var FontAwesomeIcon = defineComponent({
   }
 });
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function getDefaultExportFromCjs (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
 var faPhone = {};
 
 (function (exports) {
@@ -11856,8 +11353,2248 @@ var faAt = {};
 	exports.aliases = aliases; 
 } (faAt));
 
-library$1.add(faPhone.faPhone, faAt.faAt, faTelegramPlane.faTelegramPlane);
-ViteSSG(App, ({ app }) => {
-  app.component("font-awesome-icon", FontAwesomeIcon);
+var faLinkedin = {};
+
+(function (exports) {
+	Object.defineProperty(exports, '__esModule', { value: true });
+	var prefix = 'fab';
+	var iconName = 'linkedin';
+	var width = 448;
+	var height = 512;
+	var aliases = [];
+	var unicode = 'f08c';
+	var svgPathData = 'M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z';
+
+	exports.definition = {
+	  prefix: prefix,
+	  iconName: iconName,
+	  icon: [
+	    width,
+	    height,
+	    aliases,
+	    unicode,
+	    svgPathData
+	  ]};
+
+	exports.faLinkedin = exports.definition;
+	exports.prefix = prefix;
+	exports.iconName = iconName;
+	exports.width = width;
+	exports.height = height;
+	exports.ligatures = aliases;
+	exports.unicode = unicode;
+	exports.svgPathData = svgPathData;
+	exports.aliases = aliases; 
+} (faLinkedin));
+
+/*!
+  * vue-router v4.5.0
+  * (c) 2024 Eduardo San Martin Morote
+  * @license MIT
+  */
+const isBrowser = typeof document !== "undefined";
+function isRouteComponent(component) {
+  return typeof component === "object" || "displayName" in component || "props" in component || "__vccOpts" in component;
+}
+function isESModule(obj) {
+  return obj.__esModule || obj[Symbol.toStringTag] === "Module" || // support CF with dynamic imports that do not
+  // add the Module string tag
+  obj.default && isRouteComponent(obj.default);
+}
+const assign = Object.assign;
+function applyToParams(fn, params) {
+  const newParams = {};
+  for (const key in params) {
+    const value = params[key];
+    newParams[key] = isArray(value) ? value.map(fn) : fn(value);
+  }
+  return newParams;
+}
+const noop = () => {
+};
+const isArray = Array.isArray;
+const HASH_RE = /#/g;
+const AMPERSAND_RE = /&/g;
+const SLASH_RE = /\//g;
+const EQUAL_RE = /=/g;
+const IM_RE = /\?/g;
+const PLUS_RE = /\+/g;
+const ENC_BRACKET_OPEN_RE = /%5B/g;
+const ENC_BRACKET_CLOSE_RE = /%5D/g;
+const ENC_CARET_RE = /%5E/g;
+const ENC_BACKTICK_RE = /%60/g;
+const ENC_CURLY_OPEN_RE = /%7B/g;
+const ENC_PIPE_RE = /%7C/g;
+const ENC_CURLY_CLOSE_RE = /%7D/g;
+const ENC_SPACE_RE = /%20/g;
+function commonEncode(text) {
+  return encodeURI("" + text).replace(ENC_PIPE_RE, "|").replace(ENC_BRACKET_OPEN_RE, "[").replace(ENC_BRACKET_CLOSE_RE, "]");
+}
+function encodeHash(text) {
+  return commonEncode(text).replace(ENC_CURLY_OPEN_RE, "{").replace(ENC_CURLY_CLOSE_RE, "}").replace(ENC_CARET_RE, "^");
+}
+function encodeQueryValue(text) {
+  return commonEncode(text).replace(PLUS_RE, "%2B").replace(ENC_SPACE_RE, "+").replace(HASH_RE, "%23").replace(AMPERSAND_RE, "%26").replace(ENC_BACKTICK_RE, "`").replace(ENC_CURLY_OPEN_RE, "{").replace(ENC_CURLY_CLOSE_RE, "}").replace(ENC_CARET_RE, "^");
+}
+function encodeQueryKey(text) {
+  return encodeQueryValue(text).replace(EQUAL_RE, "%3D");
+}
+function encodePath(text) {
+  return commonEncode(text).replace(HASH_RE, "%23").replace(IM_RE, "%3F");
+}
+function encodeParam(text) {
+  return text == null ? "" : encodePath(text).replace(SLASH_RE, "%2F");
+}
+function decode(text) {
+  try {
+    return decodeURIComponent("" + text);
+  } catch (err) {
+  }
+  return "" + text;
+}
+const TRAILING_SLASH_RE = /\/$/;
+const removeTrailingSlash = (path) => path.replace(TRAILING_SLASH_RE, "");
+function parseURL(parseQuery2, location2, currentLocation = "/") {
+  let path, query = {}, searchString = "", hash = "";
+  const hashPos = location2.indexOf("#");
+  let searchPos = location2.indexOf("?");
+  if (hashPos < searchPos && hashPos >= 0) {
+    searchPos = -1;
+  }
+  if (searchPos > -1) {
+    path = location2.slice(0, searchPos);
+    searchString = location2.slice(searchPos + 1, hashPos > -1 ? hashPos : location2.length);
+    query = parseQuery2(searchString);
+  }
+  if (hashPos > -1) {
+    path = path || location2.slice(0, hashPos);
+    hash = location2.slice(hashPos, location2.length);
+  }
+  path = resolveRelativePath(path != null ? path : location2, currentLocation);
+  return {
+    fullPath: path + (searchString && "?") + searchString + hash,
+    path,
+    query,
+    hash: decode(hash)
+  };
+}
+function stringifyURL(stringifyQuery2, location2) {
+  const query = location2.query ? stringifyQuery2(location2.query) : "";
+  return location2.path + (query && "?") + query + (location2.hash || "");
+}
+function isSameRouteLocation(stringifyQuery2, a, b) {
+  const aLastIndex = a.matched.length - 1;
+  const bLastIndex = b.matched.length - 1;
+  return aLastIndex > -1 && aLastIndex === bLastIndex && isSameRouteRecord(a.matched[aLastIndex], b.matched[bLastIndex]) && isSameRouteLocationParams(a.params, b.params) && stringifyQuery2(a.query) === stringifyQuery2(b.query) && a.hash === b.hash;
+}
+function isSameRouteRecord(a, b) {
+  return (a.aliasOf || a) === (b.aliasOf || b);
+}
+function isSameRouteLocationParams(a, b) {
+  if (Object.keys(a).length !== Object.keys(b).length)
+    return false;
+  for (const key in a) {
+    if (!isSameRouteLocationParamsValue(a[key], b[key]))
+      return false;
+  }
+  return true;
+}
+function isSameRouteLocationParamsValue(a, b) {
+  return isArray(a) ? isEquivalentArray(a, b) : isArray(b) ? isEquivalentArray(b, a) : a === b;
+}
+function isEquivalentArray(a, b) {
+  return isArray(b) ? a.length === b.length && a.every((value, i) => value === b[i]) : a.length === 1 && a[0] === b;
+}
+function resolveRelativePath(to, from) {
+  if (to.startsWith("/"))
+    return to;
+  if (!to)
+    return from;
+  const fromSegments = from.split("/");
+  const toSegments = to.split("/");
+  const lastToSegment = toSegments[toSegments.length - 1];
+  if (lastToSegment === ".." || lastToSegment === ".") {
+    toSegments.push("");
+  }
+  let position = fromSegments.length - 1;
+  let toPosition;
+  let segment;
+  for (toPosition = 0; toPosition < toSegments.length; toPosition++) {
+    segment = toSegments[toPosition];
+    if (segment === ".")
+      continue;
+    if (segment === "..") {
+      if (position > 1)
+        position--;
+    } else
+      break;
+  }
+  return fromSegments.slice(0, position).join("/") + "/" + toSegments.slice(toPosition).join("/");
+}
+const START_LOCATION_NORMALIZED = {
+  path: "/",
+  // TODO: could we use a symbol in the future?
+  name: void 0,
+  params: {},
+  query: {},
+  hash: "",
+  fullPath: "/",
+  matched: [],
+  meta: {},
+  redirectedFrom: void 0
+};
+var NavigationType;
+(function(NavigationType2) {
+  NavigationType2["pop"] = "pop";
+  NavigationType2["push"] = "push";
+})(NavigationType || (NavigationType = {}));
+var NavigationDirection;
+(function(NavigationDirection2) {
+  NavigationDirection2["back"] = "back";
+  NavigationDirection2["forward"] = "forward";
+  NavigationDirection2["unknown"] = "";
+})(NavigationDirection || (NavigationDirection = {}));
+const START = "";
+function normalizeBase(base) {
+  if (!base) {
+    if (isBrowser) {
+      const baseEl = document.querySelector("base");
+      base = baseEl && baseEl.getAttribute("href") || "/";
+      base = base.replace(/^\w+:\/\/[^\/]+/, "");
+    } else {
+      base = "/";
+    }
+  }
+  if (base[0] !== "/" && base[0] !== "#")
+    base = "/" + base;
+  return removeTrailingSlash(base);
+}
+const BEFORE_HASH_RE = /^[^#]+#/;
+function createHref(base, location2) {
+  return base.replace(BEFORE_HASH_RE, "#") + location2;
+}
+function getElementPosition(el, offset) {
+  const docRect = document.documentElement.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  return {
+    behavior: offset.behavior,
+    left: elRect.left - docRect.left - (offset.left || 0),
+    top: elRect.top - docRect.top - (offset.top || 0)
+  };
+}
+const computeScrollPosition = () => ({
+  left: window.scrollX,
+  top: window.scrollY
 });
-//# sourceMappingURL=app-PYtsynUd.js.map
+function scrollToPosition(position) {
+  let scrollToOptions;
+  if ("el" in position) {
+    const positionEl = position.el;
+    const isIdSelector = typeof positionEl === "string" && positionEl.startsWith("#");
+    const el = typeof positionEl === "string" ? isIdSelector ? document.getElementById(positionEl.slice(1)) : document.querySelector(positionEl) : positionEl;
+    if (!el) {
+      return;
+    }
+    scrollToOptions = getElementPosition(el, position);
+  } else {
+    scrollToOptions = position;
+  }
+  if ("scrollBehavior" in document.documentElement.style)
+    window.scrollTo(scrollToOptions);
+  else {
+    window.scrollTo(scrollToOptions.left != null ? scrollToOptions.left : window.scrollX, scrollToOptions.top != null ? scrollToOptions.top : window.scrollY);
+  }
+}
+function getScrollKey(path, delta) {
+  const position = history.state ? history.state.position - delta : -1;
+  return position + path;
+}
+const scrollPositions = /* @__PURE__ */ new Map();
+function saveScrollPosition(key, scrollPosition) {
+  scrollPositions.set(key, scrollPosition);
+}
+function getSavedScrollPosition(key) {
+  const scroll = scrollPositions.get(key);
+  scrollPositions.delete(key);
+  return scroll;
+}
+function createMemoryHistory(base = "") {
+  let listeners = [];
+  let queue = [START];
+  let position = 0;
+  base = normalizeBase(base);
+  function setLocation(location2) {
+    position++;
+    if (position !== queue.length) {
+      queue.splice(position);
+    }
+    queue.push(location2);
+  }
+  function triggerListeners(to, from, { direction, delta }) {
+    const info = {
+      direction,
+      delta,
+      type: NavigationType.pop
+    };
+    for (const callback of listeners) {
+      callback(to, from, info);
+    }
+  }
+  const routerHistory = {
+    // rewritten by Object.defineProperty
+    location: START,
+    // TODO: should be kept in queue
+    state: {},
+    base,
+    createHref: createHref.bind(null, base),
+    replace(to) {
+      queue.splice(position--, 1);
+      setLocation(to);
+    },
+    push(to, data) {
+      setLocation(to);
+    },
+    listen(callback) {
+      listeners.push(callback);
+      return () => {
+        const index = listeners.indexOf(callback);
+        if (index > -1)
+          listeners.splice(index, 1);
+      };
+    },
+    destroy() {
+      listeners = [];
+      queue = [START];
+      position = 0;
+    },
+    go(delta, shouldTrigger = true) {
+      const from = this.location;
+      const direction = (
+        // we are considering delta === 0 going forward, but in abstract mode
+        // using 0 for the delta doesn't make sense like it does in html5 where
+        // it reloads the page
+        delta < 0 ? NavigationDirection.back : NavigationDirection.forward
+      );
+      position = Math.max(0, Math.min(position + delta, queue.length - 1));
+      if (shouldTrigger) {
+        triggerListeners(this.location, from, {
+          direction,
+          delta
+        });
+      }
+    }
+  };
+  Object.defineProperty(routerHistory, "location", {
+    enumerable: true,
+    get: () => queue[position]
+  });
+  return routerHistory;
+}
+function isRouteLocation(route) {
+  return typeof route === "string" || route && typeof route === "object";
+}
+function isRouteName(name) {
+  return typeof name === "string" || typeof name === "symbol";
+}
+const NavigationFailureSymbol = Symbol("");
+var NavigationFailureType;
+(function(NavigationFailureType2) {
+  NavigationFailureType2[NavigationFailureType2["aborted"] = 4] = "aborted";
+  NavigationFailureType2[NavigationFailureType2["cancelled"] = 8] = "cancelled";
+  NavigationFailureType2[NavigationFailureType2["duplicated"] = 16] = "duplicated";
+})(NavigationFailureType || (NavigationFailureType = {}));
+function createRouterError(type, params) {
+  {
+    return assign(new Error(), {
+      type,
+      [NavigationFailureSymbol]: true
+    }, params);
+  }
+}
+function isNavigationFailure(error, type) {
+  return error instanceof Error && NavigationFailureSymbol in error && (type == null || !!(error.type & type));
+}
+const BASE_PARAM_PATTERN = "[^/]+?";
+const BASE_PATH_PARSER_OPTIONS = {
+  sensitive: false,
+  strict: false,
+  start: true,
+  end: true
+};
+const REGEX_CHARS_RE = /[.+*?^${}()[\]/\\]/g;
+function tokensToParser(segments, extraOptions) {
+  const options = assign({}, BASE_PATH_PARSER_OPTIONS, extraOptions);
+  const score = [];
+  let pattern = options.start ? "^" : "";
+  const keys = [];
+  for (const segment of segments) {
+    const segmentScores = segment.length ? [] : [
+      90
+      /* PathScore.Root */
+    ];
+    if (options.strict && !segment.length)
+      pattern += "/";
+    for (let tokenIndex = 0; tokenIndex < segment.length; tokenIndex++) {
+      const token = segment[tokenIndex];
+      let subSegmentScore = 40 + (options.sensitive ? 0.25 : 0);
+      if (token.type === 0) {
+        if (!tokenIndex)
+          pattern += "/";
+        pattern += token.value.replace(REGEX_CHARS_RE, "\\$&");
+        subSegmentScore += 40;
+      } else if (token.type === 1) {
+        const { value, repeatable, optional, regexp } = token;
+        keys.push({
+          name: value,
+          repeatable,
+          optional
+        });
+        const re2 = regexp ? regexp : BASE_PARAM_PATTERN;
+        if (re2 !== BASE_PARAM_PATTERN) {
+          subSegmentScore += 10;
+          try {
+            new RegExp(`(${re2})`);
+          } catch (err) {
+            throw new Error(`Invalid custom RegExp for param "${value}" (${re2}): ` + err.message);
+          }
+        }
+        let subPattern = repeatable ? `((?:${re2})(?:/(?:${re2}))*)` : `(${re2})`;
+        if (!tokenIndex)
+          subPattern = // avoid an optional / if there are more segments e.g. /:p?-static
+          // or /:p?-:p2
+          optional && segment.length < 2 ? `(?:/${subPattern})` : "/" + subPattern;
+        if (optional)
+          subPattern += "?";
+        pattern += subPattern;
+        subSegmentScore += 20;
+        if (optional)
+          subSegmentScore += -8;
+        if (repeatable)
+          subSegmentScore += -20;
+        if (re2 === ".*")
+          subSegmentScore += -50;
+      }
+      segmentScores.push(subSegmentScore);
+    }
+    score.push(segmentScores);
+  }
+  if (options.strict && options.end) {
+    const i = score.length - 1;
+    score[i][score[i].length - 1] += 0.7000000000000001;
+  }
+  if (!options.strict)
+    pattern += "/?";
+  if (options.end)
+    pattern += "$";
+  else if (options.strict && !pattern.endsWith("/"))
+    pattern += "(?:/|$)";
+  const re = new RegExp(pattern, options.sensitive ? "" : "i");
+  function parse(path) {
+    const match = path.match(re);
+    const params = {};
+    if (!match)
+      return null;
+    for (let i = 1; i < match.length; i++) {
+      const value = match[i] || "";
+      const key = keys[i - 1];
+      params[key.name] = value && key.repeatable ? value.split("/") : value;
+    }
+    return params;
+  }
+  function stringify(params) {
+    let path = "";
+    let avoidDuplicatedSlash = false;
+    for (const segment of segments) {
+      if (!avoidDuplicatedSlash || !path.endsWith("/"))
+        path += "/";
+      avoidDuplicatedSlash = false;
+      for (const token of segment) {
+        if (token.type === 0) {
+          path += token.value;
+        } else if (token.type === 1) {
+          const { value, repeatable, optional } = token;
+          const param = value in params ? params[value] : "";
+          if (isArray(param) && !repeatable) {
+            throw new Error(`Provided param "${value}" is an array but it is not repeatable (* or + modifiers)`);
+          }
+          const text = isArray(param) ? param.join("/") : param;
+          if (!text) {
+            if (optional) {
+              if (segment.length < 2) {
+                if (path.endsWith("/"))
+                  path = path.slice(0, -1);
+                else
+                  avoidDuplicatedSlash = true;
+              }
+            } else
+              throw new Error(`Missing required param "${value}"`);
+          }
+          path += text;
+        }
+      }
+    }
+    return path || "/";
+  }
+  return {
+    re,
+    score,
+    keys,
+    parse,
+    stringify
+  };
+}
+function compareScoreArray(a, b) {
+  let i = 0;
+  while (i < a.length && i < b.length) {
+    const diff = b[i] - a[i];
+    if (diff)
+      return diff;
+    i++;
+  }
+  if (a.length < b.length) {
+    return a.length === 1 && a[0] === 40 + 40 ? -1 : 1;
+  } else if (a.length > b.length) {
+    return b.length === 1 && b[0] === 40 + 40 ? 1 : -1;
+  }
+  return 0;
+}
+function comparePathParserScore(a, b) {
+  let i = 0;
+  const aScore = a.score;
+  const bScore = b.score;
+  while (i < aScore.length && i < bScore.length) {
+    const comp = compareScoreArray(aScore[i], bScore[i]);
+    if (comp)
+      return comp;
+    i++;
+  }
+  if (Math.abs(bScore.length - aScore.length) === 1) {
+    if (isLastScoreNegative(aScore))
+      return 1;
+    if (isLastScoreNegative(bScore))
+      return -1;
+  }
+  return bScore.length - aScore.length;
+}
+function isLastScoreNegative(score) {
+  const last = score[score.length - 1];
+  return score.length > 0 && last[last.length - 1] < 0;
+}
+const ROOT_TOKEN = {
+  type: 0,
+  value: ""
+};
+const VALID_PARAM_RE = /[a-zA-Z0-9_]/;
+function tokenizePath(path) {
+  if (!path)
+    return [[]];
+  if (path === "/")
+    return [[ROOT_TOKEN]];
+  if (!path.startsWith("/")) {
+    throw new Error(`Invalid path "${path}"`);
+  }
+  function crash(message) {
+    throw new Error(`ERR (${state})/"${buffer}": ${message}`);
+  }
+  let state = 0;
+  let previousState = state;
+  const tokens = [];
+  let segment;
+  function finalizeSegment() {
+    if (segment)
+      tokens.push(segment);
+    segment = [];
+  }
+  let i = 0;
+  let char;
+  let buffer = "";
+  let customRe = "";
+  function consumeBuffer() {
+    if (!buffer)
+      return;
+    if (state === 0) {
+      segment.push({
+        type: 0,
+        value: buffer
+      });
+    } else if (state === 1 || state === 2 || state === 3) {
+      if (segment.length > 1 && (char === "*" || char === "+"))
+        crash(`A repeatable param (${buffer}) must be alone in its segment. eg: '/:ids+.`);
+      segment.push({
+        type: 1,
+        value: buffer,
+        regexp: customRe,
+        repeatable: char === "*" || char === "+",
+        optional: char === "*" || char === "?"
+      });
+    } else {
+      crash("Invalid state to consume buffer");
+    }
+    buffer = "";
+  }
+  function addCharToBuffer() {
+    buffer += char;
+  }
+  while (i < path.length) {
+    char = path[i++];
+    if (char === "\\" && state !== 2) {
+      previousState = state;
+      state = 4;
+      continue;
+    }
+    switch (state) {
+      case 0:
+        if (char === "/") {
+          if (buffer) {
+            consumeBuffer();
+          }
+          finalizeSegment();
+        } else if (char === ":") {
+          consumeBuffer();
+          state = 1;
+        } else {
+          addCharToBuffer();
+        }
+        break;
+      case 4:
+        addCharToBuffer();
+        state = previousState;
+        break;
+      case 1:
+        if (char === "(") {
+          state = 2;
+        } else if (VALID_PARAM_RE.test(char)) {
+          addCharToBuffer();
+        } else {
+          consumeBuffer();
+          state = 0;
+          if (char !== "*" && char !== "?" && char !== "+")
+            i--;
+        }
+        break;
+      case 2:
+        if (char === ")") {
+          if (customRe[customRe.length - 1] == "\\")
+            customRe = customRe.slice(0, -1) + char;
+          else
+            state = 3;
+        } else {
+          customRe += char;
+        }
+        break;
+      case 3:
+        consumeBuffer();
+        state = 0;
+        if (char !== "*" && char !== "?" && char !== "+")
+          i--;
+        customRe = "";
+        break;
+      default:
+        crash("Unknown state");
+        break;
+    }
+  }
+  if (state === 2)
+    crash(`Unfinished custom RegExp for param "${buffer}"`);
+  consumeBuffer();
+  finalizeSegment();
+  return tokens;
+}
+function createRouteRecordMatcher(record, parent, options) {
+  const parser = tokensToParser(tokenizePath(record.path), options);
+  const matcher = assign(parser, {
+    record,
+    parent,
+    // these needs to be populated by the parent
+    children: [],
+    alias: []
+  });
+  if (parent) {
+    if (!matcher.record.aliasOf === !parent.record.aliasOf)
+      parent.children.push(matcher);
+  }
+  return matcher;
+}
+function createRouterMatcher(routes, globalOptions) {
+  const matchers = [];
+  const matcherMap = /* @__PURE__ */ new Map();
+  globalOptions = mergeOptions({ strict: false, end: true, sensitive: false }, globalOptions);
+  function getRecordMatcher(name) {
+    return matcherMap.get(name);
+  }
+  function addRoute(record, parent, originalRecord) {
+    const isRootAdd = !originalRecord;
+    const mainNormalizedRecord = normalizeRouteRecord(record);
+    mainNormalizedRecord.aliasOf = originalRecord && originalRecord.record;
+    const options = mergeOptions(globalOptions, record);
+    const normalizedRecords = [mainNormalizedRecord];
+    if ("alias" in record) {
+      const aliases = typeof record.alias === "string" ? [record.alias] : record.alias;
+      for (const alias of aliases) {
+        normalizedRecords.push(
+          // we need to normalize again to ensure the `mods` property
+          // being non enumerable
+          normalizeRouteRecord(assign({}, mainNormalizedRecord, {
+            // this allows us to hold a copy of the `components` option
+            // so that async components cache is hold on the original record
+            components: originalRecord ? originalRecord.record.components : mainNormalizedRecord.components,
+            path: alias,
+            // we might be the child of an alias
+            aliasOf: originalRecord ? originalRecord.record : mainNormalizedRecord
+            // the aliases are always of the same kind as the original since they
+            // are defined on the same record
+          }))
+        );
+      }
+    }
+    let matcher;
+    let originalMatcher;
+    for (const normalizedRecord of normalizedRecords) {
+      const { path } = normalizedRecord;
+      if (parent && path[0] !== "/") {
+        const parentPath = parent.record.path;
+        const connectingSlash = parentPath[parentPath.length - 1] === "/" ? "" : "/";
+        normalizedRecord.path = parent.record.path + (path && connectingSlash + path);
+      }
+      matcher = createRouteRecordMatcher(normalizedRecord, parent, options);
+      if (originalRecord) {
+        originalRecord.alias.push(matcher);
+      } else {
+        originalMatcher = originalMatcher || matcher;
+        if (originalMatcher !== matcher)
+          originalMatcher.alias.push(matcher);
+        if (isRootAdd && record.name && !isAliasRecord(matcher)) {
+          removeRoute(record.name);
+        }
+      }
+      if (isMatchable(matcher)) {
+        insertMatcher(matcher);
+      }
+      if (mainNormalizedRecord.children) {
+        const children = mainNormalizedRecord.children;
+        for (let i = 0; i < children.length; i++) {
+          addRoute(children[i], matcher, originalRecord && originalRecord.children[i]);
+        }
+      }
+      originalRecord = originalRecord || matcher;
+    }
+    return originalMatcher ? () => {
+      removeRoute(originalMatcher);
+    } : noop;
+  }
+  function removeRoute(matcherRef) {
+    if (isRouteName(matcherRef)) {
+      const matcher = matcherMap.get(matcherRef);
+      if (matcher) {
+        matcherMap.delete(matcherRef);
+        matchers.splice(matchers.indexOf(matcher), 1);
+        matcher.children.forEach(removeRoute);
+        matcher.alias.forEach(removeRoute);
+      }
+    } else {
+      const index = matchers.indexOf(matcherRef);
+      if (index > -1) {
+        matchers.splice(index, 1);
+        if (matcherRef.record.name)
+          matcherMap.delete(matcherRef.record.name);
+        matcherRef.children.forEach(removeRoute);
+        matcherRef.alias.forEach(removeRoute);
+      }
+    }
+  }
+  function getRoutes() {
+    return matchers;
+  }
+  function insertMatcher(matcher) {
+    const index = findInsertionIndex(matcher, matchers);
+    matchers.splice(index, 0, matcher);
+    if (matcher.record.name && !isAliasRecord(matcher))
+      matcherMap.set(matcher.record.name, matcher);
+  }
+  function resolve(location2, currentLocation) {
+    let matcher;
+    let params = {};
+    let path;
+    let name;
+    if ("name" in location2 && location2.name) {
+      matcher = matcherMap.get(location2.name);
+      if (!matcher)
+        throw createRouterError(1, {
+          location: location2
+        });
+      name = matcher.record.name;
+      params = assign(
+        // paramsFromLocation is a new object
+        paramsFromLocation(
+          currentLocation.params,
+          // only keep params that exist in the resolved location
+          // only keep optional params coming from a parent record
+          matcher.keys.filter((k) => !k.optional).concat(matcher.parent ? matcher.parent.keys.filter((k) => k.optional) : []).map((k) => k.name)
+        ),
+        // discard any existing params in the current location that do not exist here
+        // #1497 this ensures better active/exact matching
+        location2.params && paramsFromLocation(location2.params, matcher.keys.map((k) => k.name))
+      );
+      path = matcher.stringify(params);
+    } else if (location2.path != null) {
+      path = location2.path;
+      matcher = matchers.find((m) => m.re.test(path));
+      if (matcher) {
+        params = matcher.parse(path);
+        name = matcher.record.name;
+      }
+    } else {
+      matcher = currentLocation.name ? matcherMap.get(currentLocation.name) : matchers.find((m) => m.re.test(currentLocation.path));
+      if (!matcher)
+        throw createRouterError(1, {
+          location: location2,
+          currentLocation
+        });
+      name = matcher.record.name;
+      params = assign({}, currentLocation.params, location2.params);
+      path = matcher.stringify(params);
+    }
+    const matched = [];
+    let parentMatcher = matcher;
+    while (parentMatcher) {
+      matched.unshift(parentMatcher.record);
+      parentMatcher = parentMatcher.parent;
+    }
+    return {
+      name,
+      path,
+      params,
+      matched,
+      meta: mergeMetaFields(matched)
+    };
+  }
+  routes.forEach((route) => addRoute(route));
+  function clearRoutes() {
+    matchers.length = 0;
+    matcherMap.clear();
+  }
+  return {
+    addRoute,
+    resolve,
+    removeRoute,
+    clearRoutes,
+    getRoutes,
+    getRecordMatcher
+  };
+}
+function paramsFromLocation(params, keys) {
+  const newParams = {};
+  for (const key of keys) {
+    if (key in params)
+      newParams[key] = params[key];
+  }
+  return newParams;
+}
+function normalizeRouteRecord(record) {
+  const normalized = {
+    path: record.path,
+    redirect: record.redirect,
+    name: record.name,
+    meta: record.meta || {},
+    aliasOf: record.aliasOf,
+    beforeEnter: record.beforeEnter,
+    props: normalizeRecordProps(record),
+    children: record.children || [],
+    instances: {},
+    leaveGuards: /* @__PURE__ */ new Set(),
+    updateGuards: /* @__PURE__ */ new Set(),
+    enterCallbacks: {},
+    // must be declared afterwards
+    // mods: {},
+    components: "components" in record ? record.components || null : record.component && { default: record.component }
+  };
+  Object.defineProperty(normalized, "mods", {
+    value: {}
+  });
+  return normalized;
+}
+function normalizeRecordProps(record) {
+  const propsObject = {};
+  const props = record.props || false;
+  if ("component" in record) {
+    propsObject.default = props;
+  } else {
+    for (const name in record.components)
+      propsObject[name] = typeof props === "object" ? props[name] : props;
+  }
+  return propsObject;
+}
+function isAliasRecord(record) {
+  while (record) {
+    if (record.record.aliasOf)
+      return true;
+    record = record.parent;
+  }
+  return false;
+}
+function mergeMetaFields(matched) {
+  return matched.reduce((meta, record) => assign(meta, record.meta), {});
+}
+function mergeOptions(defaults, partialOptions) {
+  const options = {};
+  for (const key in defaults) {
+    options[key] = key in partialOptions ? partialOptions[key] : defaults[key];
+  }
+  return options;
+}
+function findInsertionIndex(matcher, matchers) {
+  let lower = 0;
+  let upper = matchers.length;
+  while (lower !== upper) {
+    const mid = lower + upper >> 1;
+    const sortOrder = comparePathParserScore(matcher, matchers[mid]);
+    if (sortOrder < 0) {
+      upper = mid;
+    } else {
+      lower = mid + 1;
+    }
+  }
+  const insertionAncestor = getInsertionAncestor(matcher);
+  if (insertionAncestor) {
+    upper = matchers.lastIndexOf(insertionAncestor, upper - 1);
+  }
+  return upper;
+}
+function getInsertionAncestor(matcher) {
+  let ancestor = matcher;
+  while (ancestor = ancestor.parent) {
+    if (isMatchable(ancestor) && comparePathParserScore(matcher, ancestor) === 0) {
+      return ancestor;
+    }
+  }
+  return;
+}
+function isMatchable({ record }) {
+  return !!(record.name || record.components && Object.keys(record.components).length || record.redirect);
+}
+function parseQuery(search) {
+  const query = {};
+  if (search === "" || search === "?")
+    return query;
+  const hasLeadingIM = search[0] === "?";
+  const searchParams = (hasLeadingIM ? search.slice(1) : search).split("&");
+  for (let i = 0; i < searchParams.length; ++i) {
+    const searchParam = searchParams[i].replace(PLUS_RE, " ");
+    const eqPos = searchParam.indexOf("=");
+    const key = decode(eqPos < 0 ? searchParam : searchParam.slice(0, eqPos));
+    const value = eqPos < 0 ? null : decode(searchParam.slice(eqPos + 1));
+    if (key in query) {
+      let currentValue = query[key];
+      if (!isArray(currentValue)) {
+        currentValue = query[key] = [currentValue];
+      }
+      currentValue.push(value);
+    } else {
+      query[key] = value;
+    }
+  }
+  return query;
+}
+function stringifyQuery(query) {
+  let search = "";
+  for (let key in query) {
+    const value = query[key];
+    key = encodeQueryKey(key);
+    if (value == null) {
+      if (value !== void 0) {
+        search += (search.length ? "&" : "") + key;
+      }
+      continue;
+    }
+    const values = isArray(value) ? value.map((v) => v && encodeQueryValue(v)) : [value && encodeQueryValue(value)];
+    values.forEach((value2) => {
+      if (value2 !== void 0) {
+        search += (search.length ? "&" : "") + key;
+        if (value2 != null)
+          search += "=" + value2;
+      }
+    });
+  }
+  return search;
+}
+function normalizeQuery(query) {
+  const normalizedQuery = {};
+  for (const key in query) {
+    const value = query[key];
+    if (value !== void 0) {
+      normalizedQuery[key] = isArray(value) ? value.map((v) => v == null ? null : "" + v) : value == null ? value : "" + value;
+    }
+  }
+  return normalizedQuery;
+}
+const matchedRouteKey = Symbol("");
+const viewDepthKey = Symbol("");
+const routerKey = Symbol("");
+const routeLocationKey = Symbol("");
+const routerViewLocationKey = Symbol("");
+function useCallbacks() {
+  let handlers = [];
+  function add(handler) {
+    handlers.push(handler);
+    return () => {
+      const i = handlers.indexOf(handler);
+      if (i > -1)
+        handlers.splice(i, 1);
+    };
+  }
+  function reset() {
+    handlers = [];
+  }
+  return {
+    add,
+    list: () => handlers.slice(),
+    reset
+  };
+}
+function guardToPromiseFn(guard, to, from, record, name, runWithContext = (fn) => fn()) {
+  const enterCallbackArray = record && // name is defined if record is because of the function overload
+  (record.enterCallbacks[name] = record.enterCallbacks[name] || []);
+  return () => new Promise((resolve, reject) => {
+    const next = (valid) => {
+      if (valid === false) {
+        reject(createRouterError(4, {
+          from,
+          to
+        }));
+      } else if (valid instanceof Error) {
+        reject(valid);
+      } else if (isRouteLocation(valid)) {
+        reject(createRouterError(2, {
+          from: to,
+          to: valid
+        }));
+      } else {
+        if (enterCallbackArray && // since enterCallbackArray is truthy, both record and name also are
+        record.enterCallbacks[name] === enterCallbackArray && typeof valid === "function") {
+          enterCallbackArray.push(valid);
+        }
+        resolve();
+      }
+    };
+    const guardReturn = runWithContext(() => guard.call(record && record.instances[name], to, from, next));
+    let guardCall = Promise.resolve(guardReturn);
+    if (guard.length < 3)
+      guardCall = guardCall.then(next);
+    guardCall.catch((err) => reject(err));
+  });
+}
+function extractComponentsGuards(matched, guardType, to, from, runWithContext = (fn) => fn()) {
+  const guards = [];
+  for (const record of matched) {
+    for (const name in record.components) {
+      let rawComponent = record.components[name];
+      if (guardType !== "beforeRouteEnter" && !record.instances[name])
+        continue;
+      if (isRouteComponent(rawComponent)) {
+        const options = rawComponent.__vccOpts || rawComponent;
+        const guard = options[guardType];
+        guard && guards.push(guardToPromiseFn(guard, to, from, record, name, runWithContext));
+      } else {
+        let componentPromise = rawComponent();
+        guards.push(() => componentPromise.then((resolved) => {
+          if (!resolved)
+            throw new Error(`Couldn't resolve component "${name}" at "${record.path}"`);
+          const resolvedComponent = isESModule(resolved) ? resolved.default : resolved;
+          record.mods[name] = resolved;
+          record.components[name] = resolvedComponent;
+          const options = resolvedComponent.__vccOpts || resolvedComponent;
+          const guard = options[guardType];
+          return guard && guardToPromiseFn(guard, to, from, record, name, runWithContext)();
+        }));
+      }
+    }
+  }
+  return guards;
+}
+function useLink(props) {
+  const router = inject(routerKey);
+  const currentRoute = inject(routeLocationKey);
+  const route = computed(() => {
+    const to = unref(props.to);
+    return router.resolve(to);
+  });
+  const activeRecordIndex = computed(() => {
+    const { matched } = route.value;
+    const { length } = matched;
+    const routeMatched = matched[length - 1];
+    const currentMatched = currentRoute.matched;
+    if (!routeMatched || !currentMatched.length)
+      return -1;
+    const index = currentMatched.findIndex(isSameRouteRecord.bind(null, routeMatched));
+    if (index > -1)
+      return index;
+    const parentRecordPath = getOriginalPath(matched[length - 2]);
+    return (
+      // we are dealing with nested routes
+      length > 1 && // if the parent and matched route have the same path, this link is
+      // referring to the empty child. Or we currently are on a different
+      // child of the same parent
+      getOriginalPath(routeMatched) === parentRecordPath && // avoid comparing the child with its parent
+      currentMatched[currentMatched.length - 1].path !== parentRecordPath ? currentMatched.findIndex(isSameRouteRecord.bind(null, matched[length - 2])) : index
+    );
+  });
+  const isActive = computed(() => activeRecordIndex.value > -1 && includesParams(currentRoute.params, route.value.params));
+  const isExactActive = computed(() => activeRecordIndex.value > -1 && activeRecordIndex.value === currentRoute.matched.length - 1 && isSameRouteLocationParams(currentRoute.params, route.value.params));
+  function navigate(e = {}) {
+    if (guardEvent(e)) {
+      const p = router[unref(props.replace) ? "replace" : "push"](
+        unref(props.to)
+        // avoid uncaught errors are they are logged anyway
+      ).catch(noop);
+      if (props.viewTransition && typeof document !== "undefined" && "startViewTransition" in document) {
+        document.startViewTransition(() => p);
+      }
+      return p;
+    }
+    return Promise.resolve();
+  }
+  return {
+    route,
+    href: computed(() => route.value.href),
+    isActive,
+    isExactActive,
+    navigate
+  };
+}
+function preferSingleVNode(vnodes) {
+  return vnodes.length === 1 ? vnodes[0] : vnodes;
+}
+const RouterLinkImpl = /* @__PURE__ */ defineComponent({
+  name: "RouterLink",
+  compatConfig: { MODE: 3 },
+  props: {
+    to: {
+      type: [String, Object],
+      required: true
+    },
+    replace: Boolean,
+    activeClass: String,
+    // inactiveClass: String,
+    exactActiveClass: String,
+    custom: Boolean,
+    ariaCurrentValue: {
+      type: String,
+      default: "page"
+    }
+  },
+  useLink,
+  setup(props, { slots }) {
+    const link = reactive(useLink(props));
+    const { options } = inject(routerKey);
+    const elClass = computed(() => ({
+      [getLinkClass(props.activeClass, options.linkActiveClass, "router-link-active")]: link.isActive,
+      // [getLinkClass(
+      //   props.inactiveClass,
+      //   options.linkInactiveClass,
+      //   'router-link-inactive'
+      // )]: !link.isExactActive,
+      [getLinkClass(props.exactActiveClass, options.linkExactActiveClass, "router-link-exact-active")]: link.isExactActive
+    }));
+    return () => {
+      const children = slots.default && preferSingleVNode(slots.default(link));
+      return props.custom ? children : h("a", {
+        "aria-current": link.isExactActive ? props.ariaCurrentValue : null,
+        href: link.href,
+        // this would override user added attrs but Vue will still add
+        // the listener, so we end up triggering both
+        onClick: link.navigate,
+        class: elClass.value
+      }, children);
+    };
+  }
+});
+const RouterLink = RouterLinkImpl;
+function guardEvent(e) {
+  if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+    return;
+  if (e.defaultPrevented)
+    return;
+  if (e.button !== void 0 && e.button !== 0)
+    return;
+  if (e.currentTarget && e.currentTarget.getAttribute) {
+    const target = e.currentTarget.getAttribute("target");
+    if (/\b_blank\b/i.test(target))
+      return;
+  }
+  if (e.preventDefault)
+    e.preventDefault();
+  return true;
+}
+function includesParams(outer, inner) {
+  for (const key in inner) {
+    const innerValue = inner[key];
+    const outerValue = outer[key];
+    if (typeof innerValue === "string") {
+      if (innerValue !== outerValue)
+        return false;
+    } else {
+      if (!isArray(outerValue) || outerValue.length !== innerValue.length || innerValue.some((value, i) => value !== outerValue[i]))
+        return false;
+    }
+  }
+  return true;
+}
+function getOriginalPath(record) {
+  return record ? record.aliasOf ? record.aliasOf.path : record.path : "";
+}
+const getLinkClass = (propClass, globalClass, defaultClass) => propClass != null ? propClass : globalClass != null ? globalClass : defaultClass;
+const RouterViewImpl = /* @__PURE__ */ defineComponent({
+  name: "RouterView",
+  // #674 we manually inherit them
+  inheritAttrs: false,
+  props: {
+    name: {
+      type: String,
+      default: "default"
+    },
+    route: Object
+  },
+  // Better compat for @vue/compat users
+  // https://github.com/vuejs/router/issues/1315
+  compatConfig: { MODE: 3 },
+  setup(props, { attrs, slots }) {
+    const injectedRoute = inject(routerViewLocationKey);
+    const routeToDisplay = computed(() => props.route || injectedRoute.value);
+    const injectedDepth = inject(viewDepthKey, 0);
+    const depth = computed(() => {
+      let initialDepth = unref(injectedDepth);
+      const { matched } = routeToDisplay.value;
+      let matchedRoute;
+      while ((matchedRoute = matched[initialDepth]) && !matchedRoute.components) {
+        initialDepth++;
+      }
+      return initialDepth;
+    });
+    const matchedRouteRef = computed(() => routeToDisplay.value.matched[depth.value]);
+    provide(viewDepthKey, computed(() => depth.value + 1));
+    provide(matchedRouteKey, matchedRouteRef);
+    provide(routerViewLocationKey, routeToDisplay);
+    const viewRef = ref();
+    watch(() => [viewRef.value, matchedRouteRef.value, props.name], ([instance, to, name], [oldInstance, from, oldName]) => {
+      if (to) {
+        to.instances[name] = instance;
+        if (from && from !== to && instance && instance === oldInstance) {
+          if (!to.leaveGuards.size) {
+            to.leaveGuards = from.leaveGuards;
+          }
+          if (!to.updateGuards.size) {
+            to.updateGuards = from.updateGuards;
+          }
+        }
+      }
+      if (instance && to && // if there is no instance but to and from are the same this might be
+      // the first visit
+      (!from || !isSameRouteRecord(to, from) || !oldInstance)) {
+        (to.enterCallbacks[name] || []).forEach((callback) => callback(instance));
+      }
+    }, { flush: "post" });
+    return () => {
+      const route = routeToDisplay.value;
+      const currentName = props.name;
+      const matchedRoute = matchedRouteRef.value;
+      const ViewComponent = matchedRoute && matchedRoute.components[currentName];
+      if (!ViewComponent) {
+        return normalizeSlot(slots.default, { Component: ViewComponent, route });
+      }
+      const routePropsOption = matchedRoute.props[currentName];
+      const routeProps = routePropsOption ? routePropsOption === true ? route.params : typeof routePropsOption === "function" ? routePropsOption(route) : routePropsOption : null;
+      const onVnodeUnmounted = (vnode) => {
+        if (vnode.component.isUnmounted) {
+          matchedRoute.instances[currentName] = null;
+        }
+      };
+      const component = h(ViewComponent, assign({}, routeProps, attrs, {
+        onVnodeUnmounted,
+        ref: viewRef
+      }));
+      return (
+        // pass the vnode to the slot as a prop.
+        // h and <component :is="..."> both accept vnodes
+        normalizeSlot(slots.default, { Component: component, route }) || component
+      );
+    };
+  }
+});
+function normalizeSlot(slot, data) {
+  if (!slot)
+    return null;
+  const slotContent = slot(data);
+  return slotContent.length === 1 ? slotContent[0] : slotContent;
+}
+const RouterView = RouterViewImpl;
+function createRouter(options) {
+  const matcher = createRouterMatcher(options.routes, options);
+  const parseQuery$1 = options.parseQuery || parseQuery;
+  const stringifyQuery$1 = options.stringifyQuery || stringifyQuery;
+  const routerHistory = options.history;
+  const beforeGuards = useCallbacks();
+  const beforeResolveGuards = useCallbacks();
+  const afterGuards = useCallbacks();
+  const currentRoute = shallowRef(START_LOCATION_NORMALIZED);
+  let pendingLocation = START_LOCATION_NORMALIZED;
+  if (isBrowser && options.scrollBehavior && "scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+  const normalizeParams = applyToParams.bind(null, (paramValue) => "" + paramValue);
+  const encodeParams = applyToParams.bind(null, encodeParam);
+  const decodeParams = (
+    // @ts-expect-error: intentionally avoid the type check
+    applyToParams.bind(null, decode)
+  );
+  function addRoute(parentOrRoute, route) {
+    let parent;
+    let record;
+    if (isRouteName(parentOrRoute)) {
+      parent = matcher.getRecordMatcher(parentOrRoute);
+      record = route;
+    } else {
+      record = parentOrRoute;
+    }
+    return matcher.addRoute(record, parent);
+  }
+  function removeRoute(name) {
+    const recordMatcher = matcher.getRecordMatcher(name);
+    if (recordMatcher) {
+      matcher.removeRoute(recordMatcher);
+    }
+  }
+  function getRoutes() {
+    return matcher.getRoutes().map((routeMatcher) => routeMatcher.record);
+  }
+  function hasRoute(name) {
+    return !!matcher.getRecordMatcher(name);
+  }
+  function resolve(rawLocation, currentLocation) {
+    currentLocation = assign({}, currentLocation || currentRoute.value);
+    if (typeof rawLocation === "string") {
+      const locationNormalized = parseURL(parseQuery$1, rawLocation, currentLocation.path);
+      const matchedRoute2 = matcher.resolve({ path: locationNormalized.path }, currentLocation);
+      const href2 = routerHistory.createHref(locationNormalized.fullPath);
+      return assign(locationNormalized, matchedRoute2, {
+        params: decodeParams(matchedRoute2.params),
+        hash: decode(locationNormalized.hash),
+        redirectedFrom: void 0,
+        href: href2
+      });
+    }
+    let matcherLocation;
+    if (rawLocation.path != null) {
+      matcherLocation = assign({}, rawLocation, {
+        path: parseURL(parseQuery$1, rawLocation.path, currentLocation.path).path
+      });
+    } else {
+      const targetParams = assign({}, rawLocation.params);
+      for (const key in targetParams) {
+        if (targetParams[key] == null) {
+          delete targetParams[key];
+        }
+      }
+      matcherLocation = assign({}, rawLocation, {
+        params: encodeParams(targetParams)
+      });
+      currentLocation.params = encodeParams(currentLocation.params);
+    }
+    const matchedRoute = matcher.resolve(matcherLocation, currentLocation);
+    const hash = rawLocation.hash || "";
+    matchedRoute.params = normalizeParams(decodeParams(matchedRoute.params));
+    const fullPath = stringifyURL(stringifyQuery$1, assign({}, rawLocation, {
+      hash: encodeHash(hash),
+      path: matchedRoute.path
+    }));
+    const href = routerHistory.createHref(fullPath);
+    return assign({
+      fullPath,
+      // keep the hash encoded so fullPath is effectively path + encodedQuery +
+      // hash
+      hash,
+      query: (
+        // if the user is using a custom query lib like qs, we might have
+        // nested objects, so we keep the query as is, meaning it can contain
+        // numbers at `$route.query`, but at the point, the user will have to
+        // use their own type anyway.
+        // https://github.com/vuejs/router/issues/328#issuecomment-649481567
+        stringifyQuery$1 === stringifyQuery ? normalizeQuery(rawLocation.query) : rawLocation.query || {}
+      )
+    }, matchedRoute, {
+      redirectedFrom: void 0,
+      href
+    });
+  }
+  function locationAsObject(to) {
+    return typeof to === "string" ? parseURL(parseQuery$1, to, currentRoute.value.path) : assign({}, to);
+  }
+  function checkCanceledNavigation(to, from) {
+    if (pendingLocation !== to) {
+      return createRouterError(8, {
+        from,
+        to
+      });
+    }
+  }
+  function push(to) {
+    return pushWithRedirect(to);
+  }
+  function replace(to) {
+    return push(assign(locationAsObject(to), { replace: true }));
+  }
+  function handleRedirectRecord(to) {
+    const lastMatched = to.matched[to.matched.length - 1];
+    if (lastMatched && lastMatched.redirect) {
+      const { redirect } = lastMatched;
+      let newTargetLocation = typeof redirect === "function" ? redirect(to) : redirect;
+      if (typeof newTargetLocation === "string") {
+        newTargetLocation = newTargetLocation.includes("?") || newTargetLocation.includes("#") ? newTargetLocation = locationAsObject(newTargetLocation) : (
+          // force empty params
+          { path: newTargetLocation }
+        );
+        newTargetLocation.params = {};
+      }
+      return assign({
+        query: to.query,
+        hash: to.hash,
+        // avoid transferring params if the redirect has a path
+        params: newTargetLocation.path != null ? {} : to.params
+      }, newTargetLocation);
+    }
+  }
+  function pushWithRedirect(to, redirectedFrom) {
+    const targetLocation = pendingLocation = resolve(to);
+    const from = currentRoute.value;
+    const data = to.state;
+    const force = to.force;
+    const replace2 = to.replace === true;
+    const shouldRedirect = handleRedirectRecord(targetLocation);
+    if (shouldRedirect)
+      return pushWithRedirect(
+        assign(locationAsObject(shouldRedirect), {
+          state: typeof shouldRedirect === "object" ? assign({}, data, shouldRedirect.state) : data,
+          force,
+          replace: replace2
+        }),
+        // keep original redirectedFrom if it exists
+        redirectedFrom || targetLocation
+      );
+    const toLocation = targetLocation;
+    toLocation.redirectedFrom = redirectedFrom;
+    let failure;
+    if (!force && isSameRouteLocation(stringifyQuery$1, from, targetLocation)) {
+      failure = createRouterError(16, { to: toLocation, from });
+      handleScroll(
+        from,
+        from,
+        // this is a push, the only way for it to be triggered from a
+        // history.listen is with a redirect, which makes it become a push
+        true,
+        // This cannot be the first navigation because the initial location
+        // cannot be manually navigated to
+        false
+      );
+    }
+    return (failure ? Promise.resolve(failure) : navigate(toLocation, from)).catch((error) => isNavigationFailure(error) ? (
+      // navigation redirects still mark the router as ready
+      isNavigationFailure(
+        error,
+        2
+        /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+      ) ? error : markAsReady(error)
+    ) : (
+      // reject any unknown error
+      triggerError(error, toLocation, from)
+    )).then((failure2) => {
+      if (failure2) {
+        if (isNavigationFailure(
+          failure2,
+          2
+          /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+        )) {
+          return pushWithRedirect(
+            // keep options
+            assign({
+              // preserve an existing replacement but allow the redirect to override it
+              replace: replace2
+            }, locationAsObject(failure2.to), {
+              state: typeof failure2.to === "object" ? assign({}, data, failure2.to.state) : data,
+              force
+            }),
+            // preserve the original redirectedFrom if any
+            redirectedFrom || toLocation
+          );
+        }
+      } else {
+        failure2 = finalizeNavigation(toLocation, from, true, replace2, data);
+      }
+      triggerAfterEach(toLocation, from, failure2);
+      return failure2;
+    });
+  }
+  function checkCanceledNavigationAndReject(to, from) {
+    const error = checkCanceledNavigation(to, from);
+    return error ? Promise.reject(error) : Promise.resolve();
+  }
+  function runWithContext(fn) {
+    const app = installedApps.values().next().value;
+    return app && typeof app.runWithContext === "function" ? app.runWithContext(fn) : fn();
+  }
+  function navigate(to, from) {
+    let guards;
+    const [leavingRecords, updatingRecords, enteringRecords] = extractChangingRecords(to, from);
+    guards = extractComponentsGuards(leavingRecords.reverse(), "beforeRouteLeave", to, from);
+    for (const record of leavingRecords) {
+      record.leaveGuards.forEach((guard) => {
+        guards.push(guardToPromiseFn(guard, to, from));
+      });
+    }
+    const canceledNavigationCheck = checkCanceledNavigationAndReject.bind(null, to, from);
+    guards.push(canceledNavigationCheck);
+    return runGuardQueue(guards).then(() => {
+      guards = [];
+      for (const guard of beforeGuards.list()) {
+        guards.push(guardToPromiseFn(guard, to, from));
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = extractComponentsGuards(updatingRecords, "beforeRouteUpdate", to, from);
+      for (const record of updatingRecords) {
+        record.updateGuards.forEach((guard) => {
+          guards.push(guardToPromiseFn(guard, to, from));
+        });
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = [];
+      for (const record of enteringRecords) {
+        if (record.beforeEnter) {
+          if (isArray(record.beforeEnter)) {
+            for (const beforeEnter of record.beforeEnter)
+              guards.push(guardToPromiseFn(beforeEnter, to, from));
+          } else {
+            guards.push(guardToPromiseFn(record.beforeEnter, to, from));
+          }
+        }
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      to.matched.forEach((record) => record.enterCallbacks = {});
+      guards = extractComponentsGuards(enteringRecords, "beforeRouteEnter", to, from, runWithContext);
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = [];
+      for (const guard of beforeResolveGuards.list()) {
+        guards.push(guardToPromiseFn(guard, to, from));
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).catch((err) => isNavigationFailure(
+      err,
+      8
+      /* ErrorTypes.NAVIGATION_CANCELLED */
+    ) ? err : Promise.reject(err));
+  }
+  function triggerAfterEach(to, from, failure) {
+    afterGuards.list().forEach((guard) => runWithContext(() => guard(to, from, failure)));
+  }
+  function finalizeNavigation(toLocation, from, isPush, replace2, data) {
+    const error = checkCanceledNavigation(toLocation, from);
+    if (error)
+      return error;
+    const isFirstNavigation = from === START_LOCATION_NORMALIZED;
+    const state = !isBrowser ? {} : history.state;
+    if (isPush) {
+      if (replace2 || isFirstNavigation)
+        routerHistory.replace(toLocation.fullPath, assign({
+          scroll: isFirstNavigation && state && state.scroll
+        }, data));
+      else
+        routerHistory.push(toLocation.fullPath, data);
+    }
+    currentRoute.value = toLocation;
+    handleScroll(toLocation, from, isPush, isFirstNavigation);
+    markAsReady();
+  }
+  let removeHistoryListener;
+  function setupListeners() {
+    if (removeHistoryListener)
+      return;
+    removeHistoryListener = routerHistory.listen((to, _from, info) => {
+      if (!router.listening)
+        return;
+      const toLocation = resolve(to);
+      const shouldRedirect = handleRedirectRecord(toLocation);
+      if (shouldRedirect) {
+        pushWithRedirect(assign(shouldRedirect, { replace: true, force: true }), toLocation).catch(noop);
+        return;
+      }
+      pendingLocation = toLocation;
+      const from = currentRoute.value;
+      if (isBrowser) {
+        saveScrollPosition(getScrollKey(from.fullPath, info.delta), computeScrollPosition());
+      }
+      navigate(toLocation, from).catch((error) => {
+        if (isNavigationFailure(
+          error,
+          4 | 8
+          /* ErrorTypes.NAVIGATION_CANCELLED */
+        )) {
+          return error;
+        }
+        if (isNavigationFailure(
+          error,
+          2
+          /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+        )) {
+          pushWithRedirect(
+            assign(locationAsObject(error.to), {
+              force: true
+            }),
+            toLocation
+            // avoid an uncaught rejection, let push call triggerError
+          ).then((failure) => {
+            if (isNavigationFailure(
+              failure,
+              4 | 16
+              /* ErrorTypes.NAVIGATION_DUPLICATED */
+            ) && !info.delta && info.type === NavigationType.pop) {
+              routerHistory.go(-1, false);
+            }
+          }).catch(noop);
+          return Promise.reject();
+        }
+        if (info.delta) {
+          routerHistory.go(-info.delta, false);
+        }
+        return triggerError(error, toLocation, from);
+      }).then((failure) => {
+        failure = failure || finalizeNavigation(
+          // after navigation, all matched components are resolved
+          toLocation,
+          from,
+          false
+        );
+        if (failure) {
+          if (info.delta && // a new navigation has been triggered, so we do not want to revert, that will change the current history
+          // entry while a different route is displayed
+          !isNavigationFailure(
+            failure,
+            8
+            /* ErrorTypes.NAVIGATION_CANCELLED */
+          )) {
+            routerHistory.go(-info.delta, false);
+          } else if (info.type === NavigationType.pop && isNavigationFailure(
+            failure,
+            4 | 16
+            /* ErrorTypes.NAVIGATION_DUPLICATED */
+          )) {
+            routerHistory.go(-1, false);
+          }
+        }
+        triggerAfterEach(toLocation, from, failure);
+      }).catch(noop);
+    });
+  }
+  let readyHandlers = useCallbacks();
+  let errorListeners = useCallbacks();
+  let ready;
+  function triggerError(error, to, from) {
+    markAsReady(error);
+    const list = errorListeners.list();
+    if (list.length) {
+      list.forEach((handler) => handler(error, to, from));
+    } else {
+      console.error(error);
+    }
+    return Promise.reject(error);
+  }
+  function isReady() {
+    if (ready && currentRoute.value !== START_LOCATION_NORMALIZED)
+      return Promise.resolve();
+    return new Promise((resolve2, reject) => {
+      readyHandlers.add([resolve2, reject]);
+    });
+  }
+  function markAsReady(err) {
+    if (!ready) {
+      ready = !err;
+      setupListeners();
+      readyHandlers.list().forEach(([resolve2, reject]) => err ? reject(err) : resolve2());
+      readyHandlers.reset();
+    }
+    return err;
+  }
+  function handleScroll(to, from, isPush, isFirstNavigation) {
+    const { scrollBehavior } = options;
+    if (!isBrowser || !scrollBehavior)
+      return Promise.resolve();
+    const scrollPosition = !isPush && getSavedScrollPosition(getScrollKey(to.fullPath, 0)) || (isFirstNavigation || !isPush) && history.state && history.state.scroll || null;
+    return nextTick().then(() => scrollBehavior(to, from, scrollPosition)).then((position) => position && scrollToPosition(position)).catch((err) => triggerError(err, to, from));
+  }
+  const go = (delta) => routerHistory.go(delta);
+  let started;
+  const installedApps = /* @__PURE__ */ new Set();
+  const router = {
+    currentRoute,
+    listening: true,
+    addRoute,
+    removeRoute,
+    clearRoutes: matcher.clearRoutes,
+    hasRoute,
+    getRoutes,
+    resolve,
+    options,
+    push,
+    replace,
+    go,
+    back: () => go(-1),
+    forward: () => go(1),
+    beforeEach: beforeGuards.add,
+    beforeResolve: beforeResolveGuards.add,
+    afterEach: afterGuards.add,
+    onError: errorListeners.add,
+    isReady,
+    install(app) {
+      const router2 = this;
+      app.component("RouterLink", RouterLink);
+      app.component("RouterView", RouterView);
+      app.config.globalProperties.$router = router2;
+      Object.defineProperty(app.config.globalProperties, "$route", {
+        enumerable: true,
+        get: () => unref(currentRoute)
+      });
+      if (isBrowser && // used for the initial navigation client side to avoid pushing
+      // multiple times when the router is used in multiple apps
+      !started && currentRoute.value === START_LOCATION_NORMALIZED) {
+        started = true;
+        push(routerHistory.location).catch((err) => {
+        });
+      }
+      const reactiveRoute = {};
+      for (const key in START_LOCATION_NORMALIZED) {
+        Object.defineProperty(reactiveRoute, key, {
+          get: () => currentRoute.value[key],
+          enumerable: true
+        });
+      }
+      app.provide(routerKey, router2);
+      app.provide(routeLocationKey, shallowReactive(reactiveRoute));
+      app.provide(routerViewLocationKey, currentRoute);
+      const unmountApp = app.unmount;
+      installedApps.add(app);
+      app.unmount = function() {
+        installedApps.delete(app);
+        if (installedApps.size < 1) {
+          pendingLocation = START_LOCATION_NORMALIZED;
+          removeHistoryListener && removeHistoryListener();
+          removeHistoryListener = null;
+          currentRoute.value = START_LOCATION_NORMALIZED;
+          started = false;
+          ready = false;
+        }
+        unmountApp();
+      };
+    }
+  };
+  function runGuardQueue(guards) {
+    return guards.reduce((promise, guard) => promise.then(() => runWithContext(guard)), Promise.resolve());
+  }
+  return router;
+}
+function extractChangingRecords(to, from) {
+  const leavingRecords = [];
+  const updatingRecords = [];
+  const enteringRecords = [];
+  const len = Math.max(from.matched.length, to.matched.length);
+  for (let i = 0; i < len; i++) {
+    const recordFrom = from.matched[i];
+    if (recordFrom) {
+      if (to.matched.find((record) => isSameRouteRecord(record, recordFrom)))
+        updatingRecords.push(recordFrom);
+      else
+        leavingRecords.push(recordFrom);
+    }
+    const recordTo = to.matched[i];
+    if (recordTo) {
+      if (!from.matched.find((record) => isSameRouteRecord(record, recordTo))) {
+        enteringRecords.push(recordTo);
+      }
+    }
+  }
+  return [leavingRecords, updatingRecords, enteringRecords];
+}
+
+const workExperiencesList = [
+  {
+    title: "Frontend Engineer | 14Four",
+    dates: "Oct 2023 — Now",
+    description: [
+      "Developed and deployed high-performance, creative-focused web applications for top brands like Pepsi, Toyota, and Carmax, leveraging React.js (Next.js) and Vue.js (Nuxt.js) to deliver engaging digital experiences.",
+      "Created and launched marketing campaign projects that reached 10,000+ users, driving brand engagement and user interactions through various front-end solutions and seamless UX design.",
+      "Engineered complex JavaScript features independent of frameworks, enhancing application performance and ensuring consistent, high-quality experiences across multiple devices.",
+      "Built dynamic, content-rich CMS platforms using Strapi and Craft CMS, enabling scalable and flexible content management for global marketing initiatives.",
+      "Optimized web performance and accessibility by implementing WCAG standards, ensuring 100% compliance and improving usability for diverse audiences.",
+      "Developed AI-enhanced backend features using Python (Flask) and Node.js (Nest.js), boosting API efficiency and enhancing system scalability.",
+      "Led deployment and troubleshooting efforts for client environments, resolving JavaScript-related issues and delivering ongoing feature enhancements.",
+      "Collaborated with cross-functional teams to ensure smooth integrations between front-end and backend components, maintaining high code quality and performance.",
+      "Key Technologies: React.js (Next.js), Vue.js (Nuxt.js), JavaScript (ES6+), TypeScript, Tailwind, GSAP, Webpack, Vite, Python (Flask), Node.js (Nest.js), Strapi, Craft CMS, WCAG, WebSockets, Docker."
+    ]
+  },
+  {
+    dates: "Apr 2021 — Oct 2023",
+    title: "Frontend Engineer, Team Lead | Milan Art",
+    description: [
+      "Helped my client grow their platform to over 100,000 active users by designing and building a robust architecture that delivered a smooth user experience and real-time interactions with minimal lag.",
+      "Architected and launched a social networking platform for artists completely from scratch, leveraging Vue.js (Nuxt.js), TypeScript, Composition API, and WebSockets to build a high-performance, scalable solution.",
+      "Led the end-to-end development of ArtSocial, transforming conceptual ideas into a fully functional platform that enabled artists to connect, showcase their work, and interact in real-time.",
+      "Integrated Stripe and other payment systems, enhancing the checkout experience with secure transactions, boosting user trust and engagement.",
+      "Directed project timelines, team priorities, and stakeholder communication, ensuring on-time feature delivery and alignment with business objectives.",
+      "Optimized front-end performance using Storybook, Tailwind, and Element UI, delivering a smooth, visually appealing, and responsive user experience.",
+      "Key Technologies: Vue.js (Nuxt.js), TypeScript, Composition API, WebSockets, Node.js (Nest.js), Stripe, Docker, Tailwind, Element UI, CI/CD (Bitbucket Pipelines, CircleCI), MJML, Sentry."
+    ]
+  },
+  {
+    dates: "Oct 2022 — Aug 2023",
+    title: "Frontend Engineer | SPD Ukraine",
+    description: [
+      "Developed and maintained scalable web applications for multiple clients, leveraging React.js (Next.js), TypeScript, and modern UI frameworks.",
+      "Designed and implemented dynamic, responsive UIs, ensuring seamless user experience across devices using React Query, React Hooks, and Ant Design.",
+      "Collaborated with cross-functional teams, translating business requirements into high-quality, maintainable code that enhanced user engagement.",
+      "Streamlined deployment processes by implementing best practices for code reviews, version control, and CI/CD workflows.",
+      "Key Technologies: React.js (Next.js), TypeScript, React Query, React Hooks, Ant Design, Tailwind, Google Maps API, CI/CD, Web Performance Optimization."
+    ]
+  },
+  {
+    dates: "Oct 2019 — Mar 2021",
+    title: "Frontend Developer | Kilian business consulting GmbH",
+    description: [
+      "Developed an online store and personal UI cabinet for Kilian Business Consulting GmbH, creating a seamless user experience and increasing customer engagement.",
+      "Conducted thorough code reviews, optimized existing code, and debugged errors.",
+      "Utilized a tech stack that included Vue.js, Vuex, HTML, SCSS, Bulma, and Gridsome."
+    ]
+  },
+  {
+    dates: "Apr 2017 — Apr 2021",
+    title: "Frontend Developer, Frontend Lead | Empat",
+    description: [
+      "Responsible for the development of several CRM systems using Vue.js and React.js, streamlining business processes and enhancing user experience for clients.",
+      "Developed over 20 websites using Drupal and WordPress CMS systems, catering to diverse industries and client requirements.",
+      "Utilized a diverse tech stack, including JavaScript, Vue.js, React.js, Next.js, HTML, CSS, jQuery, PHP, WordPress, Grunt, Vuex, Nuxt.js, Webpack, Gulp, Bootstrap, Bulma, and Vuetify."
+    ]
+  }
+];
+
+const _sfc_main$6 = defineComponent({
+  computed: {
+    experienceList() {
+      return workExperiencesList;
+    }
+  }
+});
+
+const _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
+};
+
+const _hoisted_1$4 = { class: "mt-12" };
+const _hoisted_2$4 = { class: "mt-6 pl-4" };
+const _hoisted_3$3 = { class: "mb-1 text-lg" };
+const _hoisted_4$2 = { class: "mr-2" };
+const _hoisted_5 = { class: "font-semibold" };
+const _hoisted_6 = { class: "mb-4 list-disc pl-4" };
+function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createElementBlock("section", _hoisted_1$4, [
+    _cache[0] || (_cache[0] = createBaseVNode("h2", { class: "text-2xl font-semibold" }, "Work experience", -1)),
+    createBaseVNode("ul", _hoisted_2$4, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.experienceList, (item, key) => {
+        return openBlock(), createElementBlock("li", {
+          key,
+          class: "mb-6"
+        }, [
+          createBaseVNode("p", _hoisted_3$3, [
+            createBaseVNode("i", _hoisted_4$2, toDisplayString(item.dates), 1),
+            createBaseVNode("b", _hoisted_5, toDisplayString(item.title), 1)
+          ]),
+          createBaseVNode("ul", _hoisted_6, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(item.description, (subItem, key2) => {
+              return openBlock(), createElementBlock("li", {
+                key: key2,
+                class: "pl-1 mb-1"
+              }, toDisplayString(subItem), 1);
+            }), 128))
+          ])
+        ]);
+      }), 128))
+    ])
+  ]);
+}
+const WorkExperience = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$1]]);
+
+const events = {};
+function getIdGenerator() {
+  let lastId = 0;
+  return function getNextUniqueId2() {
+    lastId += 1;
+    return lastId;
+  };
+}
+const getNextUniqueId = getIdGenerator();
+function on(eventType, callback) {
+  const id = getNextUniqueId();
+  if (!events[eventType]) events[eventType] = {};
+  events[eventType][id] = callback;
+  return {
+    off() {
+      delete events[eventType][id];
+      if (Object.keys(events[eventType]).length === 0) delete events[eventType];
+    }
+  };
+}
+function dispatch(eventType, arg) {
+  if (!events[eventType]) return;
+  Object.keys(events[eventType]).forEach((key) => events[eventType][key](arg));
+}
+const EventBus = {
+  on,
+  dispatch
+};
+
+const useLocalStorage = (storageKey, defaultValue) => {
+  const eventBusKey = `${storageKey}-change`;
+  const offEventBus = ref(null);
+  const storageValue = ref(null);
+  const getStorageValue = () => {
+    const value = localStorage.getItem(storageKey);
+    storageValue.value = value;
+    return value;
+  };
+  const rawSetStorageValue = (newVal, triggerBus) => {
+    localStorage.setItem(storageKey, newVal);
+    storageValue.value = newVal;
+    if (!triggerBus) return;
+    EventBus.dispatch(eventBusKey);
+  };
+  const setStorageValue = (newVal) => {
+    rawSetStorageValue(newVal, true);
+  };
+  onMounted(() => {
+    const value = getStorageValue();
+    if (!value) {
+      rawSetStorageValue(defaultValue);
+      getStorageValue();
+    }
+    const { off } = EventBus.on(eventBusKey, () => {
+      getStorageValue();
+    });
+    offEventBus.value = off;
+  });
+  onUnmounted(() => {
+    offEventBus.value?.();
+  });
+  return { storageValue, setStorageValue };
+};
+
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "ThemeSwitcher",
+  setup(__props) {
+    const { setStorageValue } = useLocalStorage("theme", "light");
+    const onClick = () => {
+      if (document.body.classList.contains("dark")) {
+        document.body.classList.remove("dark");
+        setStorageValue("light");
+      } else {
+        document.body.classList.add("dark");
+        setStorageValue("dark");
+      }
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("button", { onClick });
+    };
+  }
+});
+
+const ThemeSwitcher = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-828acd8f"]]);
+
+var dayjs_min = {exports: {}};
+
+(function (module, exports) {
+	!function(t,e){module.exports=e();}(commonjsGlobal,(function(){var t=1e3,e=6e4,n=36e5,r="millisecond",i="second",s="minute",u="hour",a="day",o="week",c="month",f="quarter",h="year",d="date",l="Invalid Date",$=/^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/,y=/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g,M={name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_"),ordinal:function(t){var e=["th","st","nd","rd"],n=t%100;return "["+t+(e[(n-20)%10]||e[n]||e[0])+"]"}},m=function(t,e,n){var r=String(t);return !r||r.length>=e?t:""+Array(e+1-r.length).join(n)+t},v={s:m,z:function(t){var e=-t.utcOffset(),n=Math.abs(e),r=Math.floor(n/60),i=n%60;return (e<=0?"+":"-")+m(r,2,"0")+":"+m(i,2,"0")},m:function t(e,n){if(e.date()<n.date())return -t(n,e);var r=12*(n.year()-e.year())+(n.month()-e.month()),i=e.clone().add(r,c),s=n-i<0,u=e.clone().add(r+(s?-1:1),c);return +(-(r+(n-i)/(s?i-u:u-i))||0)},a:function(t){return t<0?Math.ceil(t)||0:Math.floor(t)},p:function(t){return {M:c,y:h,w:o,d:a,D:d,h:u,m:s,s:i,ms:r,Q:f}[t]||String(t||"").toLowerCase().replace(/s$/,"")},u:function(t){return void 0===t}},g="en",D={};D[g]=M;var p="$isDayjsObject",S=function(t){return t instanceof _||!(!t||!t[p])},w=function t(e,n,r){var i;if(!e)return g;if("string"==typeof e){var s=e.toLowerCase();D[s]&&(i=s),n&&(D[s]=n,i=s);var u=e.split("-");if(!i&&u.length>1)return t(u[0])}else {var a=e.name;D[a]=e,i=a;}return !r&&i&&(g=i),i||!r&&g},O=function(t,e){if(S(t))return t.clone();var n="object"==typeof e?e:{};return n.date=t,n.args=arguments,new _(n)},b=v;b.l=w,b.i=S,b.w=function(t,e){return O(t,{locale:e.$L,utc:e.$u,x:e.$x,$offset:e.$offset})};var _=function(){function M(t){this.$L=w(t.locale,null,true),this.parse(t),this.$x=this.$x||t.x||{},this[p]=true;}var m=M.prototype;return m.parse=function(t){this.$d=function(t){var e=t.date,n=t.utc;if(null===e)return new Date(NaN);if(b.u(e))return new Date;if(e instanceof Date)return new Date(e);if("string"==typeof e&&!/Z$/i.test(e)){var r=e.match($);if(r){var i=r[2]-1||0,s=(r[7]||"0").substring(0,3);return n?new Date(Date.UTC(r[1],i,r[3]||1,r[4]||0,r[5]||0,r[6]||0,s)):new Date(r[1],i,r[3]||1,r[4]||0,r[5]||0,r[6]||0,s)}}return new Date(e)}(t),this.init();},m.init=function(){var t=this.$d;this.$y=t.getFullYear(),this.$M=t.getMonth(),this.$D=t.getDate(),this.$W=t.getDay(),this.$H=t.getHours(),this.$m=t.getMinutes(),this.$s=t.getSeconds(),this.$ms=t.getMilliseconds();},m.$utils=function(){return b},m.isValid=function(){return !(this.$d.toString()===l)},m.isSame=function(t,e){var n=O(t);return this.startOf(e)<=n&&n<=this.endOf(e)},m.isAfter=function(t,e){return O(t)<this.startOf(e)},m.isBefore=function(t,e){return this.endOf(e)<O(t)},m.$g=function(t,e,n){return b.u(t)?this[e]:this.set(n,t)},m.unix=function(){return Math.floor(this.valueOf()/1e3)},m.valueOf=function(){return this.$d.getTime()},m.startOf=function(t,e){var n=this,r=!!b.u(e)||e,f=b.p(t),l=function(t,e){var i=b.w(n.$u?Date.UTC(n.$y,e,t):new Date(n.$y,e,t),n);return r?i:i.endOf(a)},$=function(t,e){return b.w(n.toDate()[t].apply(n.toDate("s"),(r?[0,0,0,0]:[23,59,59,999]).slice(e)),n)},y=this.$W,M=this.$M,m=this.$D,v="set"+(this.$u?"UTC":"");switch(f){case h:return r?l(1,0):l(31,11);case c:return r?l(1,M):l(0,M+1);case o:var g=this.$locale().weekStart||0,D=(y<g?y+7:y)-g;return l(r?m-D:m+(6-D),M);case a:case d:return $(v+"Hours",0);case u:return $(v+"Minutes",1);case s:return $(v+"Seconds",2);case i:return $(v+"Milliseconds",3);default:return this.clone()}},m.endOf=function(t){return this.startOf(t,false)},m.$set=function(t,e){var n,o=b.p(t),f="set"+(this.$u?"UTC":""),l=(n={},n[a]=f+"Date",n[d]=f+"Date",n[c]=f+"Month",n[h]=f+"FullYear",n[u]=f+"Hours",n[s]=f+"Minutes",n[i]=f+"Seconds",n[r]=f+"Milliseconds",n)[o],$=o===a?this.$D+(e-this.$W):e;if(o===c||o===h){var y=this.clone().set(d,1);y.$d[l]($),y.init(),this.$d=y.set(d,Math.min(this.$D,y.daysInMonth())).$d;}else l&&this.$d[l]($);return this.init(),this},m.set=function(t,e){return this.clone().$set(t,e)},m.get=function(t){return this[b.p(t)]()},m.add=function(r,f){var d,l=this;r=Number(r);var $=b.p(f),y=function(t){var e=O(l);return b.w(e.date(e.date()+Math.round(t*r)),l)};if($===c)return this.set(c,this.$M+r);if($===h)return this.set(h,this.$y+r);if($===a)return y(1);if($===o)return y(7);var M=(d={},d[s]=e,d[u]=n,d[i]=t,d)[$]||1,m=this.$d.getTime()+r*M;return b.w(m,this)},m.subtract=function(t,e){return this.add(-1*t,e)},m.format=function(t){var e=this,n=this.$locale();if(!this.isValid())return n.invalidDate||l;var r=t||"YYYY-MM-DDTHH:mm:ssZ",i=b.z(this),s=this.$H,u=this.$m,a=this.$M,o=n.weekdays,c=n.months,f=n.meridiem,h=function(t,n,i,s){return t&&(t[n]||t(e,r))||i[n].slice(0,s)},d=function(t){return b.s(s%12||12,t,"0")},$=f||function(t,e,n){var r=t<12?"AM":"PM";return n?r.toLowerCase():r};return r.replace(y,(function(t,r){return r||function(t){switch(t){case "YY":return String(e.$y).slice(-2);case "YYYY":return b.s(e.$y,4,"0");case "M":return a+1;case "MM":return b.s(a+1,2,"0");case "MMM":return h(n.monthsShort,a,c,3);case "MMMM":return h(c,a);case "D":return e.$D;case "DD":return b.s(e.$D,2,"0");case "d":return String(e.$W);case "dd":return h(n.weekdaysMin,e.$W,o,2);case "ddd":return h(n.weekdaysShort,e.$W,o,3);case "dddd":return o[e.$W];case "H":return String(s);case "HH":return b.s(s,2,"0");case "h":return d(1);case "hh":return d(2);case "a":return $(s,u,true);case "A":return $(s,u,false);case "m":return String(u);case "mm":return b.s(u,2,"0");case "s":return String(e.$s);case "ss":return b.s(e.$s,2,"0");case "SSS":return b.s(e.$ms,3,"0");case "Z":return i}return null}(t)||i.replace(":","")}))},m.utcOffset=function(){return 15*-Math.round(this.$d.getTimezoneOffset()/15)},m.diff=function(r,d,l){var $,y=this,M=b.p(d),m=O(r),v=(m.utcOffset()-this.utcOffset())*e,g=this-m,D=function(){return b.m(y,m)};switch(M){case h:$=D()/12;break;case c:$=D();break;case f:$=D()/3;break;case o:$=(g-v)/6048e5;break;case a:$=(g-v)/864e5;break;case u:$=g/n;break;case s:$=g/e;break;case i:$=g/t;break;default:$=g;}return l?$:b.a($)},m.daysInMonth=function(){return this.endOf(c).$D},m.$locale=function(){return D[this.$L]},m.locale=function(t,e){if(!t)return this.$L;var n=this.clone(),r=w(t,e,true);return r&&(n.$L=r),n},m.clone=function(){return b.w(this.$d,this)},m.toDate=function(){return new Date(this.valueOf())},m.toJSON=function(){return this.isValid()?this.toISOString():null},m.toISOString=function(){return this.$d.toISOString()},m.toString=function(){return this.$d.toUTCString()},M}(),k=_.prototype;return O.prototype=k,[["$ms",r],["$s",i],["$m",s],["$H",u],["$W",a],["$M",c],["$y",h],["$D",d]].forEach((function(t){k[t[1]]=function(e){return this.$g(e,t[0],t[1])};})),O.extend=function(t,e){return t.$i||(t(e,_,O),t.$i=true),O},O.locale=w,O.isDayjs=S,O.unix=function(t){return O(1e3*t)},O.en=D[g],O.Ls=D,O.p={},O})); 
+} (dayjs_min));
+
+var dayjs_minExports = dayjs_min.exports;
+const dayjs = /*@__PURE__*/getDefaultExportFromCjs(dayjs_minExports);
+
+var relativeTime$1 = {exports: {}};
+
+(function (module, exports) {
+	!function(r,e){module.exports=e();}(commonjsGlobal,(function(){return function(r,e,t){r=r||{};var n=e.prototype,o={future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"};function i(r,e,t,o){return n.fromToBase(r,e,t,o)}t.en.relativeTime=o,n.fromToBase=function(e,n,i,d,u){for(var f,a,s,l=i.$locale().relativeTime||o,h=r.thresholds||[{l:"s",r:44,d:"second"},{l:"m",r:89},{l:"mm",r:44,d:"minute"},{l:"h",r:89},{l:"hh",r:21,d:"hour"},{l:"d",r:35},{l:"dd",r:25,d:"day"},{l:"M",r:45},{l:"MM",r:10,d:"month"},{l:"y",r:17},{l:"yy",d:"year"}],m=h.length,c=0;c<m;c+=1){var y=h[c];y.d&&(f=d?t(e).diff(i,y.d,true):i.diff(e,y.d,true));var p=(r.rounding||Math.round)(Math.abs(f));if(s=f>0,p<=y.r||!y.r){p<=1&&c>0&&(y=h[c-1]);var v=l[y.l];u&&(p=u(""+p)),a="string"==typeof v?v.replace("%d",p):v(p,n,y.l,s);break}}if(n)return a;var M=s?l.future:l.past;return "function"==typeof M?M(a):M.replace("%s",a)},n.to=function(r,e){return i(r,e,this,true)},n.from=function(r,e){return i(r,e,this)};var d=function(r){return r.$u?t.utc():t()};n.toNow=function(r){return this.to(d(this),r)},n.fromNow=function(r){return this.from(d(this),r)};}})); 
+} (relativeTime$1));
+
+var relativeTimeExports = relativeTime$1.exports;
+const relativeTime = /*@__PURE__*/getDefaultExportFromCjs(relativeTimeExports);
+
+const WORKING_START_DATE = "2017-04-01";
+const TELEGRAM_LINK = "https://t.me/m_nkv";
+const EMAIL_ADDRESS = "max.novikov.work@gmail.com";
+const LINKEDIN_LINK = "https://www.linkedin.com/in/max-novikov/";
+
+const getDegreeSin = (degree) => Math.sin(degree * Math.PI / 180);
+
+var ERectColor = /* @__PURE__ */ ((ERectColor2) => {
+  ERectColor2["Yellow"] = "#ffcc00";
+  ERectColor2["Blue"] = "#0066cc";
+  ERectColor2["Black"] = "#000";
+  ERectColor2["Red"] = "#fa0202";
+  return ERectColor2;
+})(ERectColor || {});
+
+const ROWS_COUNT = 35;
+const COLS_COUNT = 45;
+const CIRCLE_DEGREES = 360;
+const WAVE_SIZE = 1.25;
+const RECT_SIZE = 1;
+const SHADOW_OFFSET = 4;
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "CanvasAnimation",
+  setup(__props) {
+    const DEGREE_STEP = CIRCLE_DEGREES / COLS_COUNT;
+    const LAST_ROW_INDEX = Math.floor(ROWS_COUNT / 2 - 1);
+    const TOP_POSITION = WAVE_SIZE * 2 + SHADOW_OFFSET;
+    const LEFT_POSITION = 1 + SHADOW_OFFSET;
+    const IMAGE_HEIGHT = ROWS_COUNT * RECT_SIZE + TOP_POSITION * 2 + WAVE_SIZE * 2 + SHADOW_OFFSET;
+    const IMAGE_WIDTH = COLS_COUNT + LEFT_POSITION * 2 + SHADOW_OFFSET;
+    const { storageValue } = useLocalStorage("theme");
+    const isDarkMode = computed(() => storageValue.value === "dark");
+    const getAnimationState = (offset) => {
+      const topColor = isDarkMode.value ? ERectColor.Red : ERectColor.Blue;
+      const bottomColor = isDarkMode.value ? ERectColor.Black : ERectColor.Yellow;
+      const matrix = [];
+      for (let row = 0; row < ROWS_COUNT; row++) {
+        matrix[row] = [];
+        for (let col = 0; col < COLS_COUNT; col++) {
+          const degree = DEGREE_STEP * offset + DEGREE_STEP * col;
+          matrix[row][col] = {
+            color: row <= LAST_ROW_INDEX ? topColor : bottomColor,
+            x: LEFT_POSITION + col * RECT_SIZE,
+            y: TOP_POSITION + row * RECT_SIZE + getDegreeSin(degree) * WAVE_SIZE
+          };
+        }
+      }
+      return matrix;
+    };
+    const step = ref(0);
+    const timeout = ref(null);
+    const initializeAnimation = () => {
+      setCanvasSize();
+      draw(0);
+      setAnimation();
+    };
+    onMounted(initializeAnimation);
+    onUnmounted(() => {
+      clearTimeout(timeout.value);
+    });
+    const canvas = ref(null);
+    const setCanvasSize = () => {
+      const ctx = canvas.value.getContext("2d");
+      canvas.value.width = IMAGE_WIDTH;
+      canvas.value.height = IMAGE_HEIGHT;
+      const dpr = window.devicePixelRatio;
+      const rect = canvas.value.getBoundingClientRect();
+      canvas.value.width = rect.width * dpr;
+      canvas.value.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.value.style.width = `${rect.width}px`;
+      canvas.value.style.height = `${rect.height}px`;
+    };
+    const setAnimation = () => {
+      requestAnimationFrame(() => {
+        step.value = step.value >= COLS_COUNT ? 0 : step.value + 1;
+        draw(step.value);
+        timeout.value = setTimeout(setAnimation, 25);
+      });
+    };
+    const draw = (offset) => {
+      const ctx = canvas.value.getContext("2d", {
+        alpha: false
+      });
+      ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = "rgba(0,0,0, 0.65)";
+      ctx.shadowOffsetY = SHADOW_OFFSET;
+      ctx.shadowOffsetX = SHADOW_OFFSET;
+      const matrix = getAnimationState(offset);
+      matrix.forEach(
+        (row) => row.forEach((col) => {
+          ctx.fillStyle = col.color;
+          ctx.fillRect(col.x, col.y, RECT_SIZE, RECT_SIZE);
+        })
+      );
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("canvas", {
+        ref_key: "canvas",
+        ref: canvas
+      }, null, 512);
+    };
+  }
+});
+
+const _hoisted_1$3 = { class: "flex items-center gap-x-4" };
+const _hoisted_2$3 = ["href"];
+const _hoisted_3$2 = ["href"];
+const _hoisted_4$1 = ["href"];
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "ContactsBlock",
+  setup(__props) {
+    return (_ctx, _cache) => {
+      const _component_font_awesome_icon = resolveComponent("font-awesome-icon");
+      return openBlock(), createElementBlock("div", _hoisted_1$3, [
+        _cache[0] || (_cache[0] = createBaseVNode("strong", null, "My contacts:", -1)),
+        createBaseVNode("a", {
+          class: "text-red-400",
+          href: `mailto:${unref(EMAIL_ADDRESS)}`
+        }, [
+          createVNode(_component_font_awesome_icon, { icon: "at" })
+        ], 8, _hoisted_2$3),
+        createBaseVNode("a", {
+          class: "text-red-400",
+          href: unref(TELEGRAM_LINK)
+        }, [
+          createVNode(_component_font_awesome_icon, { icon: ["fab", "telegram-plane"] })
+        ], 8, _hoisted_3$2),
+        createBaseVNode("a", {
+          class: "text-red-400",
+          href: unref(LINKEDIN_LINK),
+          target: "_blank"
+        }, [
+          createVNode(_component_font_awesome_icon, { icon: ["fab", "linkedin"] })
+        ], 8, _hoisted_4$1)
+      ]);
+    };
+  }
+});
+
+const _hoisted_1$2 = { class: "text-5xl font-semibold flex" };
+const _hoisted_2$2 = { class: "content-block__wrapper mt-12" };
+const _hoisted_3$1 = { class: "mb-3" };
+const _hoisted_4 = { class: "whitespace-nowrap" };
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "ContentBlock",
+  setup(__props) {
+    dayjs.extend(relativeTime);
+    const startWorkingDate = computed(() => {
+      return dayjs(WORKING_START_DATE).fromNow(true);
+    });
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("section", null, [
+        createBaseVNode("h1", _hoisted_1$2, [
+          _cache[0] || (_cache[0] = createTextVNode(" Hello. ")),
+          createVNode(_sfc_main$4, { class: "ml-1 mt-1" })
+        ]),
+        createBaseVNode("div", _hoisted_2$2, [
+          createBaseVNode("p", _hoisted_3$1, [
+            _cache[2] || (_cache[2] = createTextVNode(" My name is ")),
+            _cache[3] || (_cache[3] = createBaseVNode("strong", null, "Maksym Novikov.", -1)),
+            _cache[4] || (_cache[4] = createTextVNode(" I am a Frontend Engineer with ")),
+            createBaseVNode("b", null, [
+              createBaseVNode("span", _hoisted_4, toDisplayString(startWorkingDate.value) + "+", 1),
+              _cache[1] || (_cache[1] = createTextVNode(" years of experience"))
+            ]),
+            _cache[5] || (_cache[5] = createTextVNode(" building high-performance, scalable web applications. Skilled in ")),
+            _cache[6] || (_cache[6] = createBaseVNode("b", null, "Vue.js, React.js, TypeScript, JavaScript (ES6+), and UI/UX best practices", -1)),
+            _cache[7] || (_cache[7] = createTextVNode(". Passionate about delivering optimized, accessible, and visually appealing user experiences. Proven track record of developing applications for top brands like ")),
+            _cache[8] || (_cache[8] = createBaseVNode("b", null, "Pepsi, Toyota, and Carmax", -1)),
+            _cache[9] || (_cache[9] = createTextVNode(". Strong collaborator with expertise in ")),
+            _cache[10] || (_cache[10] = createBaseVNode("b", null, "performance optimization, security, and API integrations", -1)),
+            _cache[11] || (_cache[11] = createTextVNode(". "))
+          ])
+        ]),
+        createVNode(_sfc_main$3, { class: "mt-4" })
+      ]);
+    };
+  }
+});
+
+const workExamplesList = [
+  "https://www.artsocial.com/",
+  "https://input.propdo.ai/il/buyer-2",
+  "https://akurateco.com/",
+  "https://express-tehbud.com/",
+  "https://www.csi.org.ua/",
+  "https://empat.tech/",
+  "https://smartdome.ch/"
+];
+
+const _sfc_main$1 = defineComponent({
+  computed: {
+    examplesList() {
+      return workExamplesList;
+    }
+  }
+});
+
+const _hoisted_1$1 = { class: "mt-12" };
+const _hoisted_2$1 = { class: "mt-6 list-disc pl-4" };
+const _hoisted_3 = ["href"];
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createElementBlock("section", _hoisted_1$1, [
+    _cache[0] || (_cache[0] = createBaseVNode("h2", { class: "text-2xl font-semibold" }, "Examples of my work", -1)),
+    createBaseVNode("ul", _hoisted_2$1, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.examplesList, (link) => {
+        return openBlock(), createElementBlock("li", {
+          key: link,
+          class: "mb-2"
+        }, [
+          createBaseVNode("a", {
+            href: link,
+            target: "_blank",
+            class: "text-red-400 border-b-2 border-dashed border-red-400"
+          }, toDisplayString(link), 9, _hoisted_3)
+        ]);
+      }), 128))
+    ])
+  ]);
+}
+const ExamplesOfWork = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render]]);
+
+const _hoisted_1 = { class: "min-h-screen bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 px-4 py-10 sm:px-12 sm:py-16" };
+const _hoisted_2 = { class: "wrapper flex-grow w-full" };
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "HomeView",
+  setup(__props) {
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("main", _hoisted_1, [
+        createBaseVNode("div", _hoisted_2, [
+          createVNode(_sfc_main$2),
+          createVNode(WorkExperience),
+          createVNode(ExamplesOfWork)
+        ]),
+        createVNode(ThemeSwitcher)
+      ]);
+    };
+  }
+});
+
+const HomeView = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-7858c441"]]);
+
+const routes = [{ path: "/", component: HomeView }];
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes
+});
+
+library$1.add(faPhone.faPhone, faAt.faAt, faTelegramPlane.faTelegramPlane, faLinkedin.faLinkedin);
+ViteSSG(_sfc_main$7, ({ app }) => {
+  app.component("font-awesome-icon", FontAwesomeIcon);
+  app.use(router);
+});
+//# sourceMappingURL=app-DagrBnyc.js.map
