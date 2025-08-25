@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="update;" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MaxNvk&quot;
+  }
+}</component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MaxNvk/maxnvk.github.io.git&quot;,
+    &quot;accountId&quot;: &quot;fb9be63e-656b-4f16-a458-bdb4188f2a22&quot;
+  }
+}</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2Hd6ratFNICt0MRAwbSNdpnHv8U" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/maxnovikov/work_folders/maxnvk.github.io&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/assets" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task id="LOCAL-00001" summary="update;">
+      <created>1661325257302</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1661325257302</updated>
+    </task>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="update;" />
+      <created>1668602812281</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1668602812281</updated>
+      <workItem from="1668602813766" duration="29000" />
+      <workItem from="1723925990080" duration="16000" />
+      <workItem from="1728376573473" duration="11000" />
+      <workItem from="1728376588553" duration="274000" />
+      <workItem from="1728376947223" duration="38000" />
+      <workItem from="1728378142040" duration="2492000" />
+      <workItem from="1739856650676" duration="37000" />
+      <workItem from="1740378145403" duration="29000" />
+      <workItem from="1741111732422" duration="571000" />
+      <workItem from="1741112423900" duration="1000" />
+      <workItem from="1741112838727" duration="83000" />
+      <workItem from="1741134784330" duration="45000" />
+      <workItem from="1741313078991" duration="60000" />
+    </task>
+    <task id="LOCAL-00002" summary="update;">
+      <created>1668602831537</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1668602831537</updated>
+    </task>
+    <task id="LOCAL-00003" summary="updated;">
+      <option name="closed" value="true" />
+      <created>1723926001033</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1723926001033</updated>
+    </task>
+    <task id="LOCAL-00004" summary="updated;">
+      <option name="closed" value="true" />
+      <created>1728376606386</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1728376606386</updated>
+    </task>
+    <task id="LOCAL-00005" summary="updated;">
+      <option name="closed" value="true" />
+      <created>1728376966763</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1728376966763</updated>
+    </task>
+    <task id="LOCAL-00006" summary="updated;">
+      <option name="closed" value="true" />
+      <created>1728378177007</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1728378177007</updated>
+    </task>
+    <task id="LOCAL-00007" summary="removed videos;">
+      <option name="closed" value="true" />
+      <created>1728378760266</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1728378760266</updated>
+    </task>
+    <task id="LOCAL-00008" summary="removed videos;">
+      <option name="closed" value="true" />
+      <created>1728379118548</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1728379118548</updated>
+    </task>
+    <task id="LOCAL-00009" summary="updated;">
+      <option name="closed" value="true" />
+      <created>1728379443592</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1728379443592</updated>
+    </task>
+    <task id="LOCAL-00010" summary="small fix;">
+      <option name="closed" value="true" />
+      <created>1739856681470</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1739856681470</updated>
+    </task>
+    <task id="LOCAL-00011" summary="updates;">
+      <option name="closed" value="true" />
+      <created>1740378166705</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1740378166705</updated>
+    </task>
+    <task id="LOCAL-00012" summary="test of canvas editor;">
+      <option name="closed" value="true" />
+      <created>1741111754776</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1741111754776</updated>
+    </task>
+    <task id="LOCAL-00013" summary="test of canvas editor;">
+      <option name="closed" value="true" />
+      <created>1741112916487</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1741112916487</updated>
+    </task>
+    <task id="LOCAL-00014" summary="update;">
+      <option name="closed" value="true" />
+      <created>1741134804274</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1741134804274</updated>
+    </task>
+    <task id="LOCAL-00015" summary="update;">
+      <option name="closed" value="true" />
+      <created>1741313135288</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1741313135288</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="removed videos;" />
+    <MESSAGE value="updated;" />
+    <MESSAGE value="small fix;" />
+    <MESSAGE value="updates;" />
+    <MESSAGE value="test of canvas editor;" />
+    <MESSAGE value="update;" />
+    <option name="LAST_COMMIT_MESSAGE" value="update;" />
+  </component>
+</project>
