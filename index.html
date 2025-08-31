@@ -5,8 +5,8 @@
     <link rel="icon" type="image/ico" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ask a Lawyer</title>
-    <script type="module" crossorigin src="/assets/index-9qSPwlGn.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BvWsqC9p.css">
+    <script type="module" crossorigin src="/assets/index-BkKm7Hi7.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CzcTgC3x.css">
   </head>
   <body>
     <header class="header tw-fixed tw-top-0 tw-left-0 tw-w-full tw-px-4 tw-z-20">
@@ -1118,22 +1118,8 @@
   </lawyer-chat-window-navbar>
 
   <lawyer-chat-window-chat>
-    <questions-progress class="tw-pt-6">
-      <div class="tw-flex tw-justify-between tw-mb-2">
-        <div class="tw-font-GeneralSans tw-text-xl">Intake Questions</div>
-
-        <div class="tw-text-xs tw-text-[#53535C] js-steps-counter"></div>
-      </div>
-      <!--      Just put the specific count of <div> elements equal the count of steps that you wanna count in the js-steps block -->
-      <div class="steps js-steps">
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    </questions-progress>
-
     <div class="lg:tw-hidden tw-flex tw-justify-between tw-items-center tw-py-2 tw-bg-[#EEF5FE]">
-      <button class="button button--icon">
+      <button class="button button--icon js-menu-button">
         <img src="data:image/svg+xml,%3csvg%20width='20'%20height='20'%20viewBox='0%200%2020%2020'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M15.7273%205H4.27273C3.56982%205%203%205.55964%203%206.25V13.75C3%2014.4404%203.56982%2015%204.27273%2015H15.7273C16.4302%2015%2017%2014.4404%2017%2013.75V6.25C17%205.55964%2016.4302%205%2015.7273%205Z'%20stroke='%2371717A'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3cpath%20d='M6.66699%2015L6.66659%205'%20stroke='%2371717A'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e" alt="" class="tw-w-5 tw-h-5 tw-mx-0.5" />
         <span class="tw-sr-only">Open Chat History</span>
       </button>
@@ -1148,9 +1134,75 @@
       </button>
     </div>
 
+    <questions-progress class="tw-pt-6">
+      <div class="tw-flex tw-justify-between tw-mb-2">
+        <div class="tw-font-GeneralSans tw-text-xl">Intake Questions</div>
+
+        <div class="tw-text-xs tw-text-[#53535C] js-steps-counter"></div>
+      </div>
+      <!--      Just put the specific count of <div> elements equal the count of steps that you wanna count in the js-steps block -->
+      <div class="steps js-steps">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </questions-progress>
+
     <div class="chat-window-chat__wrapper">
       <div class="chat-window-chat__content">
-        <p class="chat-window-chat__placeholder">What’s your legal question?</p>
+<!--        <p class="chat-window-chat__placeholder">What’s your legal question?</p>-->
+        <div class="chat-window-chat__message user">
+          <div class="chat-window-chat__message-text">
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+        <div class="chat-window-chat__message attorney">
+          <img src="/assets/chatbot-icon-D5cI5mDp.svg" alt="" class="tw-hidden lg:tw-block tw-w-9 tw-h-9 tw-flex-shrink-0 tw-mt-auto" />
+          <div class="chat-window-chat__message-text">
+            <p class="tw-text-[#71717A] tw-mb-0.5 tw-text-xs lg:tw-text-sm">Lexi, Chatbot</p>
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+
+        <div class="chat-window-chat__message user">
+          <div class="chat-window-chat__message-text">
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+        <div class="chat-window-chat__message attorney">
+          <img src="/assets/chatbot-icon-D5cI5mDp.svg" alt="" class="tw-hidden lg:tw-block tw-w-9 tw-h-9 tw-flex-shrink-0 tw-mt-auto" />
+          <div class="chat-window-chat__message-text">
+            <p class="tw-text-[#71717A] tw-mb-0.5 tw-text-xs lg:tw-text-sm">Lexi, Chatbot</p>
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+
+        <div class="chat-window-chat__message user">
+          <div class="chat-window-chat__message-text">
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+        <div class="chat-window-chat__message attorney">
+          <img src="/assets/chatbot-icon-D5cI5mDp.svg" alt="" class="tw-hidden lg:tw-block tw-w-9 tw-h-9 tw-flex-shrink-0 tw-mt-auto" />
+          <div class="chat-window-chat__message-text">
+            <p class="tw-text-[#71717A] tw-mb-0.5 tw-text-xs lg:tw-text-sm">Lexi, Chatbot</p>
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+
+        <div class="chat-window-chat__message user">
+          <div class="chat-window-chat__message-text">
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+        <div class="chat-window-chat__message attorney">
+          <img src="/assets/chatbot-icon-D5cI5mDp.svg" alt="" class="tw-hidden lg:tw-block tw-w-9 tw-h-9 tw-flex-shrink-0 tw-mt-auto" />
+          <div class="chat-window-chat__message-text">
+            <p class="tw-text-[#71717A] tw-mb-0.5 tw-text-xs lg:tw-text-sm">Lexi, Chatbot</p>
+            Hi, I’m planning to apply for a U.S. green card based on my marriage to a U.S. citizen. Could you walk me through the full process step-by-step, including what documents we’ll need to prepare, how long each stage usually takes, and what kind of evidence USCIS typically looks for to prove the marriage is genuine? I’m especially curious about what to expect during the interview, how to avoid common mistakes, and whether we should file everything at once (like the I-130 and I-485 together) or separately. Also, can you explain the difference in timelines or process if I’m applying from inside the U.S. vs. abroad?”
+          </div>
+        </div>
+
       </div>
     </div>
 
