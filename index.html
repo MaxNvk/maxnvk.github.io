@@ -5,8 +5,8 @@
     <link rel="icon" type="image/ico" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ask a Lawyer</title>
-    <script type="module" crossorigin src="/assets/index-BkKm7Hi7.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CzcTgC3x.css">
+    <script type="module" crossorigin src="/assets/index-VsvViPCB.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CrcScBQV.css">
   </head>
   <body>
     <header class="header tw-fixed tw-top-0 tw-left-0 tw-w-full tw-px-4 tw-z-20">
@@ -968,12 +968,16 @@
 
     <lawyer-chat-window>
   <lawyer-chat-window-navbar>
-    <a href="/">
+    <a href="/" class="tw-hidden lg:tw-block tw-w-max">
       <img src="/assets/chat-logo-BSlN1fG7.svg" alt="Ask a Lawyer Logo" class="tw-flex-shrink-0 tw-w-[168px]" loading="lazy" />
     </a>
+    <button class="button button--icon js-hide-navbar tw-mr-auto tw-flex-shrink-0">
+      <img src="data:image/svg+xml,%3csvg%20width='20'%20height='20'%20viewBox='0%200%2020%2020'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M2.5%2015.8337V4.16699'%20stroke='%2371717A'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3cpath%20d='M10.667%205.83301L6.50033%209.99967L10.667%2014.1663'%20stroke='%2371717A'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3cpath%20d='M6.5%2010H16.5'%20stroke='%2371717A'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e" alt="" loading="lazy" class="tw-w-5 tw-h-5 tw-mx-0.5" />
+      <span class="tw-sr-only">Hide Chat History</span>
+    </button>
 
     <div class="chat-window-navigation__wrapper">
-      <div class="chat-window-navigation__content">
+      <div class="chat-window-navigation__content" body-scroll-lock-ignore>
         <div class="tw-sticky tw-top-0 tw-left-0 tw-right-0 tw-bg-white tw-pb-1.5 tw-pr-4">
           <button class="chat-navigation-button">
             <img src="data:image/svg+xml,%3csvg%20width='20'%20height='20'%20viewBox='0%200%2020%2020'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M9.02636%201.875C7.12954%201.875%205.60742%203.38137%205.60742%205.22059V9.72675L7.08644%2010.5975L7.0861%205.86047C7.08608%205.68831%207.17866%205.52945%207.32846%205.44459L11.5469%203.05488C11.566%203.04409%2011.5851%203.03345%2011.6043%203.02297C10.9781%202.3202%2010.0564%201.875%209.02636%201.875Z'%20fill='%230E121B'/%3e%3cpath%20d='M16.9609%207.87624C17.2733%206.99186%2017.2068%205.98598%2016.6928%205.11245C15.7512%203.51212%2013.6576%202.95711%2012.0172%203.8864L8.04102%206.1388L8.04113%207.70978L12.2063%205.44107C12.3513%205.36208%2012.5268%205.36355%2012.6705%205.44494L16.889%207.83465C16.9132%207.84831%2016.9371%207.86219%2016.9609%207.87624Z'%20fill='%230E121B'/%3e%3cpath%20d='M8.04102%208.79814L8.04119%2011.16L9.95988%2012.2896L12.0065%2011.1748L12.0456%208.89139L10.0388%207.70996L8.04102%208.79814Z'%20fill='%230E121B'/%3e%3cpath%20d='M11.0176%207.1767L15.113%209.58771C15.2589%209.67354%2015.3485%209.83021%2015.3485%209.99954V14.779C15.3485%2014.8019%2015.3482%2014.8247%2015.3479%2014.8475C16.2927%2014.67%2017.1526%2014.1064%2017.6677%2013.2309C18.6062%2011.636%2018.0531%209.59246%2016.4177%208.66604L12.4303%206.40723L11.0176%207.1767Z'%20fill='%230E121B'/%3e%3cpath%20d='M12.994%209.44922L12.9134%2014.1476C12.9106%2014.3168%2012.8184%2014.4718%2012.6712%2014.5552L8.45265%2016.945C8.43398%2016.9556%208.41523%2016.966%208.39648%2016.9762C9.02257%2017.6796%209.94473%2018.1253%2010.9753%2018.1253C12.8722%2018.1253%2014.3942%2016.619%2014.3942%2014.7797V10.2736L12.994%209.44922Z'%20fill='%230E121B'/%3e%3cpath%20d='M11.9881%2012.274L7.79266%2014.5592C7.64764%2014.6382%207.47212%2014.6367%207.32843%2014.5553L3.10993%2012.1656C3.08523%2012.1516%203.06072%2012.1375%203.03639%2012.123C2.72386%2013.0075%202.79033%2014.0135%203.30438%2014.887C4.24605%2016.4874%206.33962%2017.0424%207.98008%2016.113L11.961%2013.858L11.9881%2012.274Z'%20fill='%230E121B'/%3e%3cpath%20d='M8.98208%2012.823L7.33792%2011.855C7.32715%2011.8492%207.31662%2011.843%207.30637%2011.8365L4.88661%2010.4119C4.74071%2010.326%204.65113%2010.1694%204.65113%2010V5.22063C4.65113%205.19782%204.65132%205.17506%204.65167%205.15234C3.70671%205.32968%202.84673%205.89337%202.33148%206.76902C1.39302%208.36387%201.94617%2010.4075%203.58149%2011.3339L7.56895%2013.5926L8.98208%2012.823Z'%20fill='%230E121B'/%3e%3c/svg%3e" alt="" loading="lazy" />
@@ -1134,7 +1138,7 @@
       </button>
     </div>
 
-    <questions-progress class="tw-pt-6">
+    <questions-progress class="tw-pt-6 tw-flex-shrink-0" steps="3" current-step="1">
       <div class="tw-flex tw-justify-between tw-mb-2">
         <div class="tw-font-GeneralSans tw-text-xl">Intake Questions</div>
 
@@ -1142,14 +1146,12 @@
       </div>
       <!--      Just put the specific count of <div> elements equal the count of steps that you wanna count in the js-steps block -->
       <div class="steps js-steps">
-        <div></div>
-        <div></div>
-        <div></div>
+        <!--        JS creates steps regarding to steps attribute and fills them with blue color regarding to current-step attribute-->
       </div>
     </questions-progress>
 
     <div class="chat-window-chat__wrapper">
-      <div class="chat-window-chat__content">
+      <div class="chat-window-chat__content" body-scroll-lock-ignore>
 <!--        <p class="chat-window-chat__placeholder">What’s your legal question?</p>-->
         <div class="chat-window-chat__message user">
           <div class="chat-window-chat__message-text">
@@ -1220,7 +1222,7 @@
             src="data:image/webp;base64,UklGRvgAAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSG4AAAABHyAQIKz5n3FgIyKCE4xi226Ssv9+vpA0sBA78fElYCZaLh2WEf1X27YNo0yBMtUj3FmxRcKE6Eqsk0weEUxKgiglicSaSPT/IBKEIhMZkUjCcHK0RLmR3KdDfbTPN3yHfKd4x0fv3GTHnzgpHFZQOCBkAAAAcAUAnQEqQABAAD51LJBIJKKhoT3oAJAOiWkAFSABSlKHLikAWbHDI1Z71r1TtnqJPDBWmAD++0Itv//WoofltL3/fAoUv//1qJsA+fjVA/f/gT3f9gT//60/Cf/gUEX/VQQAAA=="
             alt="arrow-right"
             loading="lazy"
-            class="tw-w-4 tw-mx-[3px]"
+            class="tw-w-4 tw-mx-[3px] tw-transform tw--rotate-90"
           >
         </button>
       </div>
