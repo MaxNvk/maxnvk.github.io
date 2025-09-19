@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="minor updates;" />
+    <list default="true" id="32cd98c0-4ed4-4db5-8571-7330f473340d" name="Changes" comment="modals;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,6 +118,7 @@
       <workItem from="1757219959630" duration="40000" />
       <workItem from="1757220794381" duration="147000" />
       <workItem from="1757221438875" duration="18000" />
+      <workItem from="1757702191194" duration="82000" />
     </task>
     <task id="LOCAL-00002" summary="update;">
       <created>1668602831537</created>
@@ -374,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757221453215</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="modals;">
+      <option name="closed" value="true" />
+      <created>1757702268579</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1757702268579</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -399,6 +408,7 @@
     <MESSAGE value="test of canvas editor;" />
     <MESSAGE value="update;" />
     <MESSAGE value="minor updates;" />
-    <option name="LAST_COMMIT_MESSAGE" value="minor updates;" />
+    <MESSAGE value="modals;" />
+    <option name="LAST_COMMIT_MESSAGE" value="modals;" />
   </component>
 </project>
